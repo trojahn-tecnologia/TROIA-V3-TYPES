@@ -143,6 +143,7 @@ export interface LeadQuery extends PaginationQuery {
         segment?: string | string[];
         source?: ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api') | ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api')[];
         origin?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
+        suborigin?: string;
         channelId?: string | string[];
         status?: ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost') | ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost')[];
         priority?: ('low' | 'medium' | 'high' | 'urgent') | ('low' | 'medium' | 'high' | 'urgent')[];

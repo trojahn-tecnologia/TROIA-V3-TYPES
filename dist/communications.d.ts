@@ -52,6 +52,7 @@ export interface MessageData {
         emoji: string;
         targetMessageId: string;
     };
+    interactiveData?: Record<string, unknown>;
 }
 export interface WebhookData {
     url: string;

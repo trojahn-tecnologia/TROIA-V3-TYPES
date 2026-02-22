@@ -1,5 +1,5 @@
 import { TenantAwareDocument, PaginationQuery, ListResponse } from './common';
-export type WebsiteFieldType = 'text' | 'textarea' | 'richtext' | 'number' | 'boolean' | 'select' | 'color' | 'image' | 'images' | 'url' | 'reference' | 'list' | 'object';
+export type WebsiteFieldType = 'text' | 'textarea' | 'richtext' | 'number' | 'boolean' | 'select' | 'multiselect' | 'color' | 'image' | 'images' | 'url' | 'reference' | 'list' | 'object';
 export interface ComponentFieldDefinition {
     name: string;
     label: string;

@@ -12,6 +12,7 @@ export type WebsiteFieldType =
   | 'number'
   | 'boolean'
   | 'select'
+  | 'multiselect'
   | 'color'
   | 'image'
   | 'images'

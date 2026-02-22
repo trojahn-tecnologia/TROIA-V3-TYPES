@@ -68,7 +68,44 @@ export interface SystemContent {
     action: 'conversation_started' | 'conversation_ended' | 'user_joined' | 'user_left' | 'assignment_changed' | 'status_changed';
     details?: Record<string, any>;
 }
-export type MessageContent = TextContent | ImageContent | VideoContent | AudioContent | DocumentContent | LocationContent | ContactContent | LinkContent | ReactionContent | SystemContent;
+export interface ButtonItem {
+    id: string;
+    text: string;
+}
+export interface ButtonsContent {
+    type: 'buttons';
+    text: string;
+    footer?: string;
+    buttons: ButtonItem[];
+}
+export interface ListSection {
+    title: string;
+    rows: Array<{
+        id: string;
+        title: string;
+        description?: string;
+    }>;
+}
+export interface ListContent {
+    type: 'list';
+    text: string;
+    title?: string;
+    buttonText: string;
+    footer?: string;
+    sections: ListSection[];
+}
+export interface TemplateButton {
+    type: 'url' | 'quick_reply' | 'call';
+    text: string;
+    url?: string;
+    phoneNumber?: string;
+}
+export interface TemplateContent {
+    type: 'template';
+    text: string;
+    buttons: TemplateButton[];
+}
+export type MessageContent = TextContent | ImageContent | VideoContent | AudioContent | DocumentContent | LocationContent | ContactContent | LinkContent | ReactionContent | SystemContent | ButtonsContent | ListContent | TemplateContent;
 export interface Sender {
     id: string;
     name: string;
@@ -196,7 +233,7 @@ export interface ConversationMessageQuery extends PaginationQuery {
         senderType?: 'contact' | 'user' | 'system' | 'ai' | 'automation' | 'automation-follow';
         senderId?: string;
         status?: 'sent' | 'delivered' | 'read' | 'failed' | 'pending';
-        contentType?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'link' | 'reaction' | 'system';
+        contentType?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'link' | 'reaction' | 'system' | 'buttons' | 'list' | 'template';
         isInternal?: boolean;
         isEdited?: boolean;
         isDeleted?: boolean;
