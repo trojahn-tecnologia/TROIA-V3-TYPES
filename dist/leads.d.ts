@@ -105,6 +105,7 @@ export interface LeadResponse extends Lead {
     contact?: {
         id: string;
         name: string;
+        picture?: string;
         tags?: string[];
         identifiers?: {
             email?: string[];
