@@ -21,6 +21,8 @@ export interface LeadRoutingRule {
   description?: string;
   funnelId: string;
   assigneeId: string;
+  assigneeIds: string[];
+  lastAssignedUserId?: string;
   conditions: LeadRoutingCondition[];
   priority: number;
   status: ActiveStatus;
@@ -39,7 +41,8 @@ export interface CreateLeadRoutingRuleRequest {
   name: string;
   description?: string;
   funnelId: string;
-  assigneeId: string;
+  assigneeId?: string;
+  assigneeIds?: string[];
   conditions: LeadRoutingCondition[];
   priority: number;
 }
@@ -49,8 +52,18 @@ export interface UpdateLeadRoutingRuleRequest {
   description?: string;
   funnelId?: string;
   assigneeId?: string;
+  assigneeIds?: string[];
   conditions?: LeadRoutingCondition[];
   priority?: number;
+}
+
+/**
+ * Result of evaluating routing rules against lead data
+ */
+export interface LeadRoutingEvaluationResult {
+  assigneeId: string;
+  ruleId: string;
+  ruleName: string;
 }
 
 export interface LeadRoutingRuleQuery extends PaginationQuery {
