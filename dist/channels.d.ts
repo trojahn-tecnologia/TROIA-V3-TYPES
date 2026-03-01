@@ -39,6 +39,18 @@ export interface ChannelLotteryConfig extends CoreLotteryConfig {
     /** Escopo do lottery: apenas usuários, apenas equipes, ou ambos */
     scope?: 'team' | 'user' | 'both';
 }
+export interface EmailChannelConfig {
+    domainId: string;
+    emailAddress: string;
+    displayName: string;
+    signature?: string;
+    autoCreateTicket?: boolean;
+    ticketCategory?: string;
+    ticketPriority?: string;
+    ticketTeamId?: string;
+    autoReplyEnabled?: boolean;
+    autoReplyMessage?: string;
+}
 export interface ChannelProvider {
     name: string;
     categories: string[];

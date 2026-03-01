@@ -62,6 +62,23 @@ export interface ChannelLotteryConfig extends CoreLotteryConfig {
 }
 
 // ============================================================================
+// EMAIL CHANNEL CONFIG (for email-resend provider)
+// ============================================================================
+
+export interface EmailChannelConfig {
+  domainId: string;
+  emailAddress: string;
+  displayName: string;
+  signature?: string;
+  autoCreateTicket?: boolean;
+  ticketCategory?: string;
+  ticketPriority?: string;
+  ticketTeamId?: string;
+  autoReplyEnabled?: boolean;
+  autoReplyMessage?: string;
+}
+
+// ============================================================================
 // CHANNEL PROVIDER TYPES (CompanyIntegration defined in company-integrations.ts)
 // ============================================================================
 

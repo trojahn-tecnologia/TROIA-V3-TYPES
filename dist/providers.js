@@ -10,6 +10,7 @@ var ProviderId;
     ProviderId["EMAIL_SMTP"] = "email-smtp";
     ProviderId["EMAIL_SENDGRID"] = "email-sendgrid";
     ProviderId["EMAIL_SES"] = "email-ses";
+    ProviderId["EMAIL_RESEND"] = "email-resend";
     ProviderId["GMAIL_API"] = "gmail-api";
     // Messaging Providers
     ProviderId["WHATSAPP_BUSINESS"] = "whatsapp-business";
@@ -47,6 +48,7 @@ var ProviderId;
     ProviderId["AI_ELEVENLABS"] = "ai-elevenlabs";
     // Database Providers (Properties, Real Estate, etc.)
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
+    ProviderId["DATABASE_DWV"] = "database-dwv";
     // Meta Platform (Unified Meta services)
     ProviderId["META"] = "meta";
 })(ProviderId || (exports.ProviderId = ProviderId = {}));
@@ -142,5 +144,10 @@ var ProviderCapability;
     ProviderCapability["DELETE_PROPERTY"] = "delete_property";
     // Meta Platform Capabilities
     ProviderCapability["SOCIAL_LOGIN"] = "social_login";
-    ProviderCapability["WHATSAPP_EMBEDDED_SIGNUP"] = "whatsapp_embedded_signup"; // WhatsApp Business Embedded Signup flow
+    ProviderCapability["WHATSAPP_EMBEDDED_SIGNUP"] = "whatsapp_embedded_signup";
+    // Voice Cloning capabilities
+    ProviderCapability["VOICE_CLONING"] = "voice_cloning";
+    // Batch & Domain Management capabilities
+    ProviderCapability["BATCH_SEND"] = "batch_send";
+    ProviderCapability["DOMAIN_MANAGEMENT"] = "domain_management"; // Manage email domains (DNS, verification)
 })(ProviderCapability || (exports.ProviderCapability = ProviderCapability = {}));

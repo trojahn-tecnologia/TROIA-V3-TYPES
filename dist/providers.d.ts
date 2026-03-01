@@ -90,6 +90,10 @@ export interface JetimobConfig {
     apiKey: string;
     syncInterval?: number;
 }
+export interface DwvConfig {
+    token: string;
+    syncInterval?: number;
+}
 export interface MetaConfig {
     appId: string;
     appSecret: string;
@@ -97,7 +101,13 @@ export interface MetaConfig {
     graphApiVersion: string;
     systemUserAccessToken?: string;
 }
-export type ProviderConfig = SmtpConfig | SendGridConfig | WhatsAppConfig | FacebookMessengerConfig | TelegramConfig | TwilioSmsConfig | WebhookConfig | InstagramConfig | LinkedInConfig | TikTokConfig | GmailConfig | GatewayConfig | GoogleCalendarConfig | FirebaseConfig | OneSignalConfig | ElevenLabsConfig | JetimobConfig | MetaConfig;
+export interface ResendConfig {
+    apiKey: string;
+    defaultRegion?: string;
+    webhookSecret?: string;
+    webhookId?: string;
+}
+export type ProviderConfig = SmtpConfig | SendGridConfig | WhatsAppConfig | FacebookMessengerConfig | TelegramConfig | TwilioSmsConfig | WebhookConfig | InstagramConfig | LinkedInConfig | TikTokConfig | GmailConfig | GatewayConfig | GoogleCalendarConfig | FirebaseConfig | OneSignalConfig | ElevenLabsConfig | JetimobConfig | DwvConfig | MetaConfig | ResendConfig;
 export interface ProviderCredentials {
     accessToken?: string;
     refreshToken?: string;
@@ -161,6 +171,7 @@ export declare enum ProviderId {
     EMAIL_SMTP = "email-smtp",
     EMAIL_SENDGRID = "email-sendgrid",
     EMAIL_SES = "email-ses",
+    EMAIL_RESEND = "email-resend",
     GMAIL_API = "gmail-api",
     WHATSAPP_BUSINESS = "whatsapp-business",
     FACEBOOK_MESSENGER = "facebook-messenger",
@@ -191,6 +202,7 @@ export declare enum ProviderId {
     AI_DEEPSEEK = "ai-deepseek",
     AI_ELEVENLABS = "ai-elevenlabs",
     DATABASE_JETIMOB = "database-jetimob",
+    DATABASE_DWV = "database-dwv",
     META = "meta"
 }
 export declare enum ProviderCapability {
@@ -260,7 +272,10 @@ export declare enum ProviderCapability {
     UPDATE_PROPERTY = "update_property",// Update property in external system
     DELETE_PROPERTY = "delete_property",// Delete property from external system
     SOCIAL_LOGIN = "social_login",// OAuth social login (Facebook, Instagram)
-    WHATSAPP_EMBEDDED_SIGNUP = "whatsapp_embedded_signup"
+    WHATSAPP_EMBEDDED_SIGNUP = "whatsapp_embedded_signup",// WhatsApp Business Embedded Signup flow
+    VOICE_CLONING = "voice_cloning",// Clone custom voices (ElevenLabs, etc.)
+    BATCH_SEND = "batch_send",// Send emails/messages in batch
+    DOMAIN_MANAGEMENT = "domain_management"
 }
 export interface BaseIntegrationRequest {
     name: string;
@@ -311,7 +326,12 @@ export interface CreateMetaIntegrationRequest extends BaseIntegrationRequest {
     config: MetaConfig;
     credentials?: ProviderCredentials;
 }
-export type CreateProviderIntegrationRequest = CreateSmtpIntegrationRequest | CreateSendGridIntegrationRequest | CreateWhatsAppIntegrationRequest | CreateFacebookMessengerIntegrationRequest | CreateTelegramIntegrationRequest | CreateWebhookIntegrationRequest | CreateGatewayIntegrationRequest | CreateGoogleCalendarIntegrationRequest | CreateMetaIntegrationRequest;
+export interface CreateResendIntegrationRequest extends BaseIntegrationRequest {
+    providerId: ProviderId.EMAIL_RESEND;
+    config: ResendConfig;
+    credentials?: ProviderCredentials;
+}
+export type CreateProviderIntegrationRequest = CreateSmtpIntegrationRequest | CreateSendGridIntegrationRequest | CreateWhatsAppIntegrationRequest | CreateFacebookMessengerIntegrationRequest | CreateTelegramIntegrationRequest | CreateWebhookIntegrationRequest | CreateGatewayIntegrationRequest | CreateGoogleCalendarIntegrationRequest | CreateMetaIntegrationRequest | CreateResendIntegrationRequest;
 export interface Provider {
     _id?: ObjectId;
     name: string;

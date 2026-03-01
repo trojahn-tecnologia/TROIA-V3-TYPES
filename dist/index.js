@@ -40,6 +40,8 @@ __exportStar(require("./email-templates"), exports);
 __exportStar(require("./providers"), exports);
 __exportStar(require("./gateway"), exports);
 __exportStar(require("./ai"), exports);
+// Email domains module (Resend integration)
+__exportStar(require("./email-domains"), exports);
 // Queue system (shared between Backend & Gateway)
 __exportStar(require("./queue-jobs"), exports);
 // Validation utilities (shared between Gateway & Backend)
@@ -89,3 +91,5 @@ __exportStar(require("./workflow-node-schemas"), exports);
 __exportStar(require("./crm-reports"), exports);
 // Websites module (website builder)
 __exportStar(require("./websites"), exports);
+// Voices module (voice cloning for AI agents)
+__exportStar(require("./voices"), exports);

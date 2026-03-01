@@ -113,12 +113,24 @@ export interface JetimobConfig {
   syncInterval?: number;     // Intervalo de sincronização em minutos (default: 60)
 }
 
+export interface DwvConfig {
+  token: string;             // DWV API Token (header authentication)
+  syncInterval?: number;     // Intervalo de sincronização em minutos (default: 60)
+}
+
 export interface MetaConfig {
   appId: string;             // Meta App ID
   appSecret: string;         // Meta App Secret
   configId?: string;         // WhatsApp Embedded Signup Config ID (optional, for WABA signup)
   graphApiVersion: string;   // Graph API version (e.g., 'v21.0')
   systemUserAccessToken?: string; // SUAT - fallback token when code exchange token has insufficient scopes
+}
+
+export interface ResendConfig {
+  apiKey: string;              // Resend API Key
+  defaultRegion?: string;      // Default region for domains (e.g., 'us-east-1')
+  webhookSecret?: string;      // Svix webhook signing secret (auto-set on integration creation)
+  webhookId?: string;          // Resend webhook ID (auto-set on integration creation)
 }
 
 // ============================================================================
@@ -143,7 +155,9 @@ export type ProviderConfig =
   | OneSignalConfig
   | ElevenLabsConfig
   | JetimobConfig
-  | MetaConfig;
+  | DwvConfig
+  | MetaConfig
+  | ResendConfig;
 
 // ============================================================================
 // PROVIDER CREDENTIALS (OAuth tokens, etc.)
@@ -242,6 +256,7 @@ export enum ProviderId {
   EMAIL_SMTP = 'email-smtp',
   EMAIL_SENDGRID = 'email-sendgrid',
   EMAIL_SES = 'email-ses',
+  EMAIL_RESEND = 'email-resend',
   GMAIL_API = 'gmail-api',
 
   // Messaging Providers
@@ -286,6 +301,7 @@ export enum ProviderId {
 
   // Database Providers (Properties, Real Estate, etc.)
   DATABASE_JETIMOB = 'database-jetimob',
+  DATABASE_DWV = 'database-dwv',
 
   // Meta Platform (Unified Meta services)
   META = 'meta'
@@ -403,7 +419,14 @@ export enum ProviderCapability {
 
   // Meta Platform Capabilities
   SOCIAL_LOGIN = 'social_login',                        // OAuth social login (Facebook, Instagram)
-  WHATSAPP_EMBEDDED_SIGNUP = 'whatsapp_embedded_signup' // WhatsApp Business Embedded Signup flow
+  WHATSAPP_EMBEDDED_SIGNUP = 'whatsapp_embedded_signup', // WhatsApp Business Embedded Signup flow
+
+  // Voice Cloning capabilities
+  VOICE_CLONING = 'voice_cloning',               // Clone custom voices (ElevenLabs, etc.)
+
+  // Batch & Domain Management capabilities
+  BATCH_SEND = 'batch_send',                     // Send emails/messages in batch
+  DOMAIN_MANAGEMENT = 'domain_management'        // Manage email domains (DNS, verification)
 }
 
 // ============================================================================
@@ -469,6 +492,12 @@ export interface CreateMetaIntegrationRequest extends BaseIntegrationRequest {
   credentials?: ProviderCredentials;
 }
 
+export interface CreateResendIntegrationRequest extends BaseIntegrationRequest {
+  providerId: ProviderId.EMAIL_RESEND;
+  config: ResendConfig;
+  credentials?: ProviderCredentials;
+}
+
 // ============================================================================
 // UNION TYPE FOR TYPED INTEGRATION REQUESTS
 // ============================================================================
@@ -482,7 +511,8 @@ export type CreateProviderIntegrationRequest =
   | CreateWebhookIntegrationRequest
   | CreateGatewayIntegrationRequest
   | CreateGoogleCalendarIntegrationRequest
-  | CreateMetaIntegrationRequest;
+  | CreateMetaIntegrationRequest
+  | CreateResendIntegrationRequest;
 
 // ============================================================================
 // PROVIDER ENTITY (Database schema)

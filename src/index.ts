@@ -28,6 +28,9 @@ export * from './providers';
 export * from './gateway';
 export * from './ai';
 
+// Email domains module (Resend integration)
+export * from './email-domains';
+
 // Queue system (shared between Backend & Gateway)
 export * from './queue-jobs';
 
@@ -93,3 +96,6 @@ export * from './crm-reports';
 
 // Websites module (website builder)
 export * from './websites';
+
+// Voices module (voice cloning for AI agents)
+export * from './voices';
