@@ -211,6 +211,7 @@ export interface UnreadCountUpdateEvent {
         ai: number;
         individual: number;
         group: number;
+        email: number;
     };
     timestamp: string;
 }

@@ -267,6 +267,7 @@ export interface UnreadCountUpdateEvent {
     ai: number;                // AI agent conversations (agentId + agentStatus: 'active')
     individual: number;        // Individual chats (contactId + no groupId + no active agent)
     group: number;             // Group conversations (groupId)
+    email: number;             // Email conversations (source: 'email')
   };
   timestamp: string;           // ISO timestamp of update
 }

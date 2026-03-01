@@ -43,7 +43,11 @@ export interface Lead {
     lastFollowUpAt?: string;
     lastStepAt?: string;
     lastActivityAt?: string;
+    campaignName?: string;
+    adsetName?: string;
+    adName?: string;
     lostReason?: string;
+    interests?: LeadInterest[];
     createdAt: string;
     updatedAt: string;
 }
@@ -179,5 +183,13 @@ export interface AssignLeadRequest {
     assigneeId?: string;
     teamId?: string;
     assignmentType?: string;
+}
+export interface LeadInterest {
+    documentId: string;
+    status: 'pending' | 'approved';
+    addedAt?: string;
+}
+export interface AddLeadInterestsRequest {
+    documentIds: string[];
 }
 import { PaginationQuery, ListResponse } from './common';

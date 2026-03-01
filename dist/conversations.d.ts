@@ -141,6 +141,7 @@ export interface ConversationQuery extends PaginationQuery {
         conversationType?: 'individual' | 'group' | 'ai';
         providerId?: string;
         source?: string;
+        excludeSource?: string;
         customerId?: string;
         contactId?: string;
         leadId?: string;
@@ -150,6 +151,7 @@ export interface ConversationQuery extends PaginationQuery {
         teamId?: string;
         category?: string;
         tags?: string[];
+        conversationTags?: string[];
         hasUnreadMessages?: boolean;
         createdFrom?: string;
         createdTo?: string;

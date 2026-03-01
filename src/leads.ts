@@ -71,8 +71,16 @@ export interface Lead {
   lastStepAt?: string;
   lastActivityAt?: string;
 
+  // Campaign/Ad tracking
+  campaignName?: string;
+  adsetName?: string;
+  adName?: string;
+
   // Loss/disqualification reasons
   lostReason?: string;
+
+  // Interests - Database documents the lead is interested in
+  interests?: LeadInterest[];
 
   createdAt: string;
   updatedAt: string;
@@ -222,6 +230,17 @@ export interface AssignLeadRequest {
   assigneeId?: string;
   teamId?: string;
   assignmentType?: string;
+}
+
+// Lead interests
+export interface LeadInterest {
+  documentId: string;
+  status: 'pending' | 'approved';
+  addedAt?: string;
+}
+
+export interface AddLeadInterestsRequest {
+  documentIds: string[];
 }
 
 // Import types

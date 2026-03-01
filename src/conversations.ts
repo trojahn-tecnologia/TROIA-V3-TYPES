@@ -196,6 +196,7 @@ export interface ConversationQuery extends PaginationQuery {
     conversationType?: 'individual' | 'group' | 'ai';  // ✅ Virtual filter: 'ai' = agentId EXISTS AND agentStatus='active'
     providerId?: string;  // ✅ Filter by provider (via channel → integration → provider)
     source?: string;
+    excludeSource?: string;
     customerId?: string;
     contactId?: string;  // ✅ Filter by contactId (ObjectId)
     leadId?: string;
@@ -205,6 +206,7 @@ export interface ConversationQuery extends PaginationQuery {
     teamId?: string;
     category?: string;
     tags?: string[];
+    conversationTags?: string[];
     hasUnreadMessages?: boolean;
     createdFrom?: string;
     createdTo?: string;
