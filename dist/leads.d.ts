@@ -68,6 +68,9 @@ export interface CreateLeadRequest {
     assigneeId?: string;
     teamId?: string;
     budget?: number;
+    campaignName?: string;
+    adsetName?: string;
+    adName?: string;
     name?: string;
     company?: string;
     position?: string;
@@ -104,6 +107,9 @@ export interface UpdateLeadRequest {
     lastInteractionAt?: string;
     lastFollowUpAt?: string;
     lastStepAt?: string;
+    campaignName?: string;
+    adsetName?: string;
+    adName?: string;
 }
 export interface LeadResponse extends Lead {
     contact?: {

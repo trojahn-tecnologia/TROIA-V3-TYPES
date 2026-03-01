@@ -104,6 +104,11 @@ export interface CreateLeadRequest {
   teamId?: string;
   budget?: number;
 
+  // Campaign/Ad tracking
+  campaignName?: string;
+  adsetName?: string;
+  adName?: string;
+
   // ✅ NEW: Contact data for automatic contact creation (if contactId not provided)
   name?: string;
   company?: string;
@@ -144,6 +149,9 @@ export interface UpdateLeadRequest {
   lastInteractionAt?: string;
   lastFollowUpAt?: string;
   lastStepAt?: string;
+  campaignName?: string;
+  adsetName?: string;
+  adName?: string;
 }
 
 export interface LeadResponse extends Lead {
