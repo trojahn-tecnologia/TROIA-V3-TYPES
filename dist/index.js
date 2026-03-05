@@ -58,6 +58,8 @@ __exportStar(require("./contacts"), exports);
 __exportStar(require("./customers"), exports);
 __exportStar(require("./leads"), exports);
 __exportStar(require("./funnels"), exports);
+// Ticket Pipelines & Stages
+__exportStar(require("./ticket-pipelines"), exports);
 // Phase 2: Advanced customer service modules
 __exportStar(require("./tickets"), exports);
 __exportStar(require("./conversations"), exports);
@@ -93,3 +95,5 @@ __exportStar(require("./crm-reports"), exports);
 __exportStar(require("./websites"), exports);
 // Voices module (voice cloning for AI agents)
 __exportStar(require("./voices"), exports);
+// Forms module (public form builder)
+__exportStar(require("./forms"), exports);

@@ -159,6 +159,7 @@ export interface ConversationMessage {
   // Message content
   content: MessageContent[];
   plainText?: string; // Extracted text for search/indexing
+  html?: string; // Original HTML body (email messages)
 
   // Message metadata
   direction: 'inbound' | 'outbound';

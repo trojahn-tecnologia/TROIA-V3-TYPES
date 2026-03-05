@@ -1,3 +1,4 @@
+import { TicketStatusCategory } from './ticket-pipelines';
 export interface Ticket {
     id: string;
     appId: string;
@@ -5,10 +6,13 @@ export interface Ticket {
     ticketNumber: string;
     title: string;
     description?: string;
-    status: 'open' | 'pending' | 'paused' | 'resolved' | 'closed' | 'canceled';
+    status: string;
     priority: 'low' | 'medium' | 'high' | 'urgent';
     category: string;
     tags: string[];
+    pipelineId: string;
+    stageId: string;
+    statusCategory: TicketStatusCategory;
     customerId?: string;
     contactId?: string;
     leadId?: string;
@@ -41,6 +45,8 @@ export interface CreateTicketRequest {
     priority?: 'low' | 'medium' | 'high' | 'urgent';
     category: string;
     tags?: string[];
+    pipelineId?: string;
+    stageId?: string;
     customerId?: string;
     contactId?: string;
     leadId?: string;
@@ -55,12 +61,13 @@ export interface CreateTicketRequest {
 export interface UpdateTicketRequest {
     title?: string;
     description?: string;
-    status?: 'open' | 'pending' | 'paused' | 'resolved' | 'closed' | 'canceled';
+    status?: string;
     statusReason?: string;
     resolution?: string;
     priority?: 'low' | 'medium' | 'high' | 'urgent';
     category?: string;
     tags?: string[];
+    stageId?: string;
     customerId?: string;
     contactId?: string;
     leadId?: string;
@@ -75,10 +82,13 @@ export type TicketResponse = Ticket;
 export interface TicketQuery extends PaginationQuery {
     filters?: {
         title?: string;
-        status?: 'open' | 'pending' | 'paused' | 'resolved' | 'closed' | 'canceled';
+        status?: string;
         priority?: 'low' | 'medium' | 'high' | 'urgent';
         category?: string;
         tags?: string[];
+        pipelineId?: string;
+        stageId?: string;
+        statusCategory?: TicketStatusCategory;
         customerId?: string;
         contactId?: string;
         leadId?: string;

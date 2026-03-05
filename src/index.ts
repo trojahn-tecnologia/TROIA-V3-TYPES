@@ -53,6 +53,9 @@ export * from './customers';
 export * from './leads';
 export * from './funnels';
 
+// Ticket Pipelines & Stages
+export * from './ticket-pipelines';
+
 // Phase 2: Advanced customer service modules
 export * from './tickets';
 export * from './conversations';
@@ -99,3 +102,6 @@ export * from './websites';
 
 // Voices module (voice cloning for AI agents)
 export * from './voices';
+
+// Forms module (public form builder)
+export * from './forms';

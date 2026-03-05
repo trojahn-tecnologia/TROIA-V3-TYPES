@@ -119,6 +119,7 @@ export interface ConversationMessage {
     conversationId: string;
     content: MessageContent[];
     plainText?: string;
+    html?: string;
     direction: 'inbound' | 'outbound';
     messageType: 'user' | 'system' | 'ai' | 'automation';
     sender?: Sender;

@@ -67,7 +67,10 @@ export type ValidModuleId =
   | 'databases'
   | 'workflows'
   | 'websites'
-  | 'voices';
+  | 'voices'
+  | 'forms'
+  | 'ticket-pipelines'
+  | 'ticket-stages';
 
 export interface Module extends AppAwareDocument {
   name: string; // "users", "crm", "teams", "chat", "reports"
