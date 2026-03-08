@@ -28,7 +28,7 @@ export interface Lead {
 
   // Universal source + channel + origin
   source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-  origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+  channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
   channelId?: string;
 
   // Status and temperature
@@ -71,10 +71,19 @@ export interface Lead {
   lastStepAt?: string;
   lastActivityAt?: string;
 
+  // Origin (free-text classification)
+  origin?: string;
+
   // Campaign/Ad tracking
   campaignName?: string;
   adsetName?: string;
   adName?: string;
+
+  // External tracking (from public endpoint / webhooks)
+  formId?: string;
+  externalLeadId?: string;
+  pageId?: string;
+  pageName?: string;
 
   // Loss/disqualification reasons
   lostReason?: string;
@@ -92,7 +101,7 @@ export interface CreateLeadRequest {
   segment: string;
   description?: string;
   source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-  origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+  channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
   channelId?: string;
   status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
   priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -104,10 +113,19 @@ export interface CreateLeadRequest {
   teamId?: string;
   budget?: number;
 
+  // Origin (free-text)
+  origin?: string;
+
   // Campaign/Ad tracking
   campaignName?: string;
   adsetName?: string;
   adName?: string;
+
+  // External tracking
+  formId?: string;
+  externalLeadId?: string;
+  pageId?: string;
+  pageName?: string;
 
   // ✅ NEW: Contact data for automatic contact creation (if contactId not provided)
   name?: string;
@@ -123,7 +141,7 @@ export interface UpdateLeadRequest {
   segment?: string;
   description?: string;
   source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-  origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+  channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
   channelId?: string;
   status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
   priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -149,9 +167,14 @@ export interface UpdateLeadRequest {
   lastInteractionAt?: string;
   lastFollowUpAt?: string;
   lastStepAt?: string;
+  origin?: string;
   campaignName?: string;
   adsetName?: string;
   adName?: string;
+  formId?: string;
+  externalLeadId?: string;
+  pageId?: string;
+  pageName?: string;
 }
 
 export interface LeadResponse extends Lead {
@@ -179,7 +202,7 @@ export interface LeadResponse extends Lead {
     id: string;
     name: string;
   };
-  channel?: {
+  channelConfig?: {
     id: string;
     name: string;
   };
@@ -198,8 +221,8 @@ export interface LeadQuery extends PaginationQuery {
     contactId?: string;
     segment?: string | string[];                                                                                                    // Multiple selection
     source?: ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api') | ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api')[];
-    origin?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
-    suborigin?: string | string[];
+    channel?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
+    origin?: string | string[];
     channelId?: string | string[];                                                                                                  // Multiple selection
     status?: ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost') | ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost')[];
     priority?: ('low' | 'medium' | 'high' | 'urgent') | ('low' | 'medium' | 'high' | 'urgent')[];

@@ -87,8 +87,8 @@ export interface LeadConversionResponse {
     value: number;
     conversionRate: number;
   }>;
-  byOrigin: Array<{
-    origin: string;
+  byChannel: Array<{
+    channel: string;
     count: number;
     won: number;
     lost: number;

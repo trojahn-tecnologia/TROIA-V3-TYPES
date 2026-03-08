@@ -18,7 +18,7 @@ export interface Lead {
     segment: string;
     description?: string;
     source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
     channelId?: string;
     status: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority: 'low' | 'medium' | 'high' | 'urgent';
@@ -43,9 +43,14 @@ export interface Lead {
     lastFollowUpAt?: string;
     lastStepAt?: string;
     lastActivityAt?: string;
+    origin?: string;
     campaignName?: string;
     adsetName?: string;
     adName?: string;
+    formId?: string;
+    externalLeadId?: string;
+    pageId?: string;
+    pageName?: string;
     lostReason?: string;
     interests?: LeadInterest[];
     createdAt: string;
@@ -57,7 +62,7 @@ export interface CreateLeadRequest {
     segment: string;
     description?: string;
     source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
     channelId?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -68,9 +73,14 @@ export interface CreateLeadRequest {
     assigneeId?: string;
     teamId?: string;
     budget?: number;
+    origin?: string;
     campaignName?: string;
     adsetName?: string;
     adName?: string;
+    formId?: string;
+    externalLeadId?: string;
+    pageId?: string;
+    pageName?: string;
     name?: string;
     company?: string;
     position?: string;
@@ -83,7 +93,7 @@ export interface UpdateLeadRequest {
     segment?: string;
     description?: string;
     source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    origin?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
     channelId?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -107,9 +117,14 @@ export interface UpdateLeadRequest {
     lastInteractionAt?: string;
     lastFollowUpAt?: string;
     lastStepAt?: string;
+    origin?: string;
     campaignName?: string;
     adsetName?: string;
     adName?: string;
+    formId?: string;
+    externalLeadId?: string;
+    pageId?: string;
+    pageName?: string;
 }
 export interface LeadResponse extends Lead {
     contact?: {
@@ -135,7 +150,7 @@ export interface LeadResponse extends Lead {
         id: string;
         name: string;
     };
-    channel?: {
+    channelConfig?: {
         id: string;
         name: string;
     };
@@ -153,8 +168,8 @@ export interface LeadQuery extends PaginationQuery {
         contactId?: string;
         segment?: string | string[];
         source?: ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api') | ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api')[];
-        origin?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
-        suborigin?: string | string[];
+        channel?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
+        origin?: string | string[];
         channelId?: string | string[];
         status?: ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost') | ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost')[];
         priority?: ('low' | 'medium' | 'high' | 'urgent') | ('low' | 'medium' | 'high' | 'urgent')[];
