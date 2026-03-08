@@ -97,3 +97,5 @@ __exportStar(require("./websites"), exports);
 __exportStar(require("./voices"), exports);
 // Forms module (public form builder)
 __exportStar(require("./forms"), exports);
+// MongoDB Document Models (ObjectId/Date types for repositories)
+__exportStar(require("./models"), exports);

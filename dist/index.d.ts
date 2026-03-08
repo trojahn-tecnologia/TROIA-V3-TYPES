@@ -56,3 +56,4 @@ export * from './crm-reports';
 export * from './websites';
 export * from './voices';
 export * from './forms';
+export * from './models';

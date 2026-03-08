@@ -105,3 +105,6 @@ export * from './voices';
 
 // Forms module (public form builder)
 export * from './forms';
+
+// MongoDB Document Models (ObjectId/Date types for repositories)
+export * from './models';

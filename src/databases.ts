@@ -411,6 +411,41 @@ export enum ProductItemStatus {
   ARCHIVED = 'archived'
 }
 
+/** Reusable dimensions type for product and variations */
+export interface ProductDimensions {
+  weight?: number;
+  width?: number;
+  height?: number;
+  depth?: number;
+  unit: 'cm' | 'inch' | 'kg' | 'lb';
+}
+
+/** Product variation with full inventory and media support */
+export interface ProductVariation {
+  /** Unique variation ID */
+  id: string;
+  /** Display name (e.g. "P / Vermelho") */
+  name: string;
+  /** Attribute key-value pairs (e.g. { cor: 'Vermelho', tamanho: 'P' }) */
+  attributes: Record<string, string>;
+  /** Variation-specific SKU */
+  sku?: string;
+  /** Barcode (EAN/UPC) */
+  barcode?: string;
+  /** Stock quantity - REQUIRED per variation */
+  stock: number;
+  /** Override product dimensions for this variation */
+  dimensions?: ProductDimensions;
+  /** Variation-specific photos */
+  media?: {
+    photos?: string[];
+  };
+  /** Independent status per variation */
+  itemStatus?: ProductItemStatus;
+  /** Override base opportunities with variation-specific pricing */
+  opportunities?: BusinessOpportunity[];
+}
+
 export interface DatabaseProductData {
   /** Product name */
   name: string;
@@ -418,7 +453,7 @@ export interface DatabaseProductData {
   /** Detailed description */
   description: string;
 
-  /** SKU (Stock Keeping Unit) */
+  /** Base SKU (optional if product has variations) */
   sku?: string;
 
   /** Category */
@@ -427,36 +462,26 @@ export interface DatabaseProductData {
   /** Brand/Manufacturer */
   brand?: string;
 
-  /** Inventory management */
+  /** Inventory configuration (product-level settings) */
   inventory: {
-    stock: number;
-    stockUnit: 'unit' | 'kg' | 'liter' | 'meter' | 'box' | 'pack';
-    lowStockThreshold?: number;
+    /** Whether to track inventory for this product */
     trackInventory: boolean;
+    /** Unit of measurement (global for product) */
+    stockUnit: 'unit' | 'kg' | 'liter' | 'meter' | 'box' | 'pack';
+    /** Alert threshold for low stock */
+    lowStockThreshold?: number;
+    /** Stock quantity - ONLY for simple products (no variations) */
+    stock?: number;
   };
 
-  /** Physical dimensions */
-  dimensions?: {
-    weight?: number;
-    width?: number;
-    height?: number;
-    depth?: number;
-    unit: 'cm' | 'inch' | 'kg' | 'lb';
-  };
+  /** Default physical dimensions (can be overridden per variation) */
+  dimensions?: ProductDimensions;
 
-  /** 🔑 MULTI-OPPORTUNITY MODEL */
+  /** Base business opportunities (can be overridden per variation) */
   opportunities: BusinessOpportunity[];
 
   /** Product variations (colors, sizes, etc.) */
-  variations?: Array<{
-    id: string;
-    name: string;
-    attributes: Record<string, string>;
-    sku?: string;
-    stock?: number;
-    /** Variations can override base opportunities with their own pricing */
-    opportunities?: BusinessOpportunity[];
-  }>;
+  variations?: ProductVariation[];
 
   /** Overall item status */
   itemStatus: ProductItemStatus;
