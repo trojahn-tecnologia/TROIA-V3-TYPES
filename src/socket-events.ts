@@ -69,6 +69,15 @@ export const SOCKET_EVENTS = {
   CAMPAIGN_MESSAGE_STATUS: 'campaign:message-status',   // Individual message status update
   CAMPAIGN_PROGRESS: 'campaign:progress',               // Overall campaign progress
   CAMPAIGN_COMPLETED: 'campaign:completed',             // Campaign finished
+
+  // Team Chat Events (internal user-to-user chat)
+  TEAM_MESSAGE: 'team:message',                         // New message sent/received
+  TEAM_MESSAGE_READ: 'team:message:read',               // Message marked as read
+  TEAM_TYPING: 'team:typing',                           // Typing indicator
+  TEAM_USER_ONLINE: 'team:user:online',                 // User came online
+  TEAM_USER_OFFLINE: 'team:user:offline',               // User went offline
+  TEAM_UNREAD_COUNT: 'team:unread-count',               // Unread count update
+  TEAM_HEARTBEAT: 'team:heartbeat',                     // Client heartbeat to keep presence alive
 } as const;
 
 // Type for event names
@@ -462,6 +471,76 @@ export interface CampaignProgressEvent {
 }
 
 /**
+ * Team Chat Message Event
+ * Bidirectional: Sender emits → Server forwards to recipient
+ */
+export interface TeamMessageEvent {
+  roomId: string;
+  message: {
+    id: string;
+    roomId: string;
+    senderId: string;
+    senderName: string;
+    senderAvatar?: string;
+    type: 'text' | 'file' | 'audio' | 'image';
+    content?: string;
+    mediaUrl?: string;
+    mediaName?: string;
+    mediaMimeType?: string;
+    mediaSize?: number;
+    readBy: string[];
+    createdAt: string;
+  };
+}
+
+/**
+ * Team Message Read Event
+ * Client-to-Server: User opened a chat room (marks messages as read)
+ */
+export interface TeamMessageReadEvent {
+  roomId: string;
+}
+
+/**
+ * Team Typing Event
+ * Bidirectional: Sender emits → Server forwards to recipient
+ */
+export interface TeamTypingEvent {
+  roomId: string;
+  userId: string;
+  isTyping: boolean;
+}
+
+/**
+ * Team User Online Event
+ * Server-to-Client: Broadcast to company room when user connects
+ */
+export interface TeamUserOnlineEvent {
+  userId: string;
+  status: 'online';
+}
+
+/**
+ * Team User Offline Event
+ * Server-to-Client: Broadcast to company room when user disconnects
+ */
+export interface TeamUserOfflineEvent {
+  userId: string;
+  status: 'offline';
+  lastSeen: string;
+}
+
+/**
+ * Team Unread Count Event
+ * Server-to-Client: Updated unread count for team chat
+ */
+export interface TeamUnreadCountEvent {
+  userId: string;
+  totalUnread: number;
+  byUser: Record<string, number>; // { [targetUserId]: unreadCount }
+}
+
+/**
  * Campaign Completed Event
  * Server-to-Client: Campaign finished (all messages processed)
  */
@@ -537,6 +616,14 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.CAMPAIGN_MESSAGE_STATUS]: CampaignMessageStatusEvent;
   [SOCKET_EVENTS.CAMPAIGN_PROGRESS]: CampaignProgressEvent;
   [SOCKET_EVENTS.CAMPAIGN_COMPLETED]: CampaignCompletedEvent;
+
+  // Team Chat Events
+  [SOCKET_EVENTS.TEAM_MESSAGE]: TeamMessageEvent;
+  [SOCKET_EVENTS.TEAM_MESSAGE_READ]: TeamMessageReadEvent;
+  [SOCKET_EVENTS.TEAM_TYPING]: TeamTypingEvent;
+  [SOCKET_EVENTS.TEAM_USER_ONLINE]: TeamUserOnlineEvent;
+  [SOCKET_EVENTS.TEAM_USER_OFFLINE]: TeamUserOfflineEvent;
+  [SOCKET_EVENTS.TEAM_UNREAD_COUNT]: TeamUnreadCountEvent;
 }
 
 // ============================================================================

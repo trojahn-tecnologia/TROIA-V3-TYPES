@@ -97,5 +97,7 @@ __exportStar(require("./websites"), exports);
 __exportStar(require("./voices"), exports);
 // Forms module (public form builder)
 __exportStar(require("./forms"), exports);
+// Internal Team Chat (user-to-user chat, Redis-backed, 72h TTL)
+__exportStar(require("./internal-chat"), exports);
 // MongoDB Document Models (ObjectId/Date types for repositories)
 __exportStar(require("./models"), exports);

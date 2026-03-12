@@ -106,5 +106,8 @@ export * from './voices';
 // Forms module (public form builder)
 export * from './forms';
 
+// Internal Team Chat (user-to-user chat, Redis-backed, 72h TTL)
+export * from './internal-chat';
+
 // MongoDB Document Models (ObjectId/Date types for repositories)
 export * from './models';

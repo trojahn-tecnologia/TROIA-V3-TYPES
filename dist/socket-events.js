@@ -59,6 +59,14 @@ exports.SOCKET_EVENTS = {
     CAMPAIGN_MESSAGE_STATUS: 'campaign:message-status', // Individual message status update
     CAMPAIGN_PROGRESS: 'campaign:progress', // Overall campaign progress
     CAMPAIGN_COMPLETED: 'campaign:completed', // Campaign finished
+    // Team Chat Events (internal user-to-user chat)
+    TEAM_MESSAGE: 'team:message', // New message sent/received
+    TEAM_MESSAGE_READ: 'team:message:read', // Message marked as read
+    TEAM_TYPING: 'team:typing', // Typing indicator
+    TEAM_USER_ONLINE: 'team:user:online', // User came online
+    TEAM_USER_OFFLINE: 'team:user:offline', // User went offline
+    TEAM_UNREAD_COUNT: 'team:unread-count', // Unread count update
+    TEAM_HEARTBEAT: 'team:heartbeat', // Client heartbeat to keep presence alive
 };
 // ============================================================================
 // ROOM PATTERNS
