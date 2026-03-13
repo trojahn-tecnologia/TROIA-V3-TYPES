@@ -152,6 +152,7 @@ export interface ConversationQuery extends PaginationQuery {
         category?: string;
         tags?: string[];
         conversationTags?: string[];
+        excludeConversationTags?: string[];
         hasUnreadMessages?: boolean;
         createdFrom?: string;
         createdTo?: string;
