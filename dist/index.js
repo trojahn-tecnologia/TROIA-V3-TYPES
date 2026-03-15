@@ -62,6 +62,7 @@ __exportStar(require("./funnels"), exports);
 __exportStar(require("./ticket-pipelines"), exports);
 // Phase 2: Advanced customer service modules
 __exportStar(require("./tickets"), exports);
+__exportStar(require("./ticket-followers"), exports);
 __exportStar(require("./conversations"), exports);
 __exportStar(require("./conversation-messages"), exports);
 __exportStar(require("./chat-dashboard"), exports);

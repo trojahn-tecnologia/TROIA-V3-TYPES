@@ -58,6 +58,7 @@ export * from './ticket-pipelines';
 
 // Phase 2: Advanced customer service modules
 export * from './tickets';
+export * from './ticket-followers';
 export * from './conversations';
 export * from './conversation-messages';
 export * from './chat-dashboard';
