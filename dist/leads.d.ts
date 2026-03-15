@@ -17,9 +17,11 @@ export interface Lead {
     score: number;
     segment: string;
     description?: string;
-    source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
+    medium?: 'organic' | 'paid';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
     channelId?: string;
+    type?: string;
     status: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority: 'low' | 'medium' | 'high' | 'urgent';
     temperature: 'cold' | 'warm' | 'hot';
@@ -61,9 +63,11 @@ export interface CreateLeadRequest {
     score?: number;
     segment: string;
     description?: string;
-    source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
+    medium?: 'organic' | 'paid';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
     channelId?: string;
+    type?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority?: 'low' | 'medium' | 'high' | 'urgent';
     temperature?: 'cold' | 'warm' | 'hot';
@@ -92,9 +96,11 @@ export interface UpdateLeadRequest {
     score?: number;
     segment?: string;
     description?: string;
-    source?: 'webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other';
+    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
+    medium?: 'organic' | 'paid';
+    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
     channelId?: string;
+    type?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
     priority?: 'low' | 'medium' | 'high' | 'urgent';
     temperature?: 'cold' | 'warm' | 'hot';
@@ -167,8 +173,9 @@ export interface LeadQuery extends PaginationQuery {
     filters?: {
         contactId?: string;
         segment?: string | string[];
-        source?: ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api') | ('webhook' | 'conversation' | 'ai-conversation' | 'manual' | 'api')[];
-        channel?: ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'email' | 'website' | 'phone' | 'referral' | 'other')[];
+        source?: ('meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct') | ('meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct')[];
+        medium?: ('organic' | 'paid') | ('organic' | 'paid')[];
+        channel?: ('whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other')[];
         origin?: string | string[];
         channelId?: string | string[];
         status?: ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost') | ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost')[];
@@ -191,6 +198,7 @@ export interface LeadQuery extends PaginationQuery {
         adsetName?: string | string[];
         adName?: string | string[];
         tags?: string | string[];
+        type?: string | string[];
     };
 }
 export interface LeadListResponse extends ListResponse<LeadResponse> {

@@ -4,7 +4,7 @@ import { ActiveStatus, PaginationQuery } from './common';
  * Lead Routing Condition - a single condition to evaluate against lead data
  */
 export interface LeadRoutingCondition {
-    field: 'campaignName' | 'channel' | 'origin' | 'source' | 'segment' | 'adName' | 'adsetName';
+    field: 'campaignName' | 'channel' | 'origin' | 'source' | 'medium' | 'segment' | 'adName' | 'adsetName';
     operator: 'equals' | 'contains' | 'in';
     value: string | string[];
 }

@@ -36,6 +36,7 @@ export interface LeadConversionRequest extends DateRangeFilter {
     assigneeId?: string;
     teamId?: string;
     source?: string;
+    medium?: string;
     origin?: string;
 }
 export interface LeadConversionByPeriod {

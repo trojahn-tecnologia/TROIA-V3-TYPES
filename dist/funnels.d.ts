@@ -54,6 +54,8 @@ export interface Funnel extends AppAwareDocument {
     lastAssignedUserId?: string;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /** Tipos de lead disponíveis neste funil (ex: Venda, Suporte, Consultoria) */
+    types?: string[];
 }
 export interface CreateFunnelRequest {
     name: string;
@@ -63,6 +65,8 @@ export interface CreateFunnelRequest {
     assignmentConfig?: FunnelAssignmentConfig;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /** Tipos de lead disponíveis neste funil */
+    types?: string[];
 }
 export interface UpdateFunnelRequest {
     name?: string;
@@ -73,6 +77,8 @@ export interface UpdateFunnelRequest {
     assignmentConfig?: FunnelAssignmentConfig;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /** Tipos de lead disponíveis neste funil */
+    types?: string[];
 }
 export type FunnelResponse = Omit<Funnel, '_id'> & {
     id: string;
