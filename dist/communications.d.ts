@@ -92,6 +92,7 @@ export interface TemplateMessageData {
         index?: number;
     }>;
     renderedContent?: string;
+    messageId?: string;
     headerMedia?: {
         type: 'image' | 'video' | 'document';
         url: string;

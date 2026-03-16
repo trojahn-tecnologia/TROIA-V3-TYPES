@@ -112,6 +112,9 @@ export interface TemplateMessageData {
   // For Gateway: pre-rendered content (variables already replaced)
   renderedContent?: string;
 
+  // Message ID for correlation (campaign message tracking)
+  messageId?: string;
+
   // For media templates
   headerMedia?: {
     type: 'image' | 'video' | 'document';
