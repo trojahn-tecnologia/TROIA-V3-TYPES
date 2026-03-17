@@ -64,6 +64,7 @@ export interface GmailConfig {
 export interface GatewayConfig {
     webhookPath?: string;
     timeout?: number;
+    engine?: 'node' | 'go';
 }
 export interface GoogleCalendarConfig {
     clientId: string;

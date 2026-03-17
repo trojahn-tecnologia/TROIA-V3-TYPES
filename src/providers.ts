@@ -81,6 +81,7 @@ export interface GatewayConfig {
   // ✅ CONFIGURAÇÕES OPCIONAIS (gatewayUrl vem do .env, credenciais geradas pelo backend)
   webhookPath?: string;         // Path customizado para webhook
   timeout?: number;             // Timeout para requests (padrão: 10000ms)
+  engine?: 'node' | 'go';      // Engine do worker WhatsApp (padrão: 'node')
 }
 
 export interface GoogleCalendarConfig {
