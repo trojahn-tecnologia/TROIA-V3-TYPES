@@ -20,8 +20,7 @@ var CampaignStatus;
 var AudienceType;
 (function (AudienceType) {
     AudienceType["LEADS"] = "leads";
-    AudienceType["CONTACTS"] = "contacts";
-    AudienceType["MANUAL"] = "manual"; // Lista manual de IDs
+    AudienceType["CONTACTS"] = "contacts"; // Contacts collection
 })(AudienceType || (exports.AudienceType = AudienceType = {}));
 /**
  * Scheduling Type - Tipo de agendamento

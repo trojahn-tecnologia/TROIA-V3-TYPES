@@ -37,19 +37,34 @@ export enum CampaignStatus {
  */
 export enum AudienceType {
   LEADS = 'leads',           // Leads collection (via contactId)
-  CONTACTS = 'contacts',     // Contacts collection
-  MANUAL = 'manual'          // Lista manual de IDs
+  CONTACTS = 'contacts'      // Contacts collection
 }
 
 /**
  * Audience Filter - Filtros para seleção de audiência
  */
 export interface AudienceFilter {
-  status?: string[];         // Filter by status
-  tags?: string[];          // Filter by tags
-  createdAfter?: string;    // Created after date (ISO string)
-  createdBefore?: string;   // Created before date (ISO string)
-  search?: string;          // Search by name/email/phone
+  // Shared
+  search?: string;
+  tags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  // Leads-specific
+  priority?: string[];
+  businessStatus?: string[];
+  temperature?: string[];
+  qualifyStatus?: string[];
+  source?: string[];
+  medium?: string[];
+  channel?: string[];
+  origin?: string[];
+  type?: string[];
+  segment?: string[];
+  campaignName?: string[];
+  adsetName?: string[];
+  adName?: string[];
+  // Contacts-specific
+  channelType?: string[];
 }
 
 /**

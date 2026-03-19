@@ -34,18 +34,30 @@ export declare enum CampaignStatus {
  */
 export declare enum AudienceType {
     LEADS = "leads",// Leads collection (via contactId)
-    CONTACTS = "contacts",// Contacts collection
-    MANUAL = "manual"
+    CONTACTS = "contacts"
 }
 /**
  * Audience Filter - Filtros para seleção de audiência
  */
 export interface AudienceFilter {
-    status?: string[];
-    tags?: string[];
-    createdAfter?: string;
-    createdBefore?: string;
     search?: string;
+    tags?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    priority?: string[];
+    businessStatus?: string[];
+    temperature?: string[];
+    qualifyStatus?: string[];
+    source?: string[];
+    medium?: string[];
+    channel?: string[];
+    origin?: string[];
+    type?: string[];
+    segment?: string[];
+    campaignName?: string[];
+    adsetName?: string[];
+    adName?: string[];
+    channelType?: string[];
 }
 /**
  * Variable Mapping - Mapeamento de variáveis do template
