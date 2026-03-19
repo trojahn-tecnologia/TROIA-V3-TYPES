@@ -18,6 +18,7 @@ export interface AIAgent {
     model: string;
     temperature: number;
     maxTokens: number;
+    delay: number;
     version?: string;
     triggers: AIAgentTriggers;
     customActionIds: string[];
@@ -122,6 +123,7 @@ export interface CreateAIAgentRequest {
     model: string;
     temperature: number;
     maxTokens: number;
+    delay?: number;
     triggers: AIAgentTriggers;
     customActionIds?: string[];
     databases?: string[];
@@ -140,6 +142,7 @@ export interface UpdateAIAgentRequest {
     model?: string;
     temperature?: number;
     maxTokens?: number;
+    delay?: number;
     triggers?: AIAgentTriggers;
     customActionIds?: string[];
     databases?: string[];

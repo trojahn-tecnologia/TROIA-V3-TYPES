@@ -28,6 +28,7 @@ export interface AIAgent {
   model: string;
   temperature: number;
   maxTokens: number;
+  delay: number;                            // Debounce delay in seconds (10-120) before agent responds
   version?: string;                         // Semver version (e.g., "1.0.0")
   triggers: AIAgentTriggers;
   customActionIds: string[];
@@ -158,6 +159,7 @@ export interface CreateAIAgentRequest {
   model: string;
   temperature: number;
   maxTokens: number;
+  delay?: number;
   triggers: AIAgentTriggers;
   customActionIds?: string[];
   databases?: string[];                     // Database IDs that the agent can access
@@ -177,6 +179,7 @@ export interface UpdateAIAgentRequest {
   model?: string;
   temperature?: number;
   maxTokens?: number;
+  delay?: number;
   triggers?: AIAgentTriggers;
   customActionIds?: string[];
   databases?: string[];                     // Database IDs that the agent can access
