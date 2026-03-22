@@ -59,3 +59,4 @@ export * from './voices';
 export * from './forms';
 export * from './internal-chat';
 export * from './models';
+export * from './theme';

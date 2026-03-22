@@ -112,3 +112,6 @@ export * from './internal-chat';
 
 // MongoDB Document Models (ObjectId/Date types for repositories)
 export * from './models';
+
+// Theme overrides (tenant customization)
+export * from './theme';

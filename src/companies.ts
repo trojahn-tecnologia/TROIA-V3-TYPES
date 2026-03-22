@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { TenantAwareDocument, FullTenantDocument, ActiveStatus, Address, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import { AssignmentConfig } from './assignment';
+import type { TenantThemeOverrides } from './theme';
 
 export interface Company extends FullTenantDocument {
   name: string;
@@ -9,8 +10,10 @@ export interface Company extends FullTenantDocument {
   website?: string;
   logo?: string;
   status: ActiveStatus;
+  defaultCountryCode?: string;
   address: Address;
   defaultAssignmentConfig?: AssignmentConfig;
+  themeOverrides?: TenantThemeOverrides;
 }
 
 
@@ -36,8 +39,10 @@ export interface UpdateCompanyRequest {
   website?: string;
   logo?: string;
   status?: ActiveStatus;
+  defaultCountryCode?: string;
   address?: Partial<Address>;
   defaultAssignmentConfig?: AssignmentConfig;
+  themeOverrides?: TenantThemeOverrides;
 }
 
 // Assignment configuration specific request
@@ -67,8 +72,10 @@ export interface CompanyResponse {
   logo?: string;
   appId: string;
   status: ActiveStatus;
+  defaultCountryCode?: string;
   address: Address;
   defaultAssignmentConfig?: AssignmentConfig;
+  themeOverrides?: TenantThemeOverrides;
   createdAt: string;
   updatedAt: string;
 }

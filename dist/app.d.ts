@@ -1,9 +1,11 @@
 import { FullBaseDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
+import { TenantThemeOverrides, BaseThemeId } from './theme';
 export interface App extends FullBaseDocument {
     name: string;
     logo: string;
     status: ActiveStatus;
-    themes: AppTheme[];
+    baseThemeId?: BaseThemeId;
+    themeOverrides?: TenantThemeOverrides;
     domains: string[];
     modules: string[];
     backendUrl: string;
@@ -18,17 +20,11 @@ export interface AppSupportWidget {
 export interface AppSupport {
     widget?: AppSupportWidget;
 }
-export interface AppTheme {
-    name: string;
-    primaryColor: string;
-    secondaryColor: string;
-    accentColor?: string;
-    darkMode: boolean;
-}
 export interface CreateAppRequest {
     name: string;
     logo: string;
-    themes: AppTheme[];
+    baseThemeId?: BaseThemeId;
+    themeOverrides?: TenantThemeOverrides;
     domains: string[];
     modules: string[];
     backendUrl: string;
@@ -40,7 +36,8 @@ export interface UpdateAppRequest {
     name?: string;
     logo?: string;
     status?: ActiveStatus;
-    themes?: AppTheme[];
+    baseThemeId?: BaseThemeId;
+    themeOverrides?: TenantThemeOverrides;
     domains?: string[];
     modules?: string[];
     backendUrl?: string;
@@ -59,7 +56,8 @@ export interface AppResponse {
     name: string;
     logo: string;
     status: ActiveStatus;
-    themes: AppTheme[];
+    baseThemeId?: BaseThemeId;
+    themeOverrides?: TenantThemeOverrides;
     domains: string[];
     modules: string[];
     backendUrl: string;

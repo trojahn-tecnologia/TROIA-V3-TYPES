@@ -1,5 +1,6 @@
 import { FullTenantDocument, ActiveStatus, Address, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import { AssignmentConfig } from './assignment';
+import type { TenantThemeOverrides } from './theme';
 export interface Company extends FullTenantDocument {
     name: string;
     email: string;
@@ -7,8 +8,10 @@ export interface Company extends FullTenantDocument {
     website?: string;
     logo?: string;
     status: ActiveStatus;
+    defaultCountryCode?: string;
     address: Address;
     defaultAssignmentConfig?: AssignmentConfig;
+    themeOverrides?: TenantThemeOverrides;
 }
 export interface CreateCompanyRequest {
     name: string;
@@ -30,8 +33,10 @@ export interface UpdateCompanyRequest {
     website?: string;
     logo?: string;
     status?: ActiveStatus;
+    defaultCountryCode?: string;
     address?: Partial<Address>;
     defaultAssignmentConfig?: AssignmentConfig;
+    themeOverrides?: TenantThemeOverrides;
 }
 export interface UpdateCompanyAssignmentConfigRequest {
     defaultAssignmentConfig: AssignmentConfig;
@@ -51,8 +56,10 @@ export interface CompanyResponse {
     logo?: string;
     appId: string;
     status: ActiveStatus;
+    defaultCountryCode?: string;
     address: Address;
     defaultAssignmentConfig?: AssignmentConfig;
+    themeOverrides?: TenantThemeOverrides;
     createdAt: string;
     updatedAt: string;
 }

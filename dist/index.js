@@ -102,3 +102,5 @@ __exportStar(require("./forms"), exports);
 __exportStar(require("./internal-chat"), exports);
 // MongoDB Document Models (ObjectId/Date types for repositories)
 __exportStar(require("./models"), exports);
+// Theme overrides (tenant customization)
+__exportStar(require("./theme"), exports);
