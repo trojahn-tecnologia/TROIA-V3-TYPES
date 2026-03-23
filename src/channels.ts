@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { PaginationQuery, ListResponse, GenericQueryOptions, ExtendedStatus } from './common';
+import type { ChannelWarmup } from './credits';
 
 // Import assignment types from dedicated assignment module
 import {
@@ -128,6 +129,7 @@ export interface Channel {
   status: ExtendedStatus;     // 'active' | 'inactive' | 'pending' | 'suspended' | 'error'
   /** Round-robin tracking: ID do último usuário que recebeu atribuição neste channel */
   lastAssignedUserId?: string;
+  warmup?: ChannelWarmup;
   createdAt: Date;
   updatedAt: Date;
 }

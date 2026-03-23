@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { PaginationQuery, ListResponse, GenericQueryOptions, ExtendedStatus } from './common';
+import type { ChannelWarmup } from './credits';
 import { AssignmentConfig as BaseAssignmentConfig, CoreLotteryConfig } from './assignment';
 /**
  * Channel assignment config extends base assignment config.
@@ -87,6 +88,7 @@ export interface Channel {
     status: ExtendedStatus;
     /** Round-robin tracking: ID do último usuário que recebeu atribuição neste channel */
     lastAssignedUserId?: string;
+    warmup?: ChannelWarmup;
     createdAt: Date;
     updatedAt: Date;
 }

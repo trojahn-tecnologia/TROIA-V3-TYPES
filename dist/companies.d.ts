@@ -1,6 +1,7 @@
 import { FullTenantDocument, ActiveStatus, Address, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import { AssignmentConfig } from './assignment';
 import type { TenantThemeOverrides } from './theme';
+import type { CompanyCard, CompanyCardResponse, CreditBalance, CreditSubscription, CreditAlert, CreditInvoice } from './credits';
 export interface Company extends FullTenantDocument {
     name: string;
     email: string;
@@ -12,6 +13,11 @@ export interface Company extends FullTenantDocument {
     address: Address;
     defaultAssignmentConfig?: AssignmentConfig;
     themeOverrides?: TenantThemeOverrides;
+    cards: CompanyCard[];
+    creditBalance: CreditBalance;
+    creditSubscription?: CreditSubscription;
+    creditAlerts: CreditAlert[];
+    invoices: CreditInvoice[];
 }
 export interface CreateCompanyRequest {
     name: string;
@@ -60,6 +66,11 @@ export interface CompanyResponse {
     address: Address;
     defaultAssignmentConfig?: AssignmentConfig;
     themeOverrides?: TenantThemeOverrides;
+    cards: CompanyCardResponse[];
+    creditBalance: CreditBalance;
+    creditSubscription?: CreditSubscription;
+    creditAlerts: CreditAlert[];
+    invoices: CreditInvoice[];
     createdAt: string;
     updatedAt: string;
 }

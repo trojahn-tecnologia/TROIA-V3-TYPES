@@ -4,23 +4,15 @@ import { AppAwareDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, L
 export interface Plan extends AppAwareDocument {
   name: string; // "Básico", "Pro", "Enterprise"
   description: string;
+  creditsPerCycle: number;
   price: {
     monthly: number;
     yearly: number;
     currency: string;
   };
-  modules: PlanModule[]; // Módulos liberados neste plano
-  limits: PlanLimits; // ✅ Simplificado
+  features?: string[];
   status: ActiveStatus;
 }
-
-export interface PlanModule {
-  moduleId: string; // Nome do módulo: "users", "crm", "chat", etc.
-  limit: number; // ✅ Apenas um número simples
-}
-
-// ✅ Limits como Record simples
-export type PlanLimits = Record<string, number>; // { users: 100, crm: 100, channels: 50, chat: 1000 }
 
 // Generic + Specific Pattern
 export interface PlanQuery extends PaginationQuery {
@@ -36,13 +28,13 @@ export interface PlanResponse {
   id: string;
   name: string;
   description: string;
+  creditsPerCycle: number;
   price: {
     monthly: number;
     yearly: number;
     currency: string;
   };
-  modules: PlanModule[];
-  limits: PlanLimits;
+  features?: string[];
   appId: string;
   status: ActiveStatus;
   createdAt: string;
@@ -55,24 +47,24 @@ export interface PlanQueryOptions extends GenericQueryOptions<PlanQuery> {}
 export interface CreatePlanRequest {
   name: string;
   description: string;
+  creditsPerCycle: number;
   price: {
     monthly: number;
     yearly: number;
     currency: string;
   };
-  modules: PlanModule[];
-  limits: PlanLimits;
+  features?: string[];
 }
 
 export interface UpdatePlanRequest {
   name?: string;
   description?: string;
+  creditsPerCycle?: number;
   price?: {
     monthly?: number;
     yearly?: number;
     currency?: string;
   };
-  modules?: PlanModule[];
-  limits?: PlanLimits;
+  features?: string[];
   status?: ActiveStatus;
 }

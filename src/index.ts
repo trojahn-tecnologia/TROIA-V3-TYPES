@@ -9,7 +9,6 @@ export * from './modules';
 export * from './plans';
 export * from './levels';
 export * from './company-plans';
-export * from './user-permissions';
 
 // Business modules
 export * from './teams';
@@ -115,3 +114,6 @@ export * from './models';
 
 // Theme overrides (tenant customization)
 export * from './theme';
+
+// Credits system (balance, transactions, subscriptions, cost table)
+export * from './credits';

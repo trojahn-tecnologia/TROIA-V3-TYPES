@@ -19,7 +19,6 @@ export type ValidModuleId =
   // Core modules
   | 'app'
   | 'users'
-  | 'user-permissions'
   | 'companies'
   | 'levels'
   | 'plans'

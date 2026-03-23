@@ -1,5 +1,6 @@
 import { FullBaseDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import { TenantThemeOverrides, BaseThemeId } from './theme';
+import type { CreditCostEntry } from './credits';
 export interface App extends FullBaseDocument {
     name: string;
     logo: string;
@@ -12,6 +13,7 @@ export interface App extends FullBaseDocument {
     websiteUrl?: string;
     widgetUrl?: string;
     support?: AppSupport;
+    costs: CreditCostEntry[];
 }
 export interface AppSupportWidget {
     channelId: string;
@@ -64,6 +66,7 @@ export interface AppResponse {
     websiteUrl?: string;
     widgetUrl?: string;
     support?: AppSupport;
+    costs: CreditCostEntry[];
     createdAt: string;
     updatedAt: string;
 }

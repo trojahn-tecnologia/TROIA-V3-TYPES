@@ -24,7 +24,6 @@ __exportStar(require("./modules"), exports);
 __exportStar(require("./plans"), exports);
 __exportStar(require("./levels"), exports);
 __exportStar(require("./company-plans"), exports);
-__exportStar(require("./user-permissions"), exports);
 // Business modules
 __exportStar(require("./teams"), exports);
 __exportStar(require("./channels"), exports);
@@ -104,3 +103,5 @@ __exportStar(require("./internal-chat"), exports);
 __exportStar(require("./models"), exports);
 // Theme overrides (tenant customization)
 __exportStar(require("./theme"), exports);
+// Credits system (balance, transactions, subscriptions, cost table)
+__exportStar(require("./credits"), exports);

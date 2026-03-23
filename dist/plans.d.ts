@@ -2,20 +2,15 @@ import { AppAwareDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, L
 export interface Plan extends AppAwareDocument {
     name: string;
     description: string;
+    creditsPerCycle: number;
     price: {
         monthly: number;
         yearly: number;
         currency: string;
     };
-    modules: PlanModule[];
-    limits: PlanLimits;
+    features?: string[];
     status: ActiveStatus;
 }
-export interface PlanModule {
-    moduleId: string;
-    limit: number;
-}
-export type PlanLimits = Record<string, number>;
 export interface PlanQuery extends PaginationQuery {
     status?: ActiveStatus;
     name?: string;
@@ -28,13 +23,13 @@ export interface PlanResponse {
     id: string;
     name: string;
     description: string;
+    creditsPerCycle: number;
     price: {
         monthly: number;
         yearly: number;
         currency: string;
     };
-    modules: PlanModule[];
-    limits: PlanLimits;
+    features?: string[];
     appId: string;
     status: ActiveStatus;
     createdAt: string;
@@ -47,23 +42,23 @@ export interface PlanQueryOptions extends GenericQueryOptions<PlanQuery> {
 export interface CreatePlanRequest {
     name: string;
     description: string;
+    creditsPerCycle: number;
     price: {
         monthly: number;
         yearly: number;
         currency: string;
     };
-    modules: PlanModule[];
-    limits: PlanLimits;
+    features?: string[];
 }
 export interface UpdatePlanRequest {
     name?: string;
     description?: string;
+    creditsPerCycle?: number;
     price?: {
         monthly?: number;
         yearly?: number;
         currency?: string;
     };
-    modules?: PlanModule[];
-    limits?: PlanLimits;
+    features?: string[];
     status?: ActiveStatus;
 }
