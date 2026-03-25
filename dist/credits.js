@@ -24,6 +24,11 @@ var CreditCategory;
     CreditCategory["INFRA_DATABASE_SYNC"] = "infra.database.sync";
     CreditCategory["WEBSITE_SITE_PUBLISHED"] = "website.site.published";
     CreditCategory["API_EXTERNAL_CALL"] = "api.external.call";
+    CreditCategory["BILLING_SUBSCRIPTION"] = "billing.subscription";
+    CreditCategory["BILLING_PURCHASE"] = "billing.purchase";
+    CreditCategory["BILLING_EXPIRATION"] = "billing.expiration";
+    CreditCategory["BILLING_CANCELLATION"] = "billing.cancellation";
+    CreditCategory["ADMIN_ADJUSTMENT"] = "admin.adjustment";
 })(CreditCategory || (exports.CreditCategory = CreditCategory = {}));
 exports.CREDIT_CATEGORIES = {
     [CreditCategory.MESSAGE_CHAT]: { label: 'Mensagem de chat', unit: 'per_action', hasDirection: true, hasProviderId: true, providerType: 'messaging' },
@@ -42,7 +47,12 @@ exports.CREDIT_CATEGORIES = {
     [CreditCategory.INFRA_USER_ACTIVE]: { label: 'Usuário ativo', unit: 'per_month', hasDirection: false, hasProviderId: false },
     [CreditCategory.INFRA_CHANNEL_ACTIVE]: { label: 'Canal ativo', unit: 'per_month', hasDirection: false, hasProviderId: false },
     [CreditCategory.INFRA_EMAIL_DOMAIN]: { label: 'Domínio de email', unit: 'per_month', hasDirection: false, hasProviderId: false },
-    [CreditCategory.INFRA_DATABASE_SYNC]: { label: 'Sync de database', unit: 'per_day', hasDirection: false, hasProviderId: false },
+    [CreditCategory.INFRA_DATABASE_SYNC]: { label: 'Sync de database', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.WEBSITE_SITE_PUBLISHED]: { label: 'Site publicado', unit: 'per_month', hasDirection: false, hasProviderId: false },
     [CreditCategory.API_EXTERNAL_CALL]: { label: 'Chamada API externa', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.BILLING_SUBSCRIPTION]: { label: 'Assinatura', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.BILLING_PURCHASE]: { label: 'Compra de créditos', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.BILLING_EXPIRATION]: { label: 'Expiração de ciclo', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.BILLING_CANCELLATION]: { label: 'Cancelamento', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.ADMIN_ADJUSTMENT]: { label: 'Ajuste administrativo', unit: 'per_action', hasDirection: false, hasProviderId: false },
 };

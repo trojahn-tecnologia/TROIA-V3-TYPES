@@ -78,6 +78,9 @@ export const SOCKET_EVENTS = {
   TEAM_USER_OFFLINE: 'team:user:offline',               // User went offline
   TEAM_UNREAD_COUNT: 'team:unread-count',               // Unread count update
   TEAM_HEARTBEAT: 'team:heartbeat',                     // Client heartbeat to keep presence alive
+
+  // Credit Payment Events
+  CREDIT_PAYMENT_CONFIRMED: 'credit:payment:confirmed', // PIX payment confirmed via webhook
 } as const;
 
 // Type for event names
@@ -560,6 +563,18 @@ export interface CampaignCompletedEvent {
   completedAt: string;
 }
 
+/**
+ * Credit Payment Confirmed Event
+ * Server-to-Client: PIX payment confirmed via Asaas webhook
+ */
+export interface CreditPaymentConfirmedEvent {
+  companyId: string;
+  planName: string;
+  creditsPerCycle: number;
+  paymentId: string;
+  status: 'active';
+}
+
 // ============================================================================
 // SOCKET EVENT MAP (For Type-Safe Emit/On)
 // ============================================================================
@@ -624,6 +639,9 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.TEAM_USER_ONLINE]: TeamUserOnlineEvent;
   [SOCKET_EVENTS.TEAM_USER_OFFLINE]: TeamUserOfflineEvent;
   [SOCKET_EVENTS.TEAM_UNREAD_COUNT]: TeamUnreadCountEvent;
+
+  // Credit Payment Events
+  [SOCKET_EVENTS.CREDIT_PAYMENT_CONFIRMED]: CreditPaymentConfirmedEvent;
 }
 
 // ============================================================================

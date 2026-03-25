@@ -67,6 +67,8 @@ exports.SOCKET_EVENTS = {
     TEAM_USER_OFFLINE: 'team:user:offline', // User went offline
     TEAM_UNREAD_COUNT: 'team:unread-count', // Unread count update
     TEAM_HEARTBEAT: 'team:heartbeat', // Client heartbeat to keep presence alive
+    // Credit Payment Events
+    CREDIT_PAYMENT_CONFIRMED: 'credit:payment:confirmed', // PIX payment confirmed via webhook
 };
 // ============================================================================
 // ROOM PATTERNS

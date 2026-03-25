@@ -497,9 +497,10 @@ export interface PaymentDetails extends PaymentResponse {
 
 export interface PaymentProviderConfig {
   apiKey: string;
-  baseUrl: string;
+  baseUrl?: string;
   webhookSecret?: string;
-  environment: 'sandbox' | 'production';
+  isSandbox?: boolean;
+  environment?: 'sandbox' | 'production';
   merchantId?: string;
   publicKey?: string;
   secretKey?: string;

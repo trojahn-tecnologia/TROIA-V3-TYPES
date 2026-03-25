@@ -48,6 +48,7 @@ export declare const SOCKET_EVENTS: {
     readonly TEAM_USER_OFFLINE: "team:user:offline";
     readonly TEAM_UNREAD_COUNT: "team:unread-count";
     readonly TEAM_HEARTBEAT: "team:heartbeat";
+    readonly CREDIT_PAYMENT_CONFIRMED: "credit:payment:confirmed";
 };
 export type SocketEventName = typeof SOCKET_EVENTS[keyof typeof SOCKET_EVENTS];
 /**
@@ -479,6 +480,17 @@ export interface CampaignCompletedEvent {
     startedAt: string;
     completedAt: string;
 }
+/**
+ * Credit Payment Confirmed Event
+ * Server-to-Client: PIX payment confirmed via Asaas webhook
+ */
+export interface CreditPaymentConfirmedEvent {
+    companyId: string;
+    planName: string;
+    creditsPerCycle: number;
+    paymentId: string;
+    status: 'active';
+}
 export interface SocketEventMap {
     [SOCKET_EVENTS.CONVERSATION_MESSAGE]: ConversationMessageEvent;
     [SOCKET_EVENTS.CONVERSATION_UPDATED]: ConversationUpdatedEvent;
@@ -516,6 +528,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.TEAM_USER_ONLINE]: TeamUserOnlineEvent;
     [SOCKET_EVENTS.TEAM_USER_OFFLINE]: TeamUserOfflineEvent;
     [SOCKET_EVENTS.TEAM_UNREAD_COUNT]: TeamUnreadCountEvent;
+    [SOCKET_EVENTS.CREDIT_PAYMENT_CONFIRMED]: CreditPaymentConfirmedEvent;
 }
 export declare const SOCKET_ROOMS: {
     /**

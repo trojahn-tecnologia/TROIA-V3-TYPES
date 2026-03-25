@@ -21,6 +21,11 @@ export enum CreditCategory {
   INFRA_DATABASE_SYNC       = 'infra.database.sync',
   WEBSITE_SITE_PUBLISHED    = 'website.site.published',
   API_EXTERNAL_CALL         = 'api.external.call',
+  BILLING_SUBSCRIPTION      = 'billing.subscription',
+  BILLING_PURCHASE          = 'billing.purchase',
+  BILLING_EXPIRATION        = 'billing.expiration',
+  BILLING_CANCELLATION      = 'billing.cancellation',
+  ADMIN_ADJUSTMENT          = 'admin.adjustment',
 }
 
 export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day';
@@ -51,9 +56,14 @@ export const CREDIT_CATEGORIES: Record<CreditCategory, CreditCategoryConfig> = {
   [CreditCategory.INFRA_USER_ACTIVE]:           { label: 'Usuário ativo',          unit: 'per_month',     hasDirection: false, hasProviderId: false },
   [CreditCategory.INFRA_CHANNEL_ACTIVE]:        { label: 'Canal ativo',            unit: 'per_month',     hasDirection: false, hasProviderId: false },
   [CreditCategory.INFRA_EMAIL_DOMAIN]:          { label: 'Domínio de email',       unit: 'per_month',     hasDirection: false, hasProviderId: false },
-  [CreditCategory.INFRA_DATABASE_SYNC]:         { label: 'Sync de database',       unit: 'per_day',       hasDirection: false, hasProviderId: false },
+  [CreditCategory.INFRA_DATABASE_SYNC]:         { label: 'Sync de database',       unit: 'per_action',    hasDirection: false, hasProviderId: false },
   [CreditCategory.WEBSITE_SITE_PUBLISHED]:      { label: 'Site publicado',         unit: 'per_month',     hasDirection: false, hasProviderId: false },
   [CreditCategory.API_EXTERNAL_CALL]:           { label: 'Chamada API externa',    unit: 'per_action',    hasDirection: false, hasProviderId: false },
+  [CreditCategory.BILLING_SUBSCRIPTION]:        { label: 'Assinatura',             unit: 'per_action',    hasDirection: false, hasProviderId: false },
+  [CreditCategory.BILLING_PURCHASE]:            { label: 'Compra de créditos',     unit: 'per_action',    hasDirection: false, hasProviderId: false },
+  [CreditCategory.BILLING_EXPIRATION]:          { label: 'Expiração de ciclo',     unit: 'per_action',    hasDirection: false, hasProviderId: false },
+  [CreditCategory.BILLING_CANCELLATION]:        { label: 'Cancelamento',           unit: 'per_action',    hasDirection: false, hasProviderId: false },
+  [CreditCategory.ADMIN_ADJUSTMENT]:            { label: 'Ajuste administrativo',  unit: 'per_action',    hasDirection: false, hasProviderId: false },
 };
 
 // === Cost Table (embedded in App) ===
@@ -109,10 +119,40 @@ export interface CreditBalance {
 export type CreditSubscriptionStatus = 'pending' | 'active' | 'past_due' | 'suspended' | 'cancelled';
 export type CreditPaymentMethod = 'credit_card' | 'pix';
 
+/** Pending plan change — upgrade (awaiting PIX payment) or downgrade (scheduled for next cycle) */
+export interface PendingPlanChange {
+  planId: string;
+  planName: string;
+  creditsPerCycle: number;
+  effectiveAt: Date;
+  type: 'upgrade' | 'downgrade';
+  /** Asaas payment ID — only for PIX upgrades awaiting payment */
+  pendingPaymentId?: string;
+  /** Pro-rata charge amount — only for upgrades */
+  proRataCharge?: number;
+  /** Additional credits to inject on confirmation — only for upgrades */
+  additionalCredits?: number;
+}
+
+/** Result of PUT /credits/plan */
+export interface ChangePlanResult {
+  type: 'upgrade' | 'downgrade';
+  effectiveAt: 'immediate' | 'next_cycle' | 'pending_payment';
+  additionalCredits?: number;
+  proRataCharge?: number;
+  pixData?: {
+    qrCode: string;
+    copyPaste: string;
+    expiresAt: string;
+    paymentId: string;
+  };
+}
+
 export interface CreditSubscription {
   planId: string;
   creditsPerCycle: number;
   cycleDays: number;
+  subscribedAt: Date;
   currentCycleStart: Date;
   currentCycleEnd: Date;
   nextRenewalAt: Date;
@@ -126,6 +166,7 @@ export interface CreditSubscription {
 
   paymentMethod: CreditPaymentMethod;
   defaultCardIndex?: number;
+  pendingPaymentId?: string;
 
   payment: {
     lastAttemptAt?: Date;
@@ -137,6 +178,7 @@ export interface CreditSubscription {
   };
 
   status: CreditSubscriptionStatus;
+  pendingPlanChange?: PendingPlanChange;
 }
 
 // === Credit Alert (embedded in Company) ===
@@ -155,7 +197,14 @@ export interface CreditAlert {
 }
 
 // === Credit Invoice (embedded in Company) ===
-export type CreditInvoiceStatus = 'open' | 'closed';
+export type CreditInvoiceStatus = 'open' | 'closed' | 'cancelled';
+
+export interface CreditInvoicePayment {
+  amount: number;
+  discount: number;
+  total: number;
+  currency: string;
+}
 
 export interface CreditInvoice {
   cycleNumber: number;
@@ -163,6 +212,9 @@ export interface CreditInvoice {
     start: Date;
     end: Date;
   };
+  planId?: string;
+  planName?: string;
+  payment?: CreditInvoicePayment;
   summary: {
     balanceBefore: number;
     totalCreditsIn: number;
@@ -185,7 +237,8 @@ export type CreditTransactionSource =
   | 'recurring'
   | 'refund'
   | 'admin'
-  | 'expiration';
+  | 'expiration'
+  | 'cancellation';
 
 export interface CreditTransactionMetadata {
   conversationId?: string;
@@ -197,7 +250,11 @@ export interface CreditTransactionMetadata {
   tokensInput?: number;
   tokensOutput?: number;
   workflowId?: string;
+  nodeId?: string;
+  toolNames?: string[];
+  url?: string;
   description?: string;
+  adminName?: string;
 }
 
 export interface CreditTransaction {
@@ -288,6 +345,16 @@ export interface CreditDashboardResponse {
     nextRenewalAt: string;
     status: CreditSubscriptionStatus;
     paymentMethod: CreditPaymentMethod;
+    pendingPlanChange?: {
+      planId: string;
+      planName: string;
+      creditsPerCycle: number;
+      effectiveAt: string; // ISO date string in response
+      type: 'upgrade' | 'downgrade';
+      pendingPaymentId?: string;
+      proRataCharge?: number;
+      additionalCredits?: number;
+    };
   } | null;
   consumptionByCategory: Array<{
     category: CreditCategory;
@@ -300,9 +367,63 @@ export interface CreditDashboardResponse {
   };
 }
 
+export interface InvoiceCategoryConsumption {
+  category: CreditCategory;
+  total: number;
+}
+
 export interface InvoiceDetailResponse {
   invoice: CreditInvoice;
   transactions: CreditTransactionResponse[];
+  consumptionByCategory: InvoiceCategoryConsumption[];
+}
+
+export interface PixQrCodeResponse {
+  qrCode: string;
+  copyPaste: string;
+  expiresAt: string;
+}
+
+// === Consumption by Day (chart) ===
+
+export interface ConsumptionByDayItem {
+  date: string;                          // 'YYYY-MM-DD'
+  categories: Record<string, number>;    // { 'message.chat': 150, 'ai.tokens.input': 500, ... }
+  total: number;                         // soma do dia
+}
+
+export interface ConsumptionByDayResponse {
+  items: ConsumptionByDayItem[];
+  period: {
+    start: string;   // ISO date
+    end: string;     // ISO date
+  };
+  totals: Array<{
+    category: CreditCategory;
+    total: number;
+  }>;
+}
+
+// === Transaction List Params (frontend → API) ===
+// NOTE: Backend repository.ts has its own local `TransactionFilters` (uses Date).
+// This shared type uses string dates for API transport.
+
+export interface TransactionListParams {
+  category?: CreditCategory;
+  type?: CreditTransactionType;
+  source?: CreditTransactionSource;
+  startDate?: string;       // ISO date
+  endDate?: string;         // ISO date
+  page?: number;
+  limit?: number;
+}
+
+export interface TransactionListResult {
+  items: CreditTransactionResponse[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 // === Outbound Queue Job ===

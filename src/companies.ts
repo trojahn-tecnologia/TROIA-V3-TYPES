@@ -4,12 +4,16 @@ import { AssignmentConfig } from './assignment';
 import type { TenantThemeOverrides } from './theme';
 import type { CompanyCard, CompanyCardResponse, CreditBalance, CreditSubscription, CreditAlert, CreditInvoice } from './credits';
 
+export type CompanyDocumentType = 'CPF' | 'CNPJ';
+
 export interface Company extends FullTenantDocument {
   name: string;
   email: string;
   phone?: string;
   website?: string;
   logo?: string;
+  document?: string;
+  documentType?: CompanyDocumentType;
   status: ActiveStatus;
   defaultCountryCode?: string;
   address: Address;
@@ -44,6 +48,8 @@ export interface UpdateCompanyRequest {
   phone?: string;
   website?: string;
   logo?: string;
+  document?: string;
+  documentType?: CompanyDocumentType;
   status?: ActiveStatus;
   defaultCountryCode?: string;
   address?: Partial<Address>;
@@ -76,6 +82,8 @@ export interface CompanyResponse {
   phone?: string;
   website?: string;
   logo?: string;
+  document?: string;
+  documentType?: CompanyDocumentType;
   appId: string;
   status: ActiveStatus;
   defaultCountryCode?: string;
