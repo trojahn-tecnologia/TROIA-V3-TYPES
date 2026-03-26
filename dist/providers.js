@@ -49,6 +49,7 @@ var ProviderId;
     // Database Providers (Properties, Real Estate, etc.)
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
     ProviderId["DATABASE_DWV"] = "database-dwv";
+    ProviderId["DATABASE_KENLO"] = "database-kenlo";
     // Meta Platform (Unified Meta services)
     ProviderId["META"] = "meta";
 })(ProviderId || (exports.ProviderId = ProviderId = {}));

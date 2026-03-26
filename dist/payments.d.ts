@@ -188,7 +188,7 @@ export interface PaymentCustomerResponse {
     phone?: string;
     document: string;
     documentType: 'CPF' | 'CNPJ';
-    status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
+    status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'DELETED';
     createdAt: string;
     updatedAt: string;
     providerData?: any;

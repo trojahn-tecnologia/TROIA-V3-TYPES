@@ -204,6 +204,7 @@ export declare enum ProviderId {
     AI_ELEVENLABS = "ai-elevenlabs",
     DATABASE_JETIMOB = "database-jetimob",
     DATABASE_DWV = "database-dwv",
+    DATABASE_KENLO = "database-kenlo",
     META = "meta"
 }
 export declare enum ProviderCapability {

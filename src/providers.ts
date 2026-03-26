@@ -303,6 +303,7 @@ export enum ProviderId {
   // Database Providers (Properties, Real Estate, etc.)
   DATABASE_JETIMOB = 'database-jetimob',
   DATABASE_DWV = 'database-dwv',
+  DATABASE_KENLO = 'database-kenlo',
 
   // Meta Platform (Unified Meta services)
   META = 'meta'

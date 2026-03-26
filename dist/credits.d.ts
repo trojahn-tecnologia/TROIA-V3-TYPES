@@ -45,7 +45,7 @@ export interface CompanyCard {
     providerId: string;
     integrationId: string;
     customerId: string;
-    tokenId: string;
+    tokenId?: string;
     number: string;
     cvv: string;
     expiryMonth: number;
@@ -288,6 +288,7 @@ export interface CreditDashboardResponse {
         enabled: boolean;
         thresholdBalance: number;
         rechargeAmount: number;
+        maxRechargesPerCycle?: number;
     };
 }
 export interface InvoiceCategoryConsumption {
