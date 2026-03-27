@@ -116,7 +116,7 @@ export interface CreditBalance {
 }
 
 // === Credit Subscription (embedded in Company) ===
-export type CreditSubscriptionStatus = 'pending' | 'active' | 'past_due' | 'suspended' | 'cancelled';
+export type CreditSubscriptionStatus = 'pending' | 'active' | 'awaiting_payment' | 'past_due' | 'suspended' | 'cancelled';
 export type CreditPaymentMethod = 'credit_card' | 'pix';
 
 /** Pending plan change — upgrade (awaiting PIX payment) or downgrade (scheduled for next cycle) */
