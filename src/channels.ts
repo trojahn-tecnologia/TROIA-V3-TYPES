@@ -110,6 +110,25 @@ export interface ChannelExpirationConfig {
 }
 
 // ============================================================================
+// CHANNEL USER (operators vinculados a um canal)
+// ============================================================================
+
+export type ChannelUserRole = 'viewer' | 'attendant';
+export type ChannelUserScope = 'own' | 'team' | 'all';
+
+export interface ChannelUser {
+  id: string;
+  channelId: string;
+  userId: string;
+  role: ChannelUserRole;
+  scope: ChannelUserScope;
+  priority?: number | null;
+  capabilities?: string[];
+  status: 'active' | 'inactive';
+  assignedAt: string;
+}
+
+// ============================================================================
 // CHANNEL ENTITY
 // ============================================================================
 

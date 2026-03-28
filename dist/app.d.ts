@@ -1,6 +1,11 @@
 import { FullBaseDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import { TenantThemeOverrides, BaseThemeId } from './theme';
 import type { CreditCostEntry } from './credits';
+export interface PwaIcons {
+    icon192: string;
+    icon512: string;
+    maskable512: string;
+}
 export interface App extends FullBaseDocument {
     name: string;
     logo: string;
@@ -14,6 +19,7 @@ export interface App extends FullBaseDocument {
     widgetUrl?: string;
     support?: AppSupport;
     costs: CreditCostEntry[];
+    pwaIcons?: PwaIcons;
 }
 export interface AppSupportWidget {
     channelId: string;
@@ -46,6 +52,7 @@ export interface UpdateAppRequest {
     websiteUrl?: string;
     widgetUrl?: string;
     support?: AppSupport;
+    pwaIcons?: PwaIcons;
 }
 export type AppStatus = ActiveStatus;
 export interface AppQuery extends PaginationQuery {
@@ -67,6 +74,7 @@ export interface AppResponse {
     widgetUrl?: string;
     support?: AppSupport;
     costs: CreditCostEntry[];
+    pwaIcons?: PwaIcons;
     createdAt: string;
     updatedAt: string;
 }

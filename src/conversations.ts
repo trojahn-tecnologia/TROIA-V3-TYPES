@@ -1,4 +1,10 @@
 // Conversation Types - Sistema multi-canal de conversas
+
+export interface ConversationPrivacy {
+  enabled: boolean;
+  users: string[]; // ObjectId as string in response
+}
+
 export interface Conversation {
   id: string;
   appId: string;
@@ -108,6 +114,12 @@ export interface Conversation {
   tags: string[];
   category?: string;
 
+  // Privacy settings
+  privacy?: ConversationPrivacy;
+
+  // Channel-based permissions
+  userRole?: 'viewer' | 'attendant'; // role do usuário logado no canal da conversa
+
   // Metadata
   metadata?: Record<string, any>; // Channel-specific metadata
 
@@ -153,6 +165,7 @@ export interface CreateConversationRequest {
 
   tags?: string[];
   category?: string;
+  privacy?: ConversationPrivacy;
   metadata?: Record<string, any>;
 }
 
@@ -180,6 +193,7 @@ export interface UpdateConversationRequest {
 
   tags?: string[];
   category?: string;
+  privacy?: ConversationPrivacy;
   metadata?: Record<string, any>;
 }
 
@@ -192,6 +206,8 @@ export interface ConversationQuery extends PaginationQuery {
     status?: 'waiting' | 'active' | 'closed' | Array<'waiting' | 'active' | 'closed'>;  // ✅ Aceita string ou array
     priority?: 'low' | 'normal' | 'high' | 'urgent';
     channelId?: string | string[];
+    channelIds?: string[];  // ✅ Internal: channel-based access filter (set by controller, not user-facing)
+    _accessFilter?: Record<string, unknown>;  // ✅ Internal: full channel+scope+privacy filter from buildConversationAccessFilter
     channelType?: 'whatsapp' | 'instagram' | 'email' | 'chat' | 'sms' | 'telegram' | 'facebook' | 'widget';
     conversationType?: 'individual' | 'group' | 'ai';  // ✅ Virtual filter: 'ai' = agentId EXISTS AND agentStatus='active'
     providerId?: string;  // ✅ Filter by provider (via channel → integration → provider)

@@ -3,6 +3,78 @@ import { PaginationQuery, ListResponse, GenericQueryOptions, ActiveStatus } from
  * Email Templates Types
  * Used for email template management system
  */
+export declare enum EmailTemplateType {
+    PASSWORD_RESET = "password-reset",
+    WELCOME = "welcome",
+    EMAIL_VERIFICATION = "email-verification",
+    INVITATION = "invitation",
+    COMPANY_REGISTRATION = "company-registration",
+    SUBSCRIPTION_ACTIVATED = "subscription-activated",
+    SUBSCRIPTION_EXPIRED = "subscription-expired",
+    PLAN_CHANGED = "plan-changed",
+    SYSTEM_NOTIFICATION = "system-notification",
+    MAINTENANCE_NOTICE = "maintenance-notice",
+    PAYMENT_PENDING = "payment-pending",
+    PAYMENT_OVERDUE = "payment-overdue",
+    INVOICE_GENERATED = "invoice-generated"
+}
+export declare enum TemplateLevel {
+    SYSTEM = "system",// Built-in system templates
+    APP = "app",// App-level templates (core)
+    COMPANY = "company"
+}
+export interface EmailTemplateData {
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
+    email?: string;
+    companyName?: string;
+    appName?: string;
+    resetLink?: string;
+    expiresIn?: string;
+    loginLink?: string;
+    setupLink?: string;
+    inviteLink?: string;
+    inviterName?: string;
+    inviterEmail?: string;
+    role?: string;
+    verificationLink?: string;
+    verificationCode?: string;
+    planName?: string;
+    planPrice?: string;
+    billingPeriod?: string;
+    nextBillingDate?: string;
+    message?: string;
+    actionUrl?: string;
+    actionText?: string;
+    severity?: 'info' | 'warning' | 'error' | 'success';
+    primaryColor?: string;
+    logoUrl?: string;
+    footer?: string;
+    amount?: string;
+    creditsReceived?: string;
+    nextCycleDate?: string;
+    previousPlanName?: string;
+    effectiveAt?: string;
+    proRataCharge?: string;
+    additionalCredits?: string;
+    pixLink?: string;
+    expiresAt?: string;
+    dueDate?: string;
+    dashboardLink?: string;
+    invoiceCycle?: string;
+    period?: string;
+    totalAmount?: string;
+    title?: string;
+    [key: string]: unknown;
+}
+export interface BrandingConfig {
+    primaryColor?: string;
+    secondaryColor?: string;
+    logoUrl?: string;
+    companyName?: string;
+    footerText?: string;
+}
 export interface EmailTemplateQuery extends PaginationQuery {
     status?: ActiveStatus;
     templateType?: string;

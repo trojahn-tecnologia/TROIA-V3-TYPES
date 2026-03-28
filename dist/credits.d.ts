@@ -176,6 +176,7 @@ export type CreditTransactionType = 'debit' | 'credit';
 export type CreditTransactionSource = 'subscription' | 'purchase' | 'auto_recharge' | 'consumption' | 'recurring' | 'refund' | 'admin' | 'expiration' | 'cancellation';
 export interface CreditTransactionMetadata {
     conversationId?: string;
+    channelId?: string;
     campaignId?: string;
     contactId?: string;
     leadId?: string;

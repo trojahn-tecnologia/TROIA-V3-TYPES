@@ -26,7 +26,7 @@ export interface Module extends AppAwareDocument {
 }
 export interface ModulePermission {
     actions: PermissionAction[];
-    scope: PermissionScope;
+    scope?: PermissionScope;
 }
 export interface ModuleQuery extends PaginationQuery {
     status?: ActiveStatus;

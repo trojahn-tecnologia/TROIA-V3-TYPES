@@ -1,3 +1,7 @@
+export interface ConversationPrivacy {
+    enabled: boolean;
+    users: string[];
+}
 export interface Conversation {
     id: string;
     appId: string;
@@ -74,6 +78,8 @@ export interface Conversation {
     averageResponseTime?: number;
     tags: string[];
     category?: string;
+    privacy?: ConversationPrivacy;
+    userRole?: 'viewer' | 'attendant';
     metadata?: Record<string, any>;
     unreadTracking?: {
         [userId: string]: {
@@ -107,6 +113,7 @@ export interface CreateConversationRequest {
     agentStatus?: 'active' | 'inactive' | 'paused';
     tags?: string[];
     category?: string;
+    privacy?: ConversationPrivacy;
     metadata?: Record<string, any>;
 }
 export interface UpdateConversationRequest {
@@ -127,6 +134,7 @@ export interface UpdateConversationRequest {
     agentStatus?: 'active' | 'inactive' | 'paused';
     tags?: string[];
     category?: string;
+    privacy?: ConversationPrivacy;
     metadata?: Record<string, any>;
 }
 export type ConversationResponse = Conversation;
@@ -137,6 +145,8 @@ export interface ConversationQuery extends PaginationQuery {
         status?: 'waiting' | 'active' | 'closed' | Array<'waiting' | 'active' | 'closed'>;
         priority?: 'low' | 'normal' | 'high' | 'urgent';
         channelId?: string | string[];
+        channelIds?: string[];
+        _accessFilter?: Record<string, unknown>;
         channelType?: 'whatsapp' | 'instagram' | 'email' | 'chat' | 'sms' | 'telegram' | 'facebook' | 'widget';
         conversationType?: 'individual' | 'group' | 'ai';
         providerId?: string;

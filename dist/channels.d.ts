@@ -72,6 +72,19 @@ export interface ChannelExpirationConfig {
     /** Mensagem opcional a ser enviada quando o atendimento expirar */
     expirationMessage?: string;
 }
+export type ChannelUserRole = 'viewer' | 'attendant';
+export type ChannelUserScope = 'own' | 'team' | 'all';
+export interface ChannelUser {
+    id: string;
+    channelId: string;
+    userId: string;
+    role: ChannelUserRole;
+    scope: ChannelUserScope;
+    priority?: number | null;
+    capabilities?: string[];
+    status: 'active' | 'inactive';
+    assignedAt: string;
+}
 export interface Channel {
     name: string;
     integrationId: ObjectId;

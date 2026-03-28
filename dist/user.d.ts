@@ -339,6 +339,7 @@ export interface UserResponse {
     levelId?: string;
     preferences: UserPreferences;
     permissions: UserPermissions;
+    emailVerified?: boolean;
     lastLoginAt?: string;
     lastActivityAt?: string;
     createdAt: string;

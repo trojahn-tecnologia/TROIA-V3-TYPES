@@ -85,7 +85,7 @@ export interface Module extends AppAwareDocument {
 
 export interface ModulePermission {
   actions: PermissionAction[];
-  scope: PermissionScope;
+  scope?: PermissionScope;
 }
 
 // Generic + Specific Pattern

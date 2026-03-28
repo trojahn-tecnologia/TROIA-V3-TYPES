@@ -242,6 +242,7 @@ export type CreditTransactionSource =
 
 export interface CreditTransactionMetadata {
   conversationId?: string;
+  channelId?: string;
   campaignId?: string;
   contactId?: string;
   leadId?: string;
