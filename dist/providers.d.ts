@@ -205,6 +205,7 @@ export declare enum ProviderId {
     DATABASE_JETIMOB = "database-jetimob",
     DATABASE_DWV = "database-dwv",
     DATABASE_KENLO = "database-kenlo",
+    VECTOR_PINECONE = "vector-pinecone",
     META = "meta"
 }
 export declare enum ProviderCapability {
@@ -263,6 +264,7 @@ export declare enum ProviderCapability {
     MANAGE_PAGE = "manage_page",
     MANAGE_ACCOUNT = "manage_account",
     GENERATE_EMBEDDING = "generate_embedding",
+    VECTOR_STORAGE = "vector_storage",
     AI_TEXT_GENERATION = "ai_text_generation",// LLM text generation (GPT, Claude, etc.)
     AI_CHAT_COMPLETION = "ai_chat_completion",// Chat completion with conversation history
     TEXT_TO_SPEECH = "text_to_speech",// Convert text to audio (TTS)
@@ -355,4 +357,20 @@ export interface ProviderResponse extends Omit<Provider, '_id' | 'createdAt' | '
 }
 export interface GenericProviderConfig {
     [key: string]: any;
+}
+export interface VectorMetadata {
+    appId: string;
+    companyId: string;
+    resourceType: 'conversation-message-chunk' | 'database-document';
+    resourceId: string;
+}
+export interface VectorSearchResult {
+    id: string;
+    score: number;
+    metadata: VectorMetadata;
+}
+export interface VectorFilter {
+    appId: string;
+    companyId: string;
+    resourceType?: 'conversation-message-chunk' | 'database-document';
 }

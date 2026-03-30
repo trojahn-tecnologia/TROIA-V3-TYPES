@@ -305,6 +305,9 @@ export enum ProviderId {
   DATABASE_DWV = 'database-dwv',
   DATABASE_KENLO = 'database-kenlo',
 
+  // Vector Storage Providers
+  VECTOR_PINECONE = 'vector-pinecone',
+
   // Meta Platform (Unified Meta services)
   META = 'meta'
 }
@@ -404,6 +407,7 @@ export enum ProviderCapability {
 
   // AI Capabilities
   GENERATE_EMBEDDING = 'generate_embedding',
+  VECTOR_STORAGE = 'vector_storage',
   AI_TEXT_GENERATION = 'ai_text_generation',  // LLM text generation (GPT, Claude, etc.)
   AI_CHAT_COMPLETION = 'ai_chat_completion',  // Chat completion with conversation history
   TEXT_TO_SPEECH = 'text_to_speech',          // Convert text to audio (TTS)
@@ -547,4 +551,27 @@ export interface ProviderResponse extends Omit<Provider, '_id' | 'createdAt' | '
 
 export interface GenericProviderConfig {
   [key: string]: any;
+}
+
+// ============================================================================
+// VECTOR STORAGE TYPES
+// ============================================================================
+
+export interface VectorMetadata {
+  appId: string;
+  companyId: string;
+  resourceType: 'conversation-message-chunk' | 'database-document';
+  resourceId: string;
+}
+
+export interface VectorSearchResult {
+  id: string;
+  score: number;
+  metadata: VectorMetadata;
+}
+
+export interface VectorFilter {
+  appId: string;
+  companyId: string;
+  resourceType?: 'conversation-message-chunk' | 'database-document';
 }

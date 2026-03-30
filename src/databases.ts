@@ -899,6 +899,8 @@ export interface DatabaseDocumentQuery extends PaginationQuery {
     maxArea?: number;
     city?: string;
     neighborhood?: string;
+    // IDs filter — used by Pinecone hybrid search to restrict results to specific document IDs
+    _ids?: string[];
   };
 }
 

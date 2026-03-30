@@ -50,6 +50,8 @@ var ProviderId;
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
     ProviderId["DATABASE_DWV"] = "database-dwv";
     ProviderId["DATABASE_KENLO"] = "database-kenlo";
+    // Vector Storage Providers
+    ProviderId["VECTOR_PINECONE"] = "vector-pinecone";
     // Meta Platform (Unified Meta services)
     ProviderId["META"] = "meta";
 })(ProviderId || (exports.ProviderId = ProviderId = {}));
@@ -131,6 +133,7 @@ var ProviderCapability;
     ProviderCapability["MANAGE_ACCOUNT"] = "manage_account";
     // AI Capabilities
     ProviderCapability["GENERATE_EMBEDDING"] = "generate_embedding";
+    ProviderCapability["VECTOR_STORAGE"] = "vector_storage";
     ProviderCapability["AI_TEXT_GENERATION"] = "ai_text_generation";
     ProviderCapability["AI_CHAT_COMPLETION"] = "ai_chat_completion";
     ProviderCapability["TEXT_TO_SPEECH"] = "text_to_speech";

@@ -9,6 +9,7 @@ export interface PwaIcons {
 export interface App extends FullBaseDocument {
     name: string;
     logo: string;
+    favicon?: string;
     status: ActiveStatus;
     baseThemeId?: BaseThemeId;
     themeOverrides?: TenantThemeOverrides;
@@ -43,6 +44,7 @@ export interface CreateAppRequest {
 export interface UpdateAppRequest {
     name?: string;
     logo?: string;
+    favicon?: string;
     status?: ActiveStatus;
     baseThemeId?: BaseThemeId;
     themeOverrides?: TenantThemeOverrides;
@@ -64,6 +66,7 @@ export interface AppResponse {
     id: string;
     name: string;
     logo: string;
+    favicon?: string;
     status: ActiveStatus;
     baseThemeId?: BaseThemeId;
     themeOverrides?: TenantThemeOverrides;

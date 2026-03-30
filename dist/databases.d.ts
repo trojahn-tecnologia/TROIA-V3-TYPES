@@ -689,6 +689,7 @@ export interface DatabaseDocumentQuery extends PaginationQuery {
         maxArea?: number;
         city?: string;
         neighborhood?: string;
+        _ids?: string[];
     };
 }
 export interface DatabaseListResponse extends ListResponse<DatabaseResponse> {
