@@ -84,8 +84,8 @@ export interface WebhookData {
  * Supports both WhatsApp Business API (requires approval) and Gateway (no approval needed)
  */
 export interface TemplateMessageData {
-  // Recipient info
-  recipientPhone: string;
+  // Recipient info (phone number, email address, or other provider-specific identifier)
+  recipientIdentifier: string;
   recipientName?: string;
 
   // Template info
@@ -99,11 +99,12 @@ export interface TemplateMessageData {
   components?: Array<{
     type: 'header' | 'body' | 'footer' | 'button';
     parameters?: Array<{
-      type: 'text' | 'image' | 'video' | 'document';
+      type: 'text' | 'image' | 'video' | 'document' | 'location';
       text?: string;
       image?: { link: string };
       video?: { link: string };
       document?: { link: string; filename?: string };
+      location?: { latitude: number; longitude: number; name?: string; address?: string };
     }>;
     sub_type?: 'url' | 'quick_reply';
     index?: number;
@@ -115,11 +116,26 @@ export interface TemplateMessageData {
   // Message ID for correlation (campaign message tracking)
   messageId?: string;
 
-  // For media templates
+  // For media templates (image, video, document, audio)
   headerMedia?: {
-    type: 'image' | 'video' | 'document';
+    type: 'image' | 'video' | 'document' | 'audio';
     url: string;
     filename?: string;
+  };
+
+  // For location templates (Gateway: /send-location, WhatsApp Business: HEADER format=LOCATION)
+  location?: {
+    latitude: number;
+    longitude: number;
+    name?: string;
+    address?: string;
+  };
+
+  // For contact templates (Gateway: /send-contact)
+  contactData?: {
+    name: string;
+    phone?: string;
+    email?: string;
   };
 }
 

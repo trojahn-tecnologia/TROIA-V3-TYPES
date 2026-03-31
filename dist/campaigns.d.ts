@@ -201,7 +201,7 @@ export declare enum CampaignMessageStatus {
 export interface CampaignMessage extends TenantAwareDocument {
     campaignId: string;
     recipientId: string;
-    recipientPhone: string;
+    recipientIdentifier: string;
     recipientName?: string;
     recipientData?: Record<string, unknown>;
     status: CampaignMessageStatus;
@@ -230,7 +230,7 @@ export interface CampaignMessageListResponse extends ListResponse<CampaignMessag
 export interface CampaignMessageQuery extends PaginationQuery {
     campaignId?: string;
     status?: CampaignMessageStatus | CampaignMessageStatus[];
-    recipientPhone?: string;
+    recipientIdentifier?: string;
     search?: string;
 }
 /**
@@ -241,7 +241,7 @@ export interface CampaignMessageJobData {
     campaignId: string;
     channelId: string;
     templateId: string;
-    recipientPhone: string;
+    recipientIdentifier: string;
     recipientName?: string;
     variables: Record<string, string>;
     appId: string;

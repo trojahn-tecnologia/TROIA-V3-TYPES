@@ -254,6 +254,7 @@ export interface LeadQuery extends PaginationQuery {
     adName?: string | string[];
     tags?: string | string[];
     type?: string | string[];
+    contactIdIn?: string[];
   };
 }
 

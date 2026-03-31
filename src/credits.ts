@@ -429,20 +429,34 @@ export interface TransactionListResult {
 }
 
 // === Outbound Queue Job ===
+export type OutboundSource = 'campaign' | 'trigger' | 'follow-up' | 'workflow';
+
 export interface OutboundMessageJob {
-  companyId: string;
+  source: OutboundSource;
   appId: string;
+  companyId: string;
+  integrationId: string;
   channelId: string;
-  conversationId?: string;
-  messageId?: string;
+
+  // Campaign-specific
+  campaignId?: string;
   campaignMessageId?: string;
+
+  // Trigger-specific
   leadId?: string;
   agentId?: string;
-  source: 'campaign' | 'trigger' | 'notification';
-  providerId: string;
-  integrationId: string;
-  creditCategory: CreditCategory;
-  creditCost: number;
+
+  // Follow-up-specific
+  followUpId?: string;
+  followUpActionId?: string;
+  contactId?: string;
+
+  // Workflow-specific
+  workflowExecutionId?: string;
+  workflowNodeId?: string;
+  messageContent?: string;
+  targetContactIds?: string[];
+  targetConversationId?: string;
 }
 
 // === Channel Warmup ===

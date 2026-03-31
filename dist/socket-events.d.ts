@@ -372,7 +372,7 @@ export interface CampaignMessageStatusEvent {
     campaignId: string;
     messageId: string;
     providerMessageId?: string;
-    recipientPhone: string;
+    recipientIdentifier: string;
     recipientName?: string;
     status: 'sent' | 'delivered' | 'read' | 'failed';
     previousStatus?: string;

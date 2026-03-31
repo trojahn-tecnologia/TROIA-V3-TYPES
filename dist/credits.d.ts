@@ -338,20 +338,25 @@ export interface TransactionListResult {
     limit: number;
     totalPages: number;
 }
+export type OutboundSource = 'campaign' | 'trigger' | 'follow-up' | 'workflow';
 export interface OutboundMessageJob {
-    companyId: string;
+    source: OutboundSource;
     appId: string;
+    companyId: string;
+    integrationId: string;
     channelId: string;
-    conversationId?: string;
-    messageId?: string;
+    campaignId?: string;
     campaignMessageId?: string;
     leadId?: string;
     agentId?: string;
-    source: 'campaign' | 'trigger' | 'notification';
-    providerId: string;
-    integrationId: string;
-    creditCategory: CreditCategory;
-    creditCost: number;
+    followUpId?: string;
+    followUpActionId?: string;
+    contactId?: string;
+    workflowExecutionId?: string;
+    workflowNodeId?: string;
+    messageContent?: string;
+    targetContactIds?: string[];
+    targetConversationId?: string;
 }
 export interface ChannelWarmup {
     enabled: boolean;

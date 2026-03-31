@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProviderCapability = exports.ProviderId = void 0;
+exports.ProviderCapability = exports.isProviderCategory = exports.PROVIDER_CATEGORY = exports.ProviderId = void 0;
 // ============================================================================
 // PROVIDER ENUM (Centralized)
 // ============================================================================
@@ -55,6 +55,63 @@ var ProviderId;
     // Meta Platform (Unified Meta services)
     ProviderId["META"] = "meta";
 })(ProviderId || (exports.ProviderId = ProviderId = {}));
+exports.PROVIDER_CATEGORY = {
+    // Email
+    [ProviderId.EMAIL_SMTP]: 'email',
+    [ProviderId.EMAIL_SENDGRID]: 'email',
+    [ProviderId.EMAIL_SES]: 'email',
+    [ProviderId.EMAIL_RESEND]: 'email',
+    [ProviderId.GMAIL_API]: 'email',
+    // Messaging
+    [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
+    [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
+    [ProviderId.TELEGRAM_BOT]: 'messaging',
+    [ProviderId.SMS_TWILIO]: 'messaging',
+    [ProviderId.PUSH_FIREBASE]: 'messaging',
+    [ProviderId.PUSH_ONESIGNAL]: 'messaging',
+    [ProviderId.GATEWAY_WHATSAPP]: 'messaging',
+    // Social
+    [ProviderId.INSTAGRAM_MESSAGING]: 'social',
+    [ProviderId.LINKEDIN_MESSAGING]: 'social',
+    [ProviderId.TIKTOK_MESSAGING]: 'social',
+    [ProviderId.TIKTOK_BUSINESS]: 'social',
+    // Payment
+    [ProviderId.PAYMENT_ASAAS]: 'payment',
+    [ProviderId.PAYMENT_STRIPE]: 'payment',
+    [ProviderId.PAYMENT_PAYPAL]: 'payment',
+    [ProviderId.PAYMENT_MERCADOPAGO]: 'payment',
+    // Calendar
+    [ProviderId.GOOGLE_CALENDAR]: 'calendar',
+    [ProviderId.OUTLOOK_CALENDAR]: 'calendar',
+    [ProviderId.ICLOUD_CALENDAR]: 'calendar',
+    // Web/API
+    [ProviderId.WEBSITE_CHAT]: 'web',
+    [ProviderId.WEBSITE_WIDGET]: 'web',
+    [ProviderId.API_WEBHOOK]: 'web',
+    // AI
+    [ProviderId.AI_OPENAI]: 'ai',
+    [ProviderId.AI_ANTHROPIC]: 'ai',
+    [ProviderId.AI_XAI]: 'ai',
+    [ProviderId.AI_GOOGLE]: 'ai',
+    [ProviderId.AI_MISTRAL]: 'ai',
+    [ProviderId.AI_DEEPSEEK]: 'ai',
+    [ProviderId.AI_ELEVENLABS]: 'ai',
+    // Database
+    [ProviderId.DATABASE_JETIMOB]: 'database',
+    [ProviderId.DATABASE_DWV]: 'database',
+    [ProviderId.DATABASE_KENLO]: 'database',
+    // Vector
+    [ProviderId.VECTOR_PINECONE]: 'vector',
+    // Meta
+    [ProviderId.META]: 'meta',
+};
+/** Check if a providerId belongs to a given category */
+const isProviderCategory = (providerId, category) => {
+    if (!providerId)
+        return false;
+    return exports.PROVIDER_CATEGORY[providerId] === category;
+};
+exports.isProviderCategory = isProviderCategory;
 // ============================================================================
 // PROVIDER CAPABILITIES (Centralized)
 // ============================================================================

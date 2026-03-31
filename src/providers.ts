@@ -244,7 +244,7 @@ export interface RateLimitUsage {
 export interface RateLimitCheckResult {
   allowed: boolean;
   waitMs?: number;                  // Milliseconds to wait before retry
-  reason?: 'daily_limit_reached' | 'hourly_limit_reached' | 'minute_limit_reached' | 'second_limit_reached' | 'quality_rating_flagged';
+  reason?: 'daily_limit_reached' | 'hourly_limit_reached' | 'minute_limit_reached' | 'second_limit_reached' | 'quality_rating_flagged' | 'minimum_delay_between_messages';
   currentUsage?: RateLimitUsage;
 }
 
@@ -311,6 +311,78 @@ export enum ProviderId {
   // Meta Platform (Unified Meta services)
   META = 'meta'
 }
+
+// ============================================================================
+// PROVIDER CATEGORY MAPPING (Static, centralized)
+// ============================================================================
+
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta';
+
+export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
+  // Email
+  [ProviderId.EMAIL_SMTP]: 'email',
+  [ProviderId.EMAIL_SENDGRID]: 'email',
+  [ProviderId.EMAIL_SES]: 'email',
+  [ProviderId.EMAIL_RESEND]: 'email',
+  [ProviderId.GMAIL_API]: 'email',
+
+  // Messaging
+  [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
+  [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
+  [ProviderId.TELEGRAM_BOT]: 'messaging',
+  [ProviderId.SMS_TWILIO]: 'messaging',
+  [ProviderId.PUSH_FIREBASE]: 'messaging',
+  [ProviderId.PUSH_ONESIGNAL]: 'messaging',
+  [ProviderId.GATEWAY_WHATSAPP]: 'messaging',
+
+  // Social
+  [ProviderId.INSTAGRAM_MESSAGING]: 'social',
+  [ProviderId.LINKEDIN_MESSAGING]: 'social',
+  [ProviderId.TIKTOK_MESSAGING]: 'social',
+  [ProviderId.TIKTOK_BUSINESS]: 'social',
+
+  // Payment
+  [ProviderId.PAYMENT_ASAAS]: 'payment',
+  [ProviderId.PAYMENT_STRIPE]: 'payment',
+  [ProviderId.PAYMENT_PAYPAL]: 'payment',
+  [ProviderId.PAYMENT_MERCADOPAGO]: 'payment',
+
+  // Calendar
+  [ProviderId.GOOGLE_CALENDAR]: 'calendar',
+  [ProviderId.OUTLOOK_CALENDAR]: 'calendar',
+  [ProviderId.ICLOUD_CALENDAR]: 'calendar',
+
+  // Web/API
+  [ProviderId.WEBSITE_CHAT]: 'web',
+  [ProviderId.WEBSITE_WIDGET]: 'web',
+  [ProviderId.API_WEBHOOK]: 'web',
+
+  // AI
+  [ProviderId.AI_OPENAI]: 'ai',
+  [ProviderId.AI_ANTHROPIC]: 'ai',
+  [ProviderId.AI_XAI]: 'ai',
+  [ProviderId.AI_GOOGLE]: 'ai',
+  [ProviderId.AI_MISTRAL]: 'ai',
+  [ProviderId.AI_DEEPSEEK]: 'ai',
+  [ProviderId.AI_ELEVENLABS]: 'ai',
+
+  // Database
+  [ProviderId.DATABASE_JETIMOB]: 'database',
+  [ProviderId.DATABASE_DWV]: 'database',
+  [ProviderId.DATABASE_KENLO]: 'database',
+
+  // Vector
+  [ProviderId.VECTOR_PINECONE]: 'vector',
+
+  // Meta
+  [ProviderId.META]: 'meta',
+};
+
+/** Check if a providerId belongs to a given category */
+export const isProviderCategory = (providerId: string | null | undefined, category: ProviderCategory): boolean => {
+  if (!providerId) return false;
+  return PROVIDER_CATEGORY[providerId as ProviderId] === category;
+};
 
 // ============================================================================
 // PROVIDER CAPABILITIES (Centralized)

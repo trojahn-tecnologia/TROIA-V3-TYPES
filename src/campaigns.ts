@@ -225,7 +225,7 @@ export enum CampaignMessageStatus {
 export interface CampaignMessage extends TenantAwareDocument {
   campaignId: string;               // Referência à campanha
   recipientId: string;              // ID do lead/contato ou número manual
-  recipientPhone: string;           // Número de telefone normalizado
+  recipientIdentifier: string;      // Identificador do destinatário (phone, email, etc.)
   recipientName?: string;           // Nome para variáveis
   recipientData?: Record<string, unknown>; // Dados extras para variáveis
   status: CampaignMessageStatus;
@@ -256,7 +256,7 @@ export interface CampaignMessageListResponse extends ListResponse<CampaignMessag
 export interface CampaignMessageQuery extends PaginationQuery {
   campaignId?: string;
   status?: CampaignMessageStatus | CampaignMessageStatus[];
-  recipientPhone?: string;
+  recipientIdentifier?: string;
   search?: string;
 }
 
@@ -268,7 +268,7 @@ export interface CampaignMessageJobData {
   campaignId: string;
   channelId: string;
   templateId: string;
-  recipientPhone: string;
+  recipientIdentifier: string;
   recipientName?: string;
   variables: Record<string, string>;  // Variáveis já resolvidas
   appId: string;

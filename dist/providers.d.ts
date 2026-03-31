@@ -165,7 +165,7 @@ export interface RateLimitUsage {
 export interface RateLimitCheckResult {
     allowed: boolean;
     waitMs?: number;
-    reason?: 'daily_limit_reached' | 'hourly_limit_reached' | 'minute_limit_reached' | 'second_limit_reached' | 'quality_rating_flagged';
+    reason?: 'daily_limit_reached' | 'hourly_limit_reached' | 'minute_limit_reached' | 'second_limit_reached' | 'quality_rating_flagged' | 'minimum_delay_between_messages';
     currentUsage?: RateLimitUsage;
 }
 export declare enum ProviderId {
@@ -208,6 +208,10 @@ export declare enum ProviderId {
     VECTOR_PINECONE = "vector-pinecone",
     META = "meta"
 }
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta';
+export declare const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory>;
+/** Check if a providerId belongs to a given category */
+export declare const isProviderCategory: (providerId: string | null | undefined, category: ProviderCategory) => boolean;
 export declare enum ProviderCapability {
     SEND_EMAIL = "send_email",
     RECEIVE_EMAIL = "receive_email",

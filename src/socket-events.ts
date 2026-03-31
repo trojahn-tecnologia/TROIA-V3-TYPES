@@ -446,7 +446,7 @@ export interface CampaignMessageStatusEvent {
   campaignId: string;
   messageId: string;               // MongoDB campaign-message ID
   providerMessageId?: string;      // WhatsApp provider message ID
-  recipientPhone: string;
+  recipientIdentifier: string;
   recipientName?: string;
   status: 'sent' | 'delivered' | 'read' | 'failed';
   previousStatus?: string;

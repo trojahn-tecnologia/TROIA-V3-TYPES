@@ -67,7 +67,7 @@ export interface WebhookData {
  * Supports both WhatsApp Business API (requires approval) and Gateway (no approval needed)
  */
 export interface TemplateMessageData {
-    recipientPhone: string;
+    recipientIdentifier: string;
     recipientName?: string;
     templateName: string;
     language?: string;
@@ -75,7 +75,7 @@ export interface TemplateMessageData {
     components?: Array<{
         type: 'header' | 'body' | 'footer' | 'button';
         parameters?: Array<{
-            type: 'text' | 'image' | 'video' | 'document';
+            type: 'text' | 'image' | 'video' | 'document' | 'location';
             text?: string;
             image?: {
                 link: string;
@@ -87,6 +87,12 @@ export interface TemplateMessageData {
                 link: string;
                 filename?: string;
             };
+            location?: {
+                latitude: number;
+                longitude: number;
+                name?: string;
+                address?: string;
+            };
         }>;
         sub_type?: 'url' | 'quick_reply';
         index?: number;
@@ -94,9 +100,20 @@ export interface TemplateMessageData {
     renderedContent?: string;
     messageId?: string;
     headerMedia?: {
-        type: 'image' | 'video' | 'document';
+        type: 'image' | 'video' | 'document' | 'audio';
         url: string;
         filename?: string;
+    };
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string;
+        address?: string;
+    };
+    contactData?: {
+        name: string;
+        phone?: string;
+        email?: string;
     };
 }
 /**
