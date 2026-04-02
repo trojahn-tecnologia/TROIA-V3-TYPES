@@ -96,8 +96,8 @@ export interface GatewayTemplateConfig {
  * Email Template Config (HTML + Plain Text)
  */
 export interface EmailTemplateConfig {
-    providerType: 'email_smtp' | 'email_sendgrid';
-    subject: string;
+    providerType: 'email_smtp' | 'email_sendgrid' | 'email_resend' | 'email_ses' | 'gmail_api';
+    subject?: string;
     htmlBody: string;
     plainTextBody?: string;
     attachments?: Array<{
@@ -175,6 +175,7 @@ export interface Template {
     channelId: ObjectId;
     providerConfig: TemplateProviderConfig;
     variables: TemplateVariable[];
+    version?: string;
     usageCount: number;
     lastUsedAt?: Date;
     createdBy: ObjectId;
@@ -258,6 +259,61 @@ export interface TemplatePreviewResponse {
         attachment?: any;
     };
     variablesUsed: Record<number, string | number | boolean>;
+}
+/**
+ * Template Version Change Types (semantic versioning)
+ */
+export type TemplateVersionChangeType = 'major' | 'minor' | 'patch' | 'initial';
+/**
+ * Template Version Document
+ * Immutable snapshot stored in `template-versions` collection
+ */
+export interface TemplateVersion {
+    _id?: ObjectId;
+    templateId: ObjectId | string;
+    version: string;
+    htmlBody: string;
+    subject: string;
+    changePercentage: number;
+    changeType: TemplateVersionChangeType;
+    appId: ObjectId | string;
+    companyId: ObjectId | string;
+    createdAt: Date | string;
+}
+/**
+ * Template Version API Response
+ */
+export interface TemplateVersionResponse {
+    id: string;
+    templateId: string;
+    version: string;
+    htmlBody: string;
+    subject: string;
+    changePercentage: number;
+    changeType: TemplateVersionChangeType;
+    appId: string;
+    companyId: string;
+    createdAt: string;
+}
+/**
+ * Template Version Query
+ */
+export interface TemplateVersionQuery {
+    page?: number;
+    limit?: number;
+}
+/**
+ * Generate HTML Request (AI-powered)
+ */
+export interface GenerateHtmlRequest {
+    instructions: string;
+    currentHtml: string;
+}
+/**
+ * Generate HTML Response
+ */
+export interface GenerateHtmlResponse {
+    html: string;
 }
 /**
  * Submit Template for Approval Request (WhatsApp only)

@@ -125,10 +125,10 @@ export interface GatewayTemplateConfig {
  * Email Template Config (HTML + Plain Text)
  */
 export interface EmailTemplateConfig {
-  providerType: 'email_smtp' | 'email_sendgrid';
+  providerType: 'email_smtp' | 'email_sendgrid' | 'email_resend' | 'email_ses' | 'gmail_api';
 
   // Email structure
-  subject: string;          // Com {{1}}, {{2}}, etc.
+  subject?: string;         // Com {{1}}, {{2}}, etc. (opcional na criação)
   htmlBody: string;         // HTML completo com {{1}}, {{2}}, etc.
   plainTextBody?: string;   // Fallback text com {{1}}, {{2}}, etc.
 
@@ -232,6 +232,9 @@ export interface Template {
 
   // Variables (numeric format: {{1}}, {{2}}, {{3}}...)
   variables: TemplateVariable[];
+
+  // Versioning
+  version?: string;          // Semver: "1.0.0" (email templates)
 
   // Metadata
   usageCount: number;        // Times this template was used
@@ -340,6 +343,75 @@ export interface TemplatePreviewResponse {
   // Variables used and their values
   variablesUsed: Record<number, string | number | boolean>;
 }
+
+// ============================================================================
+// TEMPLATE VERSIONING
+// ============================================================================
+
+/**
+ * Template Version Change Types (semantic versioning)
+ */
+export type TemplateVersionChangeType = 'major' | 'minor' | 'patch' | 'initial';
+
+/**
+ * Template Version Document
+ * Immutable snapshot stored in `template-versions` collection
+ */
+export interface TemplateVersion {
+  _id?: ObjectId;
+  templateId: ObjectId | string;
+  version: string;                    // Semver: "1.0.0"
+  htmlBody: string;                   // Snapshot do HTML
+  subject: string;                    // Snapshot do assunto
+  changePercentage: number;           // 0-100
+  changeType: TemplateVersionChangeType;
+  appId: ObjectId | string;
+  companyId: ObjectId | string;
+  createdAt: Date | string;
+}
+
+/**
+ * Template Version API Response
+ */
+export interface TemplateVersionResponse {
+  id: string;
+  templateId: string;
+  version: string;
+  htmlBody: string;
+  subject: string;
+  changePercentage: number;
+  changeType: TemplateVersionChangeType;
+  appId: string;
+  companyId: string;
+  createdAt: string;
+}
+
+/**
+ * Template Version Query
+ */
+export interface TemplateVersionQuery {
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Generate HTML Request (AI-powered)
+ */
+export interface GenerateHtmlRequest {
+  instructions: string;
+  currentHtml: string;
+}
+
+/**
+ * Generate HTML Response
+ */
+export interface GenerateHtmlResponse {
+  html: string;
+}
+
+// ============================================================================
+// TEMPLATE APPROVAL
+// ============================================================================
 
 /**
  * Submit Template for Approval Request (WhatsApp only)
