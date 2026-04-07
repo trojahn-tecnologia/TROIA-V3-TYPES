@@ -47,6 +47,7 @@ export type ValidModuleId =
   | 'products'
   | 'orders'
   | 'campaigns'
+  | 'audiences'
   | 'templates'
   | 'calendar'
   | 'calls'

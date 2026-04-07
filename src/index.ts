@@ -77,6 +77,7 @@ export * from './message-chunks';
 // Marketing modules
 export * from './templates';
 export * from './campaigns';
+export * from './audiences';
 
 // Databases module (multi-purpose data segregation)
 export * from './databases';

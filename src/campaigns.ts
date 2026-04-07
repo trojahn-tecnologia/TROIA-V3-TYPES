@@ -11,6 +11,7 @@ export interface Campaign extends TenantAwareDocument {
   audienceType: AudienceType;      // leads, customers, groups, manual
   audienceFilter?: AudienceFilter; // Filtros de seleção
   recipientIds?: string[];         // IDs manuais (se audienceType = manual)
+  audienceId?: string;             // NOVO — usado quando audienceType === CUSTOM_AUDIENCE
   variableMapping: VariableMapping; // Mapeia variáveis do template
   schedulingType: SchedulingType;  // immediate, scheduled, recurring
   scheduledFor?: string;           // Data/hora agendada (ISO string)
@@ -36,9 +37,20 @@ export enum CampaignStatus {
  * Audience Type - Tipo de audiência da campanha
  */
 export enum AudienceType {
-  LEADS = 'leads',           // Leads collection (via contactId)
-  CONTACTS = 'contacts'      // Contacts collection
+  LEADS = 'leads',                       // Leads collection (via contactId)
+  CONTACTS = 'contacts',                 // Contacts collection
+  CUSTOM_AUDIENCE = 'custom_audience'    // Audiences module (CSV imports)
 }
+
+/**
+ * Human-readable labels for AudienceType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+export const AUDIENCE_TYPE_LABELS: Record<AudienceType, string> = {
+  [AudienceType.LEADS]: 'Leads',
+  [AudienceType.CONTACTS]: 'Contatos',
+  [AudienceType.CUSTOM_AUDIENCE]: 'Público personalizado',
+};
 
 /**
  * Audience Filter - Filtros para seleção de audiência
@@ -93,6 +105,16 @@ export enum SchedulingType {
 }
 
 /**
+ * Human-readable labels for SchedulingType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+export const SCHEDULING_TYPE_LABELS: Record<SchedulingType, string> = {
+  [SchedulingType.IMMEDIATE]: 'Imediato',
+  [SchedulingType.SCHEDULED]: 'Agendado',
+  [SchedulingType.RECURRING]: 'Recorrente',
+};
+
+/**
  * Recurring Config - Configuração de recorrência
  */
 export interface RecurringConfig {
@@ -141,6 +163,7 @@ export interface CreateCampaignRequest {
   audienceType: AudienceType;
   audienceFilter?: AudienceFilter;
   recipientIds?: string[];
+  audienceId?: string;             // NOVO — usado quando audienceType === CUSTOM_AUDIENCE
   variableMapping: VariableMapping;
   schedulingType: SchedulingType;
   scheduledFor?: string | null;    // ISO string, null for immediate
@@ -158,6 +181,7 @@ export interface UpdateCampaignRequest {
   audienceType?: AudienceType;
   audienceFilter?: AudienceFilter;
   recipientIds?: string[];
+  audienceId?: string;             // NOVO — usado quando audienceType === CUSTOM_AUDIENCE
   variableMapping?: VariableMapping;
   schedulingType?: SchedulingType;
   scheduledFor?: string | null;    // ISO string, null for immediate

@@ -41,6 +41,10 @@ export declare const SOCKET_EVENTS: {
     readonly CAMPAIGN_MESSAGE_STATUS: "campaign:message-status";
     readonly CAMPAIGN_PROGRESS: "campaign:progress";
     readonly CAMPAIGN_COMPLETED: "campaign:completed";
+    readonly AUDIENCE_IMPORT_STARTED: "audience:import-started";
+    readonly AUDIENCE_IMPORT_PROGRESS: "audience:import-progress";
+    readonly AUDIENCE_IMPORT_COMPLETED: "audience:import-completed";
+    readonly AUDIENCE_IMPORT_FAILED: "audience:import-failed";
     readonly TEAM_MESSAGE: "team:message";
     readonly TEAM_MESSAGE_READ: "team:message:read";
     readonly TEAM_TYPING: "team:typing";

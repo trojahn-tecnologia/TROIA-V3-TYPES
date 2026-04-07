@@ -10,6 +10,7 @@ export interface Campaign extends TenantAwareDocument {
     audienceType: AudienceType;
     audienceFilter?: AudienceFilter;
     recipientIds?: string[];
+    audienceId?: string;
     variableMapping: VariableMapping;
     schedulingType: SchedulingType;
     scheduledFor?: string;
@@ -34,8 +35,14 @@ export declare enum CampaignStatus {
  */
 export declare enum AudienceType {
     LEADS = "leads",// Leads collection (via contactId)
-    CONTACTS = "contacts"
+    CONTACTS = "contacts",// Contacts collection
+    CUSTOM_AUDIENCE = "custom_audience"
 }
+/**
+ * Human-readable labels for AudienceType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+export declare const AUDIENCE_TYPE_LABELS: Record<AudienceType, string>;
 /**
  * Audience Filter - Filtros para seleção de audiência
  */
@@ -82,6 +89,11 @@ export declare enum SchedulingType {
     RECURRING = "recurring"
 }
 /**
+ * Human-readable labels for SchedulingType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+export declare const SCHEDULING_TYPE_LABELS: Record<SchedulingType, string>;
+/**
  * Recurring Config - Configuração de recorrência
  */
 export interface RecurringConfig {
@@ -127,6 +139,7 @@ export interface CreateCampaignRequest {
     audienceType: AudienceType;
     audienceFilter?: AudienceFilter;
     recipientIds?: string[];
+    audienceId?: string;
     variableMapping: VariableMapping;
     schedulingType: SchedulingType;
     scheduledFor?: string | null;
@@ -143,6 +156,7 @@ export interface UpdateCampaignRequest {
     audienceType?: AudienceType;
     audienceFilter?: AudienceFilter;
     recipientIds?: string[];
+    audienceId?: string;
     variableMapping?: VariableMapping;
     schedulingType?: SchedulingType;
     scheduledFor?: string | null;

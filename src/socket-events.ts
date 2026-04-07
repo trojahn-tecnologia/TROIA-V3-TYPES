@@ -70,6 +70,12 @@ export const SOCKET_EVENTS = {
   CAMPAIGN_PROGRESS: 'campaign:progress',               // Overall campaign progress
   CAMPAIGN_COMPLETED: 'campaign:completed',             // Campaign finished
 
+  // Audience Events
+  AUDIENCE_IMPORT_STARTED: 'audience:import-started',
+  AUDIENCE_IMPORT_PROGRESS: 'audience:import-progress',
+  AUDIENCE_IMPORT_COMPLETED: 'audience:import-completed',
+  AUDIENCE_IMPORT_FAILED: 'audience:import-failed',
+
   // Team Chat Events (internal user-to-user chat)
   TEAM_MESSAGE: 'team:message',                         // New message sent/received
   TEAM_MESSAGE_READ: 'team:message:read',               // Message marked as read

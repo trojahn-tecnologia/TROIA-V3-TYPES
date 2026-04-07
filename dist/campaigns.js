@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CampaignMessageStatus = exports.SchedulingType = exports.AudienceType = exports.CampaignStatus = void 0;
+exports.CampaignMessageStatus = exports.SCHEDULING_TYPE_LABELS = exports.SchedulingType = exports.AUDIENCE_TYPE_LABELS = exports.AudienceType = exports.CampaignStatus = void 0;
 /**
  * Campaign Status
  */
@@ -20,8 +20,18 @@ var CampaignStatus;
 var AudienceType;
 (function (AudienceType) {
     AudienceType["LEADS"] = "leads";
-    AudienceType["CONTACTS"] = "contacts"; // Contacts collection
+    AudienceType["CONTACTS"] = "contacts";
+    AudienceType["CUSTOM_AUDIENCE"] = "custom_audience"; // Audiences module (CSV imports)
 })(AudienceType || (exports.AudienceType = AudienceType = {}));
+/**
+ * Human-readable labels for AudienceType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+exports.AUDIENCE_TYPE_LABELS = {
+    [AudienceType.LEADS]: 'Leads',
+    [AudienceType.CONTACTS]: 'Contatos',
+    [AudienceType.CUSTOM_AUDIENCE]: 'Público personalizado',
+};
 /**
  * Scheduling Type - Tipo de agendamento
  */
@@ -31,6 +41,15 @@ var SchedulingType;
     SchedulingType["SCHEDULED"] = "scheduled";
     SchedulingType["RECURRING"] = "recurring"; // Enviar periodicamente
 })(SchedulingType || (exports.SchedulingType = SchedulingType = {}));
+/**
+ * Human-readable labels for SchedulingType values.
+ * Single source of truth — consumed by the UI to render campaign metadata.
+ */
+exports.SCHEDULING_TYPE_LABELS = {
+    [SchedulingType.IMMEDIATE]: 'Imediato',
+    [SchedulingType.SCHEDULED]: 'Agendado',
+    [SchedulingType.RECURRING]: 'Recorrente',
+};
 // ============================================================
 // CAMPAIGN MESSAGES - Tracking de mensagens individuais
 // ============================================================
