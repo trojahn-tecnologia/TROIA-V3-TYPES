@@ -89,7 +89,7 @@ export interface CustomerData {
     company?: string;
     providerCustomerId?: string;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CardData {
     holderName: string;
@@ -109,7 +109,7 @@ export interface UniversalPaymentData {
     paymentMethod: PaymentMethod;
     dueDate?: string;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     customer: CustomerData;
     creditCard?: CreditCardData;
     pix?: PIXSpecificData;
@@ -159,8 +159,8 @@ export interface PaymentResponse {
     creditCard?: CreditCardResponse;
     externalReference?: string;
     createdAt: string;
-    metadata?: Record<string, any>;
-    providerData?: any;
+    metadata?: Record<string, unknown>;
+    providerData?: Record<string, unknown>;
 }
 export interface PIXResponse {
     qrCodeBase64?: string;
@@ -191,7 +191,7 @@ export interface PaymentCustomerResponse {
     status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'DELETED';
     createdAt: string;
     updatedAt: string;
-    providerData?: any;
+    providerData?: Record<string, unknown>;
 }
 export interface PaymentCustomerListResponse extends ListResponse<PaymentCustomerResponse> {
 }
@@ -214,7 +214,7 @@ export interface TokenResponse {
     expiryYear: string;
     status: 'ACTIVE' | 'EXPIRED' | 'BLOCKED';
     createdAt: string;
-    providerData?: any;
+    providerData?: Record<string, unknown>;
 }
 export interface TokenListResponse {
     tokens: TokenResponse[];
@@ -227,7 +227,7 @@ export interface TokenPaymentData {
     installments?: number;
     dueDate?: string;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface SubscriptionData {
     customerId: string;
@@ -243,7 +243,7 @@ export interface SubscriptionData {
     trialPeriodDays?: number;
     tokenId?: string;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface SubscriptionResponse {
     subscriptionId: string;
@@ -263,7 +263,7 @@ export interface SubscriptionResponse {
     trialPeriodDays?: number;
     isInTrial: boolean;
     externalReference?: string;
-    providerData?: any;
+    providerData?: Record<string, unknown>;
 }
 export interface SubscriptionPaymentListResponse {
     subscriptionId: string;
@@ -298,7 +298,7 @@ export interface RecurringPaymentSetup {
         endDate?: string;
     };
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface RecurringSetupResponse {
     setupId: string;
@@ -306,7 +306,7 @@ export interface RecurringSetupResponse {
     status: 'ACTIVE' | 'SCHEDULED' | 'PAUSED' | 'FAILED';
     managedBy: 'INTERNAL_CRON' | 'PROVIDER_NATIVE';
     nextExecutionDate?: string;
-    providerData?: any;
+    providerData?: Record<string, unknown>;
 }
 export interface TokenizationSetupResponse {
     setupId: string;
@@ -316,7 +316,7 @@ export interface TokenizationSetupResponse {
     cronExpression: string;
     nextExecutionDate: string;
     managedBy: 'INTERNAL_CRON';
-    providerData: any;
+    providerData: Record<string, unknown>;
 }
 export interface WebhookResponse {
     eventType: string;
@@ -325,8 +325,8 @@ export interface WebhookResponse {
     customerId?: string;
     status?: PaymentStatus;
     amount?: number;
-    metadata?: Record<string, any>;
-    providerData?: any;
+    metadata?: Record<string, unknown>;
+    providerData?: Record<string, unknown>;
 }
 export interface CancelResponse {
     success: boolean;
@@ -368,7 +368,7 @@ export interface PaymentDetails extends PaymentResponse {
         eventType: string;
         timestamp: string;
         description: string;
-        metadata?: Record<string, any>;
+        metadata?: Record<string, unknown>;
     }[];
 }
 export interface PaymentProviderConfig {
@@ -380,7 +380,7 @@ export interface PaymentProviderConfig {
     merchantId?: string;
     publicKey?: string;
     secretKey?: string;
-    customSettings?: Record<string, any>;
+    customSettings?: Record<string, unknown>;
     configSource?: 'app' | 'company';
     appId?: string;
     companyId?: string;
@@ -447,7 +447,7 @@ export interface TokenizedSubscription {
     lastSuccessAt?: Date;
     retryIntervalHours: number;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CreateSubscriptionWithSavedCardRequest {
     userId: string;
@@ -462,13 +462,13 @@ export interface CreateSubscriptionWithSavedCardRequest {
     maxFailures?: number;
     retryIntervalHours?: number;
     externalReference?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CreateSubscriptionResponse {
     id: string;
     status: 'ACTIVE' | 'SCHEDULED' | 'FAILED';
     context: SubscriptionContext;
-    contextEntity?: any;
+    contextEntity?: Record<string, unknown>;
     nextChargeDate: string;
     message: string;
     subscription?: TokenizedSubscription;
@@ -501,7 +501,7 @@ export interface CompanyService {
     terms?: string;
     createdAt: Date;
     updatedAt: Date;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CreateCompanyServiceRequest {
     name: string;
@@ -512,7 +512,7 @@ export interface CreateCompanyServiceRequest {
     description: string;
     features?: string[];
     terms?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CompanyServiceResponse {
     companyId: string;
@@ -528,7 +528,7 @@ export interface CompanyServiceResponse {
     terms?: string;
     createdAt: string;
     updatedAt: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface CompanyServiceQuery extends PaginationQuery {
     filters?: {
@@ -553,19 +553,19 @@ export interface CompanyServiceActivation {
     reason?: string;
     createdAt: Date;
     updatedAt: Date;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface PaymentContext {
     type: 'APP_SUBSCRIPTION' | 'COMPANY_SUBSCRIPTION' | 'ORDER_PAYMENT' | 'CUSTOM';
     entityId: string;
     customerId: string;
     providerId: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
 }
 export interface PaymentError {
     code: string;
     message: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     provider?: string;
     paymentId?: string;
 }

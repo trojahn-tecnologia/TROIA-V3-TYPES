@@ -1,7 +1,8 @@
 import { FullTenantDocument, ActiveStatus, Address, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
-import { AssignmentConfig } from './assignment';
+import type { DistributionConfig } from './distribution';
 import type { TenantThemeOverrides } from './theme';
 import type { CompanyCard, CompanyCardResponse, CreditBalance, CreditSubscription, CreditAlert, CreditInvoice } from './credits';
+import type { UserResponse } from './user';
 export type CompanyDocumentType = 'CPF' | 'CNPJ';
 export interface Company extends FullTenantDocument {
     name: string;
@@ -14,13 +15,17 @@ export interface Company extends FullTenantDocument {
     status: ActiveStatus;
     defaultCountryCode?: string;
     address: Address;
-    defaultAssignmentConfig?: AssignmentConfig;
+    defaultAssignmentConfig?: DistributionConfig;
     themeOverrides?: TenantThemeOverrides;
     cards: CompanyCard[];
     creditBalance: CreditBalance;
     creditSubscription?: CreditSubscription;
     creditAlerts: CreditAlert[];
     invoices: CreditInvoice[];
+    qualityInsights?: {
+        enabled: boolean;
+        sampleRate: number;
+    };
 }
 export interface CreateCompanyRequest {
     name: string;
@@ -46,11 +51,11 @@ export interface UpdateCompanyRequest {
     status?: ActiveStatus;
     defaultCountryCode?: string;
     address?: Partial<Address>;
-    defaultAssignmentConfig?: AssignmentConfig;
+    defaultAssignmentConfig?: DistributionConfig;
     themeOverrides?: TenantThemeOverrides;
 }
 export interface UpdateCompanyAssignmentConfigRequest {
-    defaultAssignmentConfig: AssignmentConfig;
+    defaultAssignmentConfig: DistributionConfig;
 }
 export type CompanyStatus = ActiveStatus;
 export interface CompanyQuery extends PaginationQuery {
@@ -71,13 +76,17 @@ export interface CompanyResponse {
     status: ActiveStatus;
     defaultCountryCode?: string;
     address: Address;
-    defaultAssignmentConfig?: AssignmentConfig;
+    defaultAssignmentConfig?: DistributionConfig;
     themeOverrides?: TenantThemeOverrides;
     cards: CompanyCardResponse[];
     creditBalance: CreditBalance;
     creditSubscription?: CreditSubscription;
     creditAlerts: CreditAlert[];
     invoices: CreditInvoice[];
+    qualityInsights?: {
+        enabled: boolean;
+        sampleRate: number;
+    };
     createdAt: string;
     updatedAt: string;
 }
@@ -87,5 +96,5 @@ export interface CompanyQueryOptions extends GenericQueryOptions<CompanyQuery> {
 }
 export interface CompanyRegistrationResponse {
     company: CompanyResponse;
-    user: any;
+    user: UserResponse;
 }

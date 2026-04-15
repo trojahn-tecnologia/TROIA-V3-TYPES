@@ -21,7 +21,7 @@ export interface CompanyIntegration {
     updatedAt: Date;
 }
 export interface IntegrationConfig {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 export interface IntegrationCredentials extends ProviderCredentials {
 }
@@ -53,7 +53,7 @@ export interface CompanyIntegrationResponse {
     qualityRatingUpdatedAt?: string;
     instanceKey?: string;
     instanceToken?: string;
-    instanceData?: any;
+    instanceData?: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
 }
@@ -83,23 +83,23 @@ export interface UpdateCompanyIntegrationRequest {
     qualityRatingUpdatedAt?: string;
     instanceKey?: string;
     instanceToken?: string;
-    instanceData?: any;
+    instanceData?: Record<string, unknown>;
 }
 export interface TestIntegrationRequest {
     integrationId: string;
     testType: 'send_email' | 'send_message' | 'send_webhook';
-    testData?: Record<string, any>;
+    testData?: Record<string, unknown>;
 }
 export interface TestIntegrationResponse {
     success: boolean;
     message: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     executedAt: Date;
 }
 export interface SyncIntegrationRequest {
     integrationId: string;
     syncType: 'full' | 'incremental' | 'contacts' | 'messages';
-    options?: Record<string, any>;
+    options?: Record<string, unknown>;
 }
 export interface SyncIntegrationResponse {
     success: boolean;

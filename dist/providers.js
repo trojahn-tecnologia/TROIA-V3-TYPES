@@ -46,6 +46,7 @@ var ProviderId;
     ProviderId["AI_MISTRAL"] = "ai-mistral";
     ProviderId["AI_DEEPSEEK"] = "ai-deepseek";
     ProviderId["AI_ELEVENLABS"] = "ai-elevenlabs";
+    ProviderId["AI_COHERE"] = "ai-cohere";
     // Database Providers (Properties, Real Estate, etc.)
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
     ProviderId["DATABASE_DWV"] = "database-dwv";
@@ -96,6 +97,7 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.AI_MISTRAL]: 'ai',
     [ProviderId.AI_DEEPSEEK]: 'ai',
     [ProviderId.AI_ELEVENLABS]: 'ai',
+    [ProviderId.AI_COHERE]: 'ai',
     // Database
     [ProviderId.DATABASE_JETIMOB]: 'database',
     [ProviderId.DATABASE_DWV]: 'database',
@@ -190,6 +192,7 @@ var ProviderCapability;
     ProviderCapability["MANAGE_ACCOUNT"] = "manage_account";
     // AI Capabilities
     ProviderCapability["GENERATE_EMBEDDING"] = "generate_embedding";
+    ProviderCapability["RERANK"] = "rerank";
     ProviderCapability["VECTOR_STORAGE"] = "vector_storage";
     ProviderCapability["AI_TEXT_GENERATION"] = "ai_text_generation";
     ProviderCapability["AI_CHAT_COMPLETION"] = "ai_chat_completion";

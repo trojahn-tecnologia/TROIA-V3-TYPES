@@ -33,9 +33,9 @@ export interface Activity {
   summary?: string; // Short description for lists
 
   // Activity data and changes
-  beforeData?: Record<string, any>; // State before change
-  afterData?: Record<string, any>;  // State after change
-  metadata?: Record<string, any>;   // Additional activity data
+  beforeData?: Record<string, unknown>; // State before change
+  afterData?: Record<string, unknown>;  // State after change
+  metadata?: Record<string, unknown>;   // Additional activity data
 
   // Related entities
   relatedEntities?: RelatedEntity[];
@@ -125,9 +125,9 @@ export interface CreateActivityRequest {
   title: string;
   description?: string;
   summary?: string;
-  beforeData?: Record<string, any>;
-  afterData?: Record<string, any>;
-  metadata?: Record<string, any>;
+  beforeData?: Record<string, unknown>;
+  afterData?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   relatedEntities?: RelatedEntity[];
   status?: 'completed' | 'in_progress' | 'failed' | 'cancelled' | 'pending';
   isVisible?: boolean;
@@ -141,8 +141,8 @@ export interface UpdateActivityRequest {
   description?: string;
   summary?: string;
   status?: 'completed' | 'in_progress' | 'failed' | 'cancelled' | 'pending';
-  afterData?: Record<string, any>;
-  metadata?: Record<string, any>;
+  afterData?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   isVisible?: boolean;
   isInternal?: boolean;
   dueDate?: string; // When the activity should be completed
@@ -234,7 +234,7 @@ export interface ActivityNotificationRequest {
   recipientIds: string[];
   notificationType: 'email' | 'push' | 'sms' | 'webhook';
   template?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 // Activity search
@@ -276,7 +276,7 @@ export interface ContactActivityData {
   contactId: string;
   contactName?: string;
   action: 'created' | 'updated' | 'deleted' | 'merged';
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
   actorId?: string;
 }
 
@@ -284,7 +284,7 @@ export interface LeadActivityData {
   leadId: string;
   leadName?: string;
   action: 'created' | 'updated' | 'deleted' | 'assigned' | 'converted' | 'lost';
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
   actorId?: string;
 }
 
@@ -292,7 +292,7 @@ export interface TicketActivityData {
   ticketId: string;
   ticketTitle?: string;
   action: 'created' | 'updated' | 'assigned' | 'resolved' | 'closed' | 'reopened';
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
   actorId?: string;
 }
 
@@ -300,7 +300,7 @@ export interface ConversationActivityData {
   conversationId: string;
   conversationSubject?: string;
   action: 'started' | 'assigned' | 'transferred' | 'closed' | 'reopened';
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
   actorId?: string;
 }
 

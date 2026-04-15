@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { PaginationQuery, ListResponse, GenericQueryOptions, ActiveStatus } from './common';
-import { AssignmentConfig } from './assignment';
+import type { DistributionConfig } from './distribution';
 
 // ============================================================================
 // SHIFTS TYPES
@@ -12,7 +12,7 @@ export interface Shift {
   teamId?: ObjectId; // Optional team assignment
   schedule: ShiftSchedule;
   assignments: ShiftAssignment[];
-  assignmentConfig: AssignmentConfig;
+  assignmentConfig: DistributionConfig;
   userAvailability: UserAvailability[]; // User availability within this shift
   workloadConfig?: WorkloadConfig; // Workload limits for this shift
   companyId: ObjectId;
@@ -22,31 +22,21 @@ export interface Shift {
   updatedAt: Date;
 }
 
+/**
+ * Shift schedule — always fixed pattern.
+ *
+ * Simplificado: removido `type` (`rotating`/`on_demand` nunca foram
+ * implementados). O schedule é sempre fixo: weekdays + startTime + endTime
+ * + timezone. `overlapMinutes` e `transitionStrategy` mantidos para
+ * futuras otimizações de handoff.
+ */
 export interface ShiftSchedule {
-  type: 'fixed' | 'rotating' | 'on_demand';
-  overlapMinutes: number; // Default: 15 min transition overlap
-  transitionStrategy: 'immediate' | 'finish_current' | 'overlap';
-
-  fixedSchedule?: {
-    weekdays: number[]; // [1,2,3,4,5] = Mon-Fri
-    startTime: string;  // "08:00"
-    endTime: string;    // "18:00"
-    timezone: string;   // "America/Sao_Paulo"
-  };
-
-  rotatingSchedule?: {
-    rotationDays: number; // Every X days
-    shifts: Array<{
-      weekdays: number[];
-      startTime: string;
-      endTime: string;
-    }>;
-  };
-
-  onDemandSchedule?: {
-    minUsers: number; // Minimum users that should be available
-    maxUsers: number; // Maximum users simultaneously
-  };
+  weekdays: number[];   // [0,1,2,3,4,5,6] = Sun-Sat
+  startTime: string;    // "08:00"
+  endTime: string;      // "18:00"
+  timezone: string;     // "America/Sao_Paulo"
+  overlapMinutes?: number;
+  transitionStrategy?: 'immediate' | 'finish_current' | 'overlap';
 }
 
 export interface ShiftAssignment {
@@ -143,7 +133,7 @@ export interface CreateShiftRequest {
   description?: string;
   teamId?: string;
   schedule: ShiftSchedule;
-  assignmentConfig: AssignmentConfig;
+  assignmentConfig: DistributionConfig;
   userAvailability?: UserAvailability[];
   workloadConfig?: WorkloadConfig;
 }
@@ -153,7 +143,7 @@ export interface UpdateShiftRequest {
   description?: string;
   teamId?: string;
   schedule?: ShiftSchedule;
-  assignmentConfig?: AssignmentConfig;
+  assignmentConfig?: DistributionConfig;
   userAvailability?: UserAvailability[];
   workloadConfig?: WorkloadConfig;
   status?: ActiveStatus;

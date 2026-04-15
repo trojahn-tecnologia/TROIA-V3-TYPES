@@ -83,13 +83,13 @@ export interface PaymentWithCardResponse {
         nickname?: string;
         isDefault: boolean;
     };
-    providerData?: any;
+    providerData?: Record<string, unknown>;
     createdAt: string;
 }
 export interface SavedCardError {
     code: 'INVALID_CARD' | 'TOKENIZATION_FAILED' | 'PROVIDER_ERROR' | 'CARD_NOT_FOUND' | 'CARD_EXPIRED';
     message: string;
-    details?: any;
+    details?: Record<string, unknown>;
 }
 export interface CardTokenizationRequest {
     customerId: string;
@@ -108,7 +108,7 @@ export interface CardTokenizationResponse {
     expiryMonth: number;
     expiryYear: number;
     holderName?: string;
-    providerData?: any;
+    providerData?: Record<string, unknown>;
 }
 export interface SavedCardsStats {
     totalCards: number;

@@ -328,7 +328,7 @@ export interface TemplatePreviewResponse {
     components?: WhatsAppTemplateComponent[];
 
     // For Gateway
-    messageData?: any;
+    messageData?: Record<string, unknown>;
 
     // For Email
     subject?: string;
@@ -337,7 +337,7 @@ export interface TemplatePreviewResponse {
 
     // For Instagram/Facebook
     text?: string;
-    attachment?: any;
+    attachment?: Record<string, unknown>;
   };
 
   // Variables used and their values

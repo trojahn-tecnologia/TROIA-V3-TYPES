@@ -78,7 +78,7 @@ export interface ReactionContent {
 export interface SystemContent {
   type: 'system';
   action: 'conversation_started' | 'conversation_ended' | 'user_joined' | 'user_left' | 'assignment_changed' | 'status_changed';
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // Interactive Message Types (WhatsApp buttons, lists, templates)
@@ -175,7 +175,7 @@ export interface ConversationMessage {
 
   // External provider integration
   providerMessageId?: string; // External message ID
-  providerData?: Record<string, any>; // Provider-specific metadata
+  providerData?: Record<string, unknown>; // Provider-specific metadata
 
   // Message relationships
   replyToMessageId?: string; // Message this replies to
@@ -211,7 +211,7 @@ export interface ConversationMessage {
   toolCall?: {
     id: string;              // Tool call ID for OpenAI context
     name: string;            // Tool name (e.g., 'send_text_message')
-    arguments: Record<string, any>;  // Tool arguments
+    arguments: Record<string, unknown>;  // Tool arguments
   };
 
   toolResult?: {
@@ -225,7 +225,7 @@ export interface ConversationMessage {
   toolCalls?: Array<{
     id: string;
     name: string;
-    arguments: Record<string, any>;
+    arguments: Record<string, unknown>;
   }>;
 
   // @deprecated Legacy format (use toolCall/toolResult instead)
@@ -233,7 +233,7 @@ export interface ConversationMessage {
   toolResults?: Array<{
     tool_call_id: string;
     tool_name: string;
-    output: any;
+    output: unknown;
   }>;
 
   // Internal notes (agent-only)
@@ -269,7 +269,7 @@ export interface CreateConversationMessageRequest {
   senderName?: string;
   senderType: 'contact' | 'user' | 'system' | 'ai' | 'automation' | 'automation-follow';
   providerMessageId?: string;
-  providerData?: Record<string, any>;
+  providerData?: Record<string, unknown>;
   replyToMessageId?: string;
   forwardedFromMessageId?: string;
   threadId?: string;
@@ -281,7 +281,7 @@ export interface CreateConversationMessageRequest {
   toolCall?: {
     id: string;
     name: string;
-    arguments: Record<string, any>;
+    arguments: Record<string, unknown>;
   };
   toolResult?: {
     tool_call_id: string;
@@ -293,12 +293,12 @@ export interface CreateConversationMessageRequest {
   toolCalls?: Array<{
     id: string;
     name: string;
-    arguments: Record<string, any>;
+    arguments: Record<string, unknown>;
   }>;
   toolResults?: Array<{
     tool_call_id: string;
     tool_name: string;
-    output: any;
+    output: unknown;
   }>;
 
   // ✅ DeepSeek R1 reasoning content (required for multi-turn tool calls)

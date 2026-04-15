@@ -32,11 +32,11 @@ export interface Address {
     zipCode: string;
     country: string;
 }
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
     data?: T;
     message?: string;
-    errors?: any[];
+    errors?: unknown[];
     pagination?: {
         page: number;
         limit: number;
@@ -56,7 +56,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 export interface ApiError {
     message: string;
     status: number;
-    errors?: any[];
+    errors?: unknown[];
 }
 export interface PaginationOptions {
     page: number;
@@ -71,7 +71,7 @@ export interface FilterOptions {
     status?: string;
     dateFrom?: string;
     dateTo?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 export interface QueryOptions {
     filters?: FilterOptions;
@@ -79,14 +79,14 @@ export interface QueryOptions {
     pagination?: PaginationOptions;
 }
 export interface PaginationQuery {
-    page?: number;
-    limit?: number;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    page?: number | undefined;
+    limit?: number | undefined;
+    search?: string | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: 'asc' | 'desc' | undefined;
 }
 export interface SearchQuery extends PaginationQuery {
-    filters?: Record<string, any>;
+    filters?: Record<string, unknown>;
 }
 export interface FormFieldError {
     message: string;

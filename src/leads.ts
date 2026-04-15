@@ -35,11 +35,12 @@ export interface Lead {
   // User-defined classification
   type?: string;
 
-  // Status and temperature
-  status: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  temperature: 'cold' | 'warm' | 'hot';
-  qualifyStatus: 'pending' | 'qualified' | 'disqualified';
+  // Status and temperature — unions literais + (string & {}) para aceitar valores livres
+  // vindos de integração/importação preservando autocomplete no IntelliSense
+  status: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
+  priority: 'low' | 'medium' | 'high' | 'urgent' | (string & {});
+  temperature: 'cold' | 'warm' | 'hot' | (string & {});
+  qualifyStatus: 'pending' | 'qualified' | 'disqualified' | (string & {});
 
   // Sales funnel
   funnelId?: string;
@@ -109,10 +110,10 @@ export interface CreateLeadRequest {
   channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
   channelId?: string;
   type?: string;
-  status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  temperature?: 'cold' | 'warm' | 'hot';
-  qualifyStatus?: 'pending' | 'qualified' | 'disqualified';
+  status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
+  priority?: 'low' | 'medium' | 'high' | 'urgent' | (string & {});
+  temperature?: 'cold' | 'warm' | 'hot' | (string & {});
+  qualifyStatus?: 'pending' | 'qualified' | 'disqualified' | (string & {});
   funnelId?: string;
   stepId?: string;
   assigneeId?: string;
@@ -151,10 +152,10 @@ export interface UpdateLeadRequest {
   channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
   channelId?: string;
   type?: string;
-  status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost';
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  temperature?: 'cold' | 'warm' | 'hot';
-  qualifyStatus?: 'pending' | 'qualified' | 'disqualified';
+  status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
+  priority?: 'low' | 'medium' | 'high' | 'urgent' | (string & {});
+  temperature?: 'cold' | 'warm' | 'hot' | (string & {});
+  qualifyStatus?: 'pending' | 'qualified' | 'disqualified' | (string & {});
   funnelId?: string;
   stepId?: string;
   // Optional fields for step history tracking (denormalized data)

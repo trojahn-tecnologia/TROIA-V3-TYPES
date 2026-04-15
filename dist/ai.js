@@ -7,6 +7,7 @@ exports.AI_MODELS = void 0;
 exports.getViableModels = getViableModels;
 exports.getProviderFromModel = getProviderFromModel;
 exports.getModelDefinition = getModelDefinition;
+exports.modelSupports = modelSupports;
 /**
  * Catálogo completo de modelos de IA suportados
  *
@@ -324,4 +325,18 @@ function getProviderFromModel(modelId) {
  */
 function getModelDefinition(modelId) {
     return exports.AI_MODELS.find(m => m.id === modelId);
+}
+/**
+ * Verifica se um modelo suporta uma feature específica.
+ *
+ * Retorna `false` se o modelo não for encontrado no catálogo (fail-safe).
+ * Útil para checar antes de enviar imagens/PDFs/reasoning para o modelo.
+ *
+ * @example
+ *   modelSupports('gpt-4o-mini', 'image') // true
+ *   modelSupports('deepseek-chat', 'image') // false
+ */
+function modelSupports(modelId, feature) {
+    const def = getModelDefinition(modelId);
+    return def?.features.includes(feature) ?? false;
 }

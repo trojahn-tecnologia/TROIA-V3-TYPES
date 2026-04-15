@@ -104,7 +104,7 @@ export interface ChannelDeliveryStatus {
   readAt?: Date;
   error?: string;
   providerId?: string;        // ID do provider usado (ex: 'email-smtp', 'whatsapp-gateway')
-  providerResponse?: any;     // Resposta do provider (MessageID, etc.)
+  providerResponse?: unknown;     // Resposta do provider (MessageID, etc.)
 }
 
 // ============================================================================
@@ -126,7 +126,7 @@ export interface SystemNotification {
   priority: NotificationPriority;
   title: string;
   message: string;
-  data?: Record<string, any>;               // Dados adicionais (IDs de recursos, metadados)
+  data?: Record<string, unknown>;               // Dados adicionais (IDs de recursos, metadados)
 
   // Canais e status de entrega
   channels: NotificationChannel[];          // Canais solicitados para envio
@@ -162,7 +162,7 @@ export interface CreateNotificationRequest {
   priority: NotificationPriority;
   title: string;
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   channels?: NotificationChannel[];         // Se não informado, usa preferências do user
   actionUrl?: string;
   actionLabel?: string;

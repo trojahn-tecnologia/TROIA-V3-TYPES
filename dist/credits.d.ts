@@ -7,6 +7,7 @@ export declare enum CreditCategory {
     AI_TOKENS_OUTPUT = "ai.tokens.output",
     AI_TOOL_EXECUTION = "ai.tool.execution",
     AI_VOICE_CLONE = "ai.voice.clone",
+    AI_AGENT_TRAINING = "ai.agent.training",
     CRM_LEAD_CREATED = "crm.lead.created",
     CRM_TICKET_OPENED = "crm.ticket.opened",
     CRM_CONTACT_CREATED = "crm.contact.created",
@@ -22,7 +23,8 @@ export declare enum CreditCategory {
     BILLING_PURCHASE = "billing.purchase",
     BILLING_EXPIRATION = "billing.expiration",
     BILLING_CANCELLATION = "billing.cancellation",
-    ADMIN_ADJUSTMENT = "admin.adjustment"
+    ADMIN_ADJUSTMENT = "admin.adjustment",
+    AI_CONVERSATION_QA = "ai.conversation.qa"
 }
 export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day';
 export interface CreditCategoryConfig {

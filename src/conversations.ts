@@ -121,7 +121,7 @@ export interface Conversation {
   userRole?: 'viewer' | 'attendant'; // role do usuário logado no canal da conversa
 
   // Metadata
-  metadata?: Record<string, any>; // Channel-specific metadata
+  metadata?: Record<string, unknown>; // Channel-specific metadata
 
   // ✅ Unread tracking per user (Arch 3.4)
   unreadTracking?: {
@@ -166,7 +166,7 @@ export interface CreateConversationRequest {
   tags?: string[];
   category?: string;
   privacy?: ConversationPrivacy;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UpdateConversationRequest {
@@ -194,7 +194,7 @@ export interface UpdateConversationRequest {
   tags?: string[];
   category?: string;
   privacy?: ConversationPrivacy;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export type ConversationResponse = Conversation;

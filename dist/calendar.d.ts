@@ -54,7 +54,7 @@ export interface CalendarEvent extends FullBaseDocument {
         syncStatus: 'pending' | 'synced' | 'failed';
         lastSyncAt: string;
         syncError?: string;
-        metadata?: Record<string, any>;
+        metadata?: Record<string, unknown>;
     }>;
     conferenceData?: {
         provider: 'google_meet' | 'zoom' | 'teams' | 'custom';
@@ -119,7 +119,7 @@ export interface CreateCalendarEventRequest {
         syncStatus: 'pending' | 'synced' | 'failed';
         lastSyncAt?: string;
         syncError?: string;
-        metadata?: Record<string, any>;
+        metadata?: Record<string, unknown>;
     }>;
 }
 /**
@@ -281,7 +281,7 @@ export interface FollowUpAction {
         aiAgentId?: string;
         tagId?: string;
         webhookUrl?: string;
-        webhookPayload?: Record<string, any>;
+        webhookPayload?: Record<string, unknown>;
         webhookHeaders?: Record<string, string>;
         funnelId?: string;
         stepId?: string;
@@ -349,7 +349,7 @@ export interface FollowUpExecutionJobData {
 export interface ConditionEvaluationResult {
     shouldExecute: boolean;
     reason: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 /**
  * Resultado de execução de ação
@@ -359,7 +359,7 @@ export interface ActionExecutionResult {
     actionType: FollowUpActionType;
     message: string;
     error?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 /**
  * Resultado completo de execução de follow-up

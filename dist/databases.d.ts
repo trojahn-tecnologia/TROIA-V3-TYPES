@@ -202,11 +202,11 @@ export interface DatabasePropertyData {
     /** External system ID (for integration sync) */
     externalId?: string;
     /** External system metadata */
-    externalMetadata?: Record<string, any>;
+    externalMetadata?: Record<string, unknown>;
     /** Tags for categorization */
     tags?: string[];
     /** Custom fields */
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
 }
 export declare enum VehicleType {
     CAR = "car",
@@ -288,11 +288,11 @@ export interface DatabaseVehicleData {
     /** External system ID */
     externalId?: string;
     /** External system metadata */
-    externalMetadata?: Record<string, any>;
+    externalMetadata?: Record<string, unknown>;
     /** Tags */
     tags?: string[];
     /** Custom fields */
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
 }
 export declare enum ProductCategory {
     ELECTRONICS = "electronics",
@@ -385,11 +385,11 @@ export interface DatabaseProductData {
     /** External system ID */
     externalId?: string;
     /** External system metadata */
-    externalMetadata?: Record<string, any>;
+    externalMetadata?: Record<string, unknown>;
     /** Tags */
     tags?: string[];
     /** Custom fields */
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
 }
 export declare enum ServiceType {
     CONSULTING = "consulting",
@@ -450,11 +450,11 @@ export interface DatabaseServiceData {
     /** External system ID */
     externalId?: string;
     /** External system metadata */
-    externalMetadata?: Record<string, any>;
+    externalMetadata?: Record<string, unknown>;
     /** Tags */
     tags?: string[];
     /** Custom fields */
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
 }
 export declare enum DocumentCategory {
     ARTICLE = "article",
@@ -504,11 +504,11 @@ export interface DatabaseDocumentData {
     /** External system ID */
     externalId?: string;
     /** External system metadata */
-    externalMetadata?: Record<string, any>;
+    externalMetadata?: Record<string, unknown>;
     /** Tags */
     tags?: string[];
     /** Custom fields */
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
 }
 /**
  * Sync configuration for database integration
@@ -553,7 +553,7 @@ export interface Database {
     /** Tags */
     tags?: string[];
     /** Custom settings */
-    settings?: Record<string, any>;
+    settings?: Record<string, unknown>;
     /** Domains associated with this database */
     domains?: string[];
     createdAt: Date;
@@ -591,7 +591,7 @@ export interface DatabaseProviderSyncEntry {
     lastSyncAt: string;
     syncError?: string;
 }
-export interface DatabaseDocument<T = any> {
+export interface DatabaseDocument<T = Record<string, unknown>> {
     _id: string;
     appId: string;
     companyId: string;
@@ -614,7 +614,7 @@ export interface DatabaseDocument<T = any> {
     updatedAt: Date;
     deletedAt?: Date;
 }
-export interface DatabaseDocumentResponse<T = any> extends Omit<DatabaseDocument<T>, '_id' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
+export interface DatabaseDocumentResponse<T = Record<string, unknown>> extends Omit<DatabaseDocument<T>, '_id' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
     id: string;
     appId: string;
     companyId: string;
@@ -627,12 +627,12 @@ export interface CreateDatabaseRequest {
     type: DatabaseType;
     description?: string;
     tags?: string[];
-    settings?: Record<string, any>;
+    settings?: Record<string, unknown>;
     /** Optional integration setup */
     useIntegration?: boolean;
     providerId?: string;
-    integrationConfig?: Record<string, any>;
-    integrationCredentials?: Record<string, any>;
+    integrationConfig?: Record<string, unknown>;
+    integrationCredentials?: Record<string, unknown>;
     /** Sync configuration */
     syncConfig?: Omit<DatabaseSyncConfig, 'lastSyncAt' | 'nextSyncAt'>;
 }
@@ -641,11 +641,11 @@ export interface UpdateDatabaseRequest {
     description?: string;
     status?: DatabaseStatus;
     tags?: string[];
-    settings?: Record<string, any>;
+    settings?: Record<string, unknown>;
     syncConfig?: Partial<DatabaseSyncConfig>;
     domains?: string[];
 }
-export interface CreateDatabaseDocumentRequest<T = any> {
+export interface CreateDatabaseDocumentRequest<T = Record<string, unknown>> {
     databaseId: string;
     type: DatabaseType;
     data: T;
@@ -653,7 +653,7 @@ export interface CreateDatabaseDocumentRequest<T = any> {
         source?: 'manual' | 'integration' | 'import' | 'api';
     };
 }
-export interface UpdateDatabaseDocumentRequest<T = any> {
+export interface UpdateDatabaseDocumentRequest<T = Record<string, unknown>> {
     data?: Partial<T>;
     metadata?: {
         source?: 'manual' | 'integration' | 'import' | 'api';
@@ -694,7 +694,7 @@ export interface DatabaseDocumentQuery extends PaginationQuery {
 }
 export interface DatabaseListResponse extends ListResponse<DatabaseResponse> {
 }
-export interface DatabaseDocumentListResponse<T = any> extends ListResponse<DatabaseDocumentResponse<T>> {
+export interface DatabaseDocumentListResponse<T = Record<string, unknown>> extends ListResponse<DatabaseDocumentResponse<T>> {
 }
 /**
  * Database Sync Result

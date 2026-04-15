@@ -185,7 +185,7 @@ export interface UpdateEmailTemplateRequest {
 // Render Template Request
 export interface RenderTemplateRequest {
   templateType: string;
-  templateData: Record<string, any>;
+  templateData: Record<string, unknown>;
   companyId?: string;
 }
 

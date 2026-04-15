@@ -19,7 +19,7 @@ export interface AppIntegrationResponse {
   appId: string;
   providerId: string;
   name: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   status: 'active' | 'inactive' | 'error' | 'pending';
   isDefault: boolean;
   capabilities: string[];
@@ -47,13 +47,13 @@ export type CreateAppIntegrationTypedRequest = CreateProviderIntegrationRequest 
 export interface CreateAppIntegrationRequest {
   providerId: string;
   name: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   isDefault?: boolean;
 }
 
 export interface UpdateAppIntegrationRequest {
   name?: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
   status?: 'active' | 'inactive' | 'error' | 'pending';
   isDefault?: boolean;
   lastSyncAt?: string;            // ✅ ISO 8601 timestamp
@@ -64,7 +64,7 @@ export interface UpdateAppIntegrationRequest {
 // Test Integration Request
 export interface TestAppIntegrationRequest {
   testType: 'send_email' | 'send_message' | 'send_webhook';
-  testData: Record<string, any>;
+  testData: Record<string, unknown>;
 }
 
 // Available Providers Response
@@ -74,5 +74,5 @@ export interface ProviderDefinitionResponse {
   capabilities: string[];
   categories: string[];
   status: 'active' | 'inactive';
-  configSchema: Record<string, any>;
+  configSchema: Record<string, unknown>;
 }

@@ -70,7 +70,8 @@ export type ValidModuleId =
   | 'voices'
   | 'forms'
   | 'ticket-pipelines'
-  | 'ticket-stages';
+  | 'ticket-stages'
+  | 'quality';
 
 export interface Module extends AppAwareDocument {
   name: string; // "users", "crm", "teams", "chat", "reports"

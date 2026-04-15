@@ -1,65 +1,15 @@
 import { PaginationQuery, ListResponse, AppAwareDocument, ActiveStatus } from './common';
-import {
-  AssignmentConfig as BaseAssignmentConfig,
-  CoreLotteryConfig,
-  LotteryType,
-  FixedOperatorConfig,
-  ShiftLotteryConfig
-} from './assignment';
-
-// ============================================================================
-// FUNNEL-SPECIFIC ASSIGNMENT TYPES
-// ============================================================================
-
-/**
- * Funnel assignment config extends base assignment config.
- * Usado para configurar como leads são atribuídos automaticamente.
- */
-export interface FunnelAssignmentConfig extends BaseAssignmentConfig {
-  /** Estratégia de assignment: manual, rule-based, lottery, shift_lottery, ou none */
-  strategy: 'manual' | 'rule' | 'lottery' | 'shift_lottery' | 'none';
-
-  /** Regras de assignment condicional */
-  rules?: FunnelAssignmentRule[];
-
-  /** Configuração de lottery (se strategy='lottery' ou 'shift_lottery') */
-  lotteryConfig?: FunnelLotteryConfig;
-}
-
-export interface FunnelAssignmentRule {
-  condition: FunnelRuleCondition;
-  action: FunnelRuleAction;
-  priority: number;
-  active: boolean;
-}
-
-export interface FunnelRuleCondition {
-  type: 'source' | 'value' | 'priority' | 'tags' | 'customField';
-  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than';
-  value: string | number | string[];
-}
-
-export interface FunnelRuleAction {
-  type: 'assign_to_user' | 'assign_to_team' | 'trigger_lottery';
-  userId?: string;
-  teamId?: string;
-  lotteryConfig?: FunnelLotteryConfig;
-}
-
-/**
- * Funnel lottery config extends CoreLotteryConfig.
- * Usa a mesma estrutura unificada de channels.
- *
- * @see CoreLotteryConfig - Tipos base unificados
- */
-export interface FunnelLotteryConfig extends CoreLotteryConfig {
-  /** Escopo do lottery: apenas usuários, apenas equipes, ou ambos */
-  scope?: 'team' | 'user' | 'both';
-}
+import type { DistributionConfig } from './distribution';
 
 /**
  * Funnel - Sales funnel structure
- * Each funnel has its own independent steps
+ * Each funnel has its own independent steps.
+ *
+ * Distribuição: `assignmentConfig` é unificado em `DistributionConfig` —
+ * mesmo shape para channels, funnels e ticket-pipelines. Processado por um
+ * único `DistributionService` no backend.
+ *
+ * Ver plano: DOCS/architecture/ASSIGNMENTS_REMOVAL.md
  */
 export interface Funnel extends AppAwareDocument {
   name: string;
@@ -67,9 +17,18 @@ export interface Funnel extends AppAwareDocument {
   color: string;              // Hex color (e.g., "#8b5cf6")
   order: number;              // Display order (customizable)
   status: ActiveStatus;
-  assignmentConfig?: FunnelAssignmentConfig;  // Assignment rules for leads
-  /** Round-robin tracking: ID do último usuário que recebeu atribuição neste funnel */
-  lastAssignedUserId?: string;
+  /** Distribuição automática de leads — config unificada (D8, D9). */
+  assignmentConfig?: DistributionConfig;
+  /**
+   * Contador monotônico de rotação usado por `DistributionService`.
+   * Incrementado atomicamente via `$inc` a cada atribuição. O userId
+   * selecionado é `pool[lastAssignedUserId % pool.length]`.
+   *
+   * Mantém o nome legado para preservar o campo no MongoDB mas muda
+   * semântica de "id do último usuário" (string) para "contador sequencial"
+   * (number). Ver decisão D4 / D_fase1b no plano.
+   */
+  lastAssignedUserId?: number;
   /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil (ex: Venda, Suporte, Consultoria) */
@@ -81,7 +40,7 @@ export interface CreateFunnelRequest {
   description?: string;
   color: string;
   order?: number;
-  assignmentConfig?: FunnelAssignmentConfig;
+  assignmentConfig?: DistributionConfig;
   /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil */
@@ -94,7 +53,7 @@ export interface UpdateFunnelRequest {
   color?: string;
   order?: number;
   status?: ActiveStatus;
-  assignmentConfig?: FunnelAssignmentConfig;
+  assignmentConfig?: DistributionConfig;
   /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil */

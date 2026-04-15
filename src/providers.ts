@@ -134,6 +134,12 @@ export interface ResendConfig {
   webhookId?: string;          // Resend webhook ID (auto-set on integration creation)
 }
 
+export interface CohereIntegrationConfig {
+  apiKey: string;
+  /** Cohere Rerank model. Default: 'rerank-v3.5' */
+  model?: string;
+}
+
 // ============================================================================
 // UNION TYPE FOR ALL PROVIDER CONFIGS
 // ============================================================================
@@ -179,7 +185,7 @@ export interface ProviderCredentials {
   password?: string;
 
   // Custom authentication
-  customAuth?: Record<string, any>;
+  customAuth?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -299,6 +305,7 @@ export enum ProviderId {
   AI_MISTRAL = 'ai-mistral',
   AI_DEEPSEEK = 'ai-deepseek',
   AI_ELEVENLABS = 'ai-elevenlabs',
+  AI_COHERE = 'ai-cohere',
 
   // Database Providers (Properties, Real Estate, etc.)
   DATABASE_JETIMOB = 'database-jetimob',
@@ -365,6 +372,7 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   [ProviderId.AI_MISTRAL]: 'ai',
   [ProviderId.AI_DEEPSEEK]: 'ai',
   [ProviderId.AI_ELEVENLABS]: 'ai',
+  [ProviderId.AI_COHERE]: 'ai',
 
   // Database
   [ProviderId.DATABASE_JETIMOB]: 'database',
@@ -479,6 +487,7 @@ export enum ProviderCapability {
 
   // AI Capabilities
   GENERATE_EMBEDDING = 'generate_embedding',
+  RERANK = 'rerank',
   VECTOR_STORAGE = 'vector_storage',
   AI_TEXT_GENERATION = 'ai_text_generation',  // LLM text generation (GPT, Claude, etc.)
   AI_CHAT_COMPLETION = 'ai_chat_completion',  // Chat completion with conversation history
@@ -622,7 +631,7 @@ export interface ProviderResponse extends Omit<Provider, '_id' | 'createdAt' | '
 // ============================================================================
 
 export interface GenericProviderConfig {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================

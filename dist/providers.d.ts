@@ -108,6 +108,11 @@ export interface ResendConfig {
     webhookSecret?: string;
     webhookId?: string;
 }
+export interface CohereIntegrationConfig {
+    apiKey: string;
+    /** Cohere Rerank model. Default: 'rerank-v3.5' */
+    model?: string;
+}
 export type ProviderConfig = SmtpConfig | SendGridConfig | WhatsAppConfig | FacebookMessengerConfig | TelegramConfig | TwilioSmsConfig | WebhookConfig | InstagramConfig | LinkedInConfig | TikTokConfig | GmailConfig | GatewayConfig | GoogleCalendarConfig | FirebaseConfig | OneSignalConfig | ElevenLabsConfig | JetimobConfig | DwvConfig | MetaConfig | ResendConfig;
 export interface ProviderCredentials {
     accessToken?: string;
@@ -117,7 +122,7 @@ export interface ProviderCredentials {
     apiSecret?: string;
     username?: string;
     password?: string;
-    customAuth?: Record<string, any>;
+    customAuth?: Record<string, unknown>;
 }
 /**
  * Rate limit source - where the limit came from
@@ -202,6 +207,7 @@ export declare enum ProviderId {
     AI_MISTRAL = "ai-mistral",
     AI_DEEPSEEK = "ai-deepseek",
     AI_ELEVENLABS = "ai-elevenlabs",
+    AI_COHERE = "ai-cohere",
     DATABASE_JETIMOB = "database-jetimob",
     DATABASE_DWV = "database-dwv",
     DATABASE_KENLO = "database-kenlo",
@@ -268,6 +274,7 @@ export declare enum ProviderCapability {
     MANAGE_PAGE = "manage_page",
     MANAGE_ACCOUNT = "manage_account",
     GENERATE_EMBEDDING = "generate_embedding",
+    RERANK = "rerank",
     VECTOR_STORAGE = "vector_storage",
     AI_TEXT_GENERATION = "ai_text_generation",// LLM text generation (GPT, Claude, etc.)
     AI_CHAT_COMPLETION = "ai_chat_completion",// Chat completion with conversation history
@@ -360,7 +367,7 @@ export interface ProviderResponse extends Omit<Provider, '_id' | 'createdAt' | '
     deletedAt?: string;
 }
 export interface GenericProviderConfig {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 export interface VectorMetadata {
     appId: string;

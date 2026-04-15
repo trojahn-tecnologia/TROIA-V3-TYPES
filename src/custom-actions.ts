@@ -8,31 +8,31 @@ export interface ToolFilterCondition {
 }
 
 export interface CustomAction {
-  _id?: ObjectId;
-  id?: string;
+  _id?: ObjectId | undefined;
+  id?: string | undefined;
   name: string;
   displayName: string;
-  description?: string;
+  description?: string | undefined;
   parameters: {
     type: 'object';
     properties: Record<string, {
       type: string;
       description: string;
     }>;
-    required?: string[];
+    required?: string[] | undefined;
   };
   endpoint: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     url: string;
-    headers?: Record<string, string>;
-    body?: Record<string, any>;
+    headers?: Record<string, string> | undefined;
+    body?: Record<string, unknown> | undefined;
   };
-  credentials?: Record<string, string>;
+  credentials?: Record<string, string> | undefined;
   responseMapping?: {
-    successPath?: string;
-    errorPath?: string;
-    transform?: string;
-  };
+    successPath?: string | undefined;
+    errorPath?: string | undefined;
+    transform?: string | undefined;
+  } | undefined;
   aiProcessing?: {
     enabled: boolean;
     prompt: string;
@@ -42,16 +42,16 @@ export interface CustomAction {
         type: string;
         description: string;
       }>;
-      required?: string[];
+      required?: string[] | undefined;
     };
-  };
-  filters?: ToolFilterCondition[];
+  } | undefined;
+  filters?: ToolFilterCondition[] | undefined;
   appId: ObjectId | string;
   companyId: ObjectId | string;
   status: ActiveStatus;
   createdAt: Date | string;
   updatedAt: Date | string;
-  deletedAt?: Date | string;
+  deletedAt?: Date | string | undefined;
 }
 
 export interface CustomActionResponse extends Omit<CustomAction, '_id'> {
@@ -61,27 +61,27 @@ export interface CustomActionResponse extends Omit<CustomAction, '_id'> {
 export interface CreateCustomActionRequest {
   name: string;
   displayName: string;
-  description?: string;
+  description?: string | undefined;
   parameters: {
     type: 'object';
     properties: Record<string, {
       type: string;
       description: string;
     }>;
-    required?: string[];
+    required?: string[] | undefined;
   };
   endpoint: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     url: string;
-    headers?: Record<string, string>;
-    body?: Record<string, any>;
+    headers?: Record<string, string> | undefined;
+    body?: Record<string, unknown> | undefined;
   };
-  credentials?: Record<string, string>;
+  credentials?: Record<string, string> | undefined;
   responseMapping?: {
-    successPath?: string;
-    errorPath?: string;
-    transform?: string;
-  };
+    successPath?: string | undefined;
+    errorPath?: string | undefined;
+    transform?: string | undefined;
+  } | undefined;
   aiProcessing?: {
     enabled: boolean;
     prompt: string;
@@ -91,36 +91,36 @@ export interface CreateCustomActionRequest {
         type: string;
         description: string;
       }>;
-      required?: string[];
+      required?: string[] | undefined;
     };
-  };
-  filters?: ToolFilterCondition[];
+  } | undefined;
+  filters?: ToolFilterCondition[] | undefined;
 }
 
 export interface UpdateCustomActionRequest {
-  name?: string;
-  displayName?: string;
-  description?: string;
+  name?: string | undefined;
+  displayName?: string | undefined;
+  description?: string | undefined;
   parameters?: {
     type: 'object';
     properties: Record<string, {
       type: string;
       description: string;
     }>;
-    required?: string[];
-  };
+    required?: string[] | undefined;
+  } | undefined;
   endpoint?: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     url: string;
-    headers?: Record<string, string>;
-    body?: Record<string, any>;
-  };
-  credentials?: Record<string, string>;
+    headers?: Record<string, string> | undefined;
+    body?: Record<string, unknown> | undefined;
+  } | undefined;
+  credentials?: Record<string, string> | undefined;
   responseMapping?: {
-    successPath?: string;
-    errorPath?: string;
-    transform?: string;
-  };
+    successPath?: string | undefined;
+    errorPath?: string | undefined;
+    transform?: string | undefined;
+  } | undefined;
   aiProcessing?: {
     enabled: boolean;
     prompt: string;
@@ -130,14 +130,14 @@ export interface UpdateCustomActionRequest {
         type: string;
         description: string;
       }>;
-      required?: string[];
+      required?: string[] | undefined;
     };
-  };
-  filters?: ToolFilterCondition[];
+  } | undefined;
+  filters?: ToolFilterCondition[] | undefined;
 }
 
 export interface CustomActionQuery extends PaginationQuery {
-  status?: ActiveStatus;
+  status?: ActiveStatus | undefined;
 }
 
 // Additional type exports for frontend use
@@ -150,7 +150,7 @@ export type CustomActionEndpoint = {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   url: string;
   headers?: Record<string, string>;
-  body?: Record<string, any>;
+  body?: Record<string, unknown>;
 };
 
 export type CustomActionCredentials = Record<string, string>;

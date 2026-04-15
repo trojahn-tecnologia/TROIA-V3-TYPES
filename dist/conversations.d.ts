@@ -80,7 +80,7 @@ export interface Conversation {
     category?: string;
     privacy?: ConversationPrivacy;
     userRole?: 'viewer' | 'attendant';
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     unreadTracking?: {
         [userId: string]: {
             count: number;
@@ -114,7 +114,7 @@ export interface CreateConversationRequest {
     tags?: string[];
     category?: string;
     privacy?: ConversationPrivacy;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export interface UpdateConversationRequest {
     subject?: string;
@@ -135,7 +135,7 @@ export interface UpdateConversationRequest {
     tags?: string[];
     category?: string;
     privacy?: ConversationPrivacy;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 export type ConversationResponse = Conversation;
 export interface ConversationQuery extends PaginationQuery {

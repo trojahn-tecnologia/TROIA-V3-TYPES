@@ -1,66 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { PaginationQuery, ListResponse, GenericQueryOptions, ExtendedStatus } from './common';
 import type { ChannelWarmup } from './credits';
-
-// Import assignment types from dedicated assignment module
-import {
-  AssignmentConfig as BaseAssignmentConfig,
-  CoreLotteryConfig,
-  LotteryType,
-  FixedOperatorConfig,
-  ShiftLotteryConfig,
-  AvailabilityLotteryConfig,
-  LastInteractionLotteryConfig
-} from './assignment';
-
-// ============================================================================
-// CHANNEL-SPECIFIC ASSIGNMENT TYPES
-// ============================================================================
-
-/**
- * Channel assignment config extends base assignment config.
- * Usado para configurar como conversas são atribuídas automaticamente.
- */
-export interface ChannelAssignmentConfig extends BaseAssignmentConfig {
-  /** Estratégia de assignment: manual, rule-based, lottery, ou none */
-  strategy: 'manual' | 'rule' | 'lottery' | 'none';
-
-  /** Regras de assignment condicional */
-  rules?: AssignmentRule[];
-
-  /** Configuração de lottery (se strategy='lottery') */
-  lotteryConfig?: ChannelLotteryConfig;
-}
-
-export interface AssignmentRule {
-  condition: RuleCondition;
-  action: RuleAction;
-  priority: number;
-  active: boolean;
-}
-
-export interface RuleCondition {
-  field: string; // 'lead.source', 'customer.city', 'ticket.priority'
-  operator: 'equals' | 'contains' | 'in' | 'not_in';
-  value: any;
-}
-
-export interface RuleAction {
-  type: 'assign_team' | 'assign_user' | 'assign_both';
-  teamId?: string;
-  userId?: string;
-}
-
-/**
- * Channel lottery config extends CoreLotteryConfig.
- * Adiciona campos específicos de channel.
- *
- * @see CoreLotteryConfig - Tipos base unificados
- */
-export interface ChannelLotteryConfig extends CoreLotteryConfig {
-  /** Escopo do lottery: apenas usuários, apenas equipes, ou ambos */
-  scope?: 'team' | 'user' | 'both';
-}
+import type { DistributionConfig } from './distribution';
 
 // ============================================================================
 // EMAIL CHANNEL CONFIG (for email-resend provider)
@@ -142,12 +83,20 @@ export interface Channel {
   identifyUser?: boolean;     // If true, operator name is added to outgoing messages
   /** Configuração de expiração automática de atendimentos */
   expirationConfig?: ChannelExpirationConfig;
-  assignmentConfig: ChannelAssignmentConfig;
+  /**
+   * Distribuição automática de conversas — config unificada (D8, D9).
+   * Mesmo shape que `Funnel.assignmentConfig` e `TicketPipeline.assignmentConfig`.
+   */
+  assignmentConfig: DistributionConfig;
   companyId: ObjectId;
   appId: ObjectId;
   status: ExtendedStatus;     // 'active' | 'inactive' | 'pending' | 'suspended' | 'error'
-  /** Round-robin tracking: ID do último usuário que recebeu atribuição neste channel */
-  lastAssignedUserId?: string;
+  /**
+   * Contador monotônico de rotação usado por `DistributionService`.
+   * Incrementado atomicamente via `$inc` a cada atribuição. O userId
+   * selecionado é `pool[lastAssignedUserId % pool.length]`. Ver decisão D4.
+   */
+  lastAssignedUserId?: number;
   warmup?: ChannelWarmup;
   createdAt: Date;
   updatedAt: Date;
@@ -176,7 +125,7 @@ export type ChannelResponse = Omit<Channel, '_id' | 'createdAt' | 'updatedAt' | 
   updatedAt: string;          // Date → ISO string
   capabilities?: string[];    // Provider capabilities from aggregation
   members?: Array<{ id: string; name: string; avatar?: string }>;
-  config?: Record<string, any>;  // Widget configuration (optional, for website-widget provider)
+  config?: Record<string, unknown>;  // Widget configuration (optional, for website-widget provider)
   qrCode?: string;            // QR Code for gateway providers
   qrCodeExpires?: number;     // QR Code expiration timestamp (Unix timestamp in seconds)
   integration?: {             // Integration credentials from company-integrations
@@ -200,10 +149,10 @@ export interface ChannelQueryOptions extends GenericQueryOptions<ChannelQuery> {
 export interface CreateChannelRequest {
   name: string;
   identifier: string;
-  assignmentConfig: ChannelAssignmentConfig;
+  assignmentConfig: DistributionConfig;
   providerId: string;
-  config: Record<string, any>;
-  credentials: Record<string, any>;
+  config: Record<string, unknown>;
+  credentials: Record<string, unknown>;
   integrationName?: string;
   integrationDescription?: string;
 }
@@ -211,55 +160,15 @@ export interface CreateChannelRequest {
 export interface CreateChannelRepositoryRequest {
   name: string;
   identifier: string;
-  assignmentConfig: ChannelAssignmentConfig;
+  assignmentConfig: DistributionConfig;
   integrationId: string;
 }
 export interface UpdateChannelRequest {
   name?: string;
   identifier?: string;
-  assignmentConfig?: ChannelAssignmentConfig;
+  assignmentConfig?: DistributionConfig;
   identifyUser?: boolean;
   /** Configuração de expiração automática de atendimentos */
   expirationConfig?: ChannelExpirationConfig;
   status?: ExtendedStatus;
-}
-
-// Channel Assignment Result (simpler version for channels)
-export interface ChannelAssignmentResult {
-  teamId: string | null;
-  userId: string | null;
-  reason?: string;
-}
-
-// Testing and Manual Assignment
-export interface TestAssignmentRequest {
-  channelId: string;
-  resourceType: 'customer' | 'lead' | 'project' | 'document' | 'ticket';
-  resourceId: string;
-  priority?: number;
-  metadata?: Record<string, any>;
-}
-
-export interface TestAssignmentResponse {
-  success: boolean;
-  assignedTo: ChannelAssignmentResult;
-  message: string;
-  executedAt: Date;
-  details?: Record<string, any>;
-}
-
-export interface ManualAssignRequest {
-  channelId: string;
-  resourceType: 'customer' | 'lead' | 'project' | 'document' | 'ticket';
-  resourceId: string;
-  userId: string;
-  priority?: number;
-  notes?: string;
-}
-
-export interface ManualAssignResponse {
-  success: boolean;
-  assignmentId: string;
-  message: string;
-  assignedAt: Date;
 }

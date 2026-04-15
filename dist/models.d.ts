@@ -29,7 +29,6 @@ import type { Team, TeamUser, TeamResource } from './teams';
 import type { Shift } from './shifts';
 import type { Level } from './levels';
 import type { Plan } from './plans';
-import type { Assignment } from './assignment';
 import type { EmailTemplateResponse } from './email-templates';
 import type { AppIntegrationResponse } from './app-integrations';
 import type { CompanyIntegrationResponse } from './company-integrations';
@@ -158,8 +157,6 @@ export type EmailTemplateModel = ToModel<EmailTemplateResponse, 'appId' | 'compa
 export type SavedCardModel = ToModel<SavedCard, 'appId' | 'companyId' | 'userId', 'createdAt' | 'updatedAt' | 'lastUsedAt'>;
 /** CalendarEvent - Evento de calendário */
 export type CalendarEventModel = ToModel<CalendarEvent, 'appId' | 'companyId', 'createdAt' | 'updatedAt'>;
-/** Assignment - Atribuição */
-export type AssignmentModel = ToModel<Assignment, never, never>;
 /**
  * Lista os campos ObjectId de cada model.
  * Use como referência ao implementar preprocessCreate nos repositories.
