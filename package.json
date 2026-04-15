@@ -27,7 +27,6 @@
     "dist/**/*"
   ],
   "dependencies": {
-    "@troia-v3/types": "file:troia-v3-types-1.1.337.tgz",
     "mongodb": "^6.19.0"
   }
 }
