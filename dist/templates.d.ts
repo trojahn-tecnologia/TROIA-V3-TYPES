@@ -251,12 +251,12 @@ export interface TemplatePreviewResponse {
     providerType: string;
     rendered: {
         components?: WhatsAppTemplateComponent[];
-        messageData?: any;
+        messageData?: Record<string, unknown>;
         subject?: string;
         htmlBody?: string;
         plainTextBody?: string;
         text?: string;
-        attachment?: any;
+        attachment?: Record<string, unknown>;
     };
     variablesUsed: Record<number, string | number | boolean>;
 }

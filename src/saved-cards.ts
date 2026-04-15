@@ -138,7 +138,7 @@ export interface PaymentWithCardResponse {
   };
 
   // Provider specific data
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 
   createdAt: string;
 }
@@ -150,7 +150,7 @@ export interface PaymentWithCardResponse {
 export interface SavedCardError {
   code: 'INVALID_CARD' | 'TOKENIZATION_FAILED' | 'PROVIDER_ERROR' | 'CARD_NOT_FOUND' | 'CARD_EXPIRED';
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 // ================================
@@ -177,7 +177,7 @@ export interface CardTokenizationResponse {
   holderName?: string;
 
   // Provider specific data
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 }
 
 // ================================

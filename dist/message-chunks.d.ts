@@ -63,7 +63,7 @@ export interface SemanticSearchResult {
     content: string;
     score: number;
     chunkIndex: number;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 /**
  * Parâmetros para busca semântica

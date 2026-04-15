@@ -14,6 +14,10 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MODEL_OBJECTID_FIELDS = void 0;
+// NOTA: AssignmentModel foi removido — a collection `assignments` foi
+// dropada na Fase 1b (Distribution & Context-Users Refactor). Distribuição
+// e rotação agora moram diretamente em channels/funnels/pipelines via
+// `assignmentConfig: DistributionConfig` + `lastAssignedUserId: number`.
 // ============================================================================
 // HELPER: ID Fields per Model (for preprocessCreate reference)
 // ============================================================================

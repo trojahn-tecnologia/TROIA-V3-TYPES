@@ -13,6 +13,7 @@ var CreditCategory;
     CreditCategory["AI_TOKENS_OUTPUT"] = "ai.tokens.output";
     CreditCategory["AI_TOOL_EXECUTION"] = "ai.tool.execution";
     CreditCategory["AI_VOICE_CLONE"] = "ai.voice.clone";
+    CreditCategory["AI_AGENT_TRAINING"] = "ai.agent.training";
     CreditCategory["CRM_LEAD_CREATED"] = "crm.lead.created";
     CreditCategory["CRM_TICKET_OPENED"] = "crm.ticket.opened";
     CreditCategory["CRM_CONTACT_CREATED"] = "crm.contact.created";
@@ -29,6 +30,7 @@ var CreditCategory;
     CreditCategory["BILLING_EXPIRATION"] = "billing.expiration";
     CreditCategory["BILLING_CANCELLATION"] = "billing.cancellation";
     CreditCategory["ADMIN_ADJUSTMENT"] = "admin.adjustment";
+    CreditCategory["AI_CONVERSATION_QA"] = "ai.conversation.qa";
 })(CreditCategory || (exports.CreditCategory = CreditCategory = {}));
 exports.CREDIT_CATEGORIES = {
     [CreditCategory.MESSAGE_CHAT]: { label: 'Mensagem de chat', unit: 'per_action', hasDirection: true, hasProviderId: true, providerType: 'messaging' },
@@ -39,6 +41,7 @@ exports.CREDIT_CATEGORIES = {
     [CreditCategory.AI_TOKENS_OUTPUT]: { label: 'Tokens IA (output)', unit: 'per_1k_tokens', hasDirection: false, hasProviderId: true, providerType: 'ai_model' },
     [CreditCategory.AI_TOOL_EXECUTION]: { label: 'Execução de tool IA', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.AI_VOICE_CLONE]: { label: 'Voz Clonada', unit: 'per_month', hasDirection: false, hasProviderId: false },
+    [CreditCategory.AI_AGENT_TRAINING]: { label: 'Treinamento de agente', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.CRM_LEAD_CREATED]: { label: 'Lead criado', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.CRM_TICKET_OPENED]: { label: 'Ticket aberto', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.CRM_CONTACT_CREATED]: { label: 'Contato criado', unit: 'per_action', hasDirection: false, hasProviderId: false },
@@ -55,4 +58,5 @@ exports.CREDIT_CATEGORIES = {
     [CreditCategory.BILLING_EXPIRATION]: { label: 'Expiração de ciclo', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.BILLING_CANCELLATION]: { label: 'Cancelamento', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.ADMIN_ADJUSTMENT]: { label: 'Ajuste administrativo', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.AI_CONVERSATION_QA]: { label: 'Análise de qualidade (conversa)', unit: 'per_action', hasDirection: false, hasProviderId: false },
 };

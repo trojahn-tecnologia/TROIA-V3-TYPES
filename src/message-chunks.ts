@@ -80,7 +80,7 @@ export interface SemanticSearchResult {
   content: string;
   score: number;                    // Similarity score (0-1, quanto maior melhor)
   chunkIndex: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**

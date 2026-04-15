@@ -76,7 +76,7 @@ export interface ChannelDeliveryStatus {
     readAt?: Date;
     error?: string;
     providerId?: string;
-    providerResponse?: any;
+    providerResponse?: unknown;
 }
 /**
  * Entidade de notificação (Database schema)
@@ -91,7 +91,7 @@ export interface SystemNotification {
     priority: NotificationPriority;
     title: string;
     message: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     channels: NotificationChannel[];
     deliveryStatus: ChannelDeliveryStatus[];
     read: boolean;
@@ -114,7 +114,7 @@ export interface CreateNotificationRequest {
     priority: NotificationPriority;
     title: string;
     message: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     channels?: NotificationChannel[];
     actionUrl?: string;
     actionLabel?: string;

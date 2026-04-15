@@ -16,7 +16,14 @@ export * from './channels';
 export * from './shifts';
 export * from './skills';
 export * from './company-integrations';
-export * from './assignment';
+// Context-users (shared enums for channels-users / funnels-users / ticket-pipelines-users)
+export * from './context-users';
+// Distribution engine (replaces legacy assignments module — coexists with it until Phase 10)
+export * from './distribution';
+// Funnels-Users pivot (visibility + scope + attendant pool for funnels)
+export * from './funnels-users';
+// Ticket-Pipelines-Users pivot (visibility + scope + attendant pool for ticket pipelines)
+export * from './ticket-pipelines-users';
 export * from './app-integrations';
 export * from './user-integrations';
 export * from './api-keys';

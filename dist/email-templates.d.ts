@@ -151,7 +151,7 @@ export interface UpdateEmailTemplateRequest {
 }
 export interface RenderTemplateRequest {
     templateType: string;
-    templateData: Record<string, any>;
+    templateData: Record<string, unknown>;
     companyId?: string;
 }
 export interface TemplateTypeResponse {

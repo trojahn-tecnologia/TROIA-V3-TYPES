@@ -94,3 +94,14 @@ export declare function getProviderFromModel(modelId: string): AIProviderType | 
  * Busca definição completa do modelo por ID.
  */
 export declare function getModelDefinition(modelId: string): AIModelDefinition | undefined;
+/**
+ * Verifica se um modelo suporta uma feature específica.
+ *
+ * Retorna `false` se o modelo não for encontrado no catálogo (fail-safe).
+ * Útil para checar antes de enviar imagens/PDFs/reasoning para o modelo.
+ *
+ * @example
+ *   modelSupports('gpt-4o-mini', 'image') // true
+ *   modelSupports('deepseek-chat', 'image') // false
+ */
+export declare function modelSupports(modelId: string, feature: AIModelFeature): boolean;

@@ -21,9 +21,9 @@ export interface Activity {
     title: string;
     description?: string;
     summary?: string;
-    beforeData?: Record<string, any>;
-    afterData?: Record<string, any>;
-    metadata?: Record<string, any>;
+    beforeData?: Record<string, unknown>;
+    afterData?: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
     relatedEntities?: RelatedEntity[];
     status: 'completed' | 'in_progress' | 'failed' | 'cancelled' | 'pending';
     isVisible: boolean;
@@ -56,9 +56,9 @@ export interface CreateActivityRequest {
     title: string;
     description?: string;
     summary?: string;
-    beforeData?: Record<string, any>;
-    afterData?: Record<string, any>;
-    metadata?: Record<string, any>;
+    beforeData?: Record<string, unknown>;
+    afterData?: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
     relatedEntities?: RelatedEntity[];
     status?: 'completed' | 'in_progress' | 'failed' | 'cancelled' | 'pending';
     isVisible?: boolean;
@@ -71,8 +71,8 @@ export interface UpdateActivityRequest {
     description?: string;
     summary?: string;
     status?: 'completed' | 'in_progress' | 'failed' | 'cancelled' | 'pending';
-    afterData?: Record<string, any>;
-    metadata?: Record<string, any>;
+    afterData?: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
     isVisible?: boolean;
     isInternal?: boolean;
     dueDate?: string;
@@ -151,7 +151,7 @@ export interface ActivityNotificationRequest {
     recipientIds: string[];
     notificationType: 'email' | 'push' | 'sms' | 'webhook';
     template?: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
 }
 export interface ActivitySearchRequest {
     query: string;
@@ -186,28 +186,28 @@ export interface ContactActivityData {
     contactId: string;
     contactName?: string;
     action: 'created' | 'updated' | 'deleted' | 'merged';
-    changes?: Record<string, any>;
+    changes?: Record<string, unknown>;
     actorId?: string;
 }
 export interface LeadActivityData {
     leadId: string;
     leadName?: string;
     action: 'created' | 'updated' | 'deleted' | 'assigned' | 'converted' | 'lost';
-    changes?: Record<string, any>;
+    changes?: Record<string, unknown>;
     actorId?: string;
 }
 export interface TicketActivityData {
     ticketId: string;
     ticketTitle?: string;
     action: 'created' | 'updated' | 'assigned' | 'resolved' | 'closed' | 'reopened';
-    changes?: Record<string, any>;
+    changes?: Record<string, unknown>;
     actorId?: string;
 }
 export interface ConversationActivityData {
     conversationId: string;
     conversationSubject?: string;
     action: 'started' | 'assigned' | 'transferred' | 'closed' | 'reopened';
-    changes?: Record<string, any>;
+    changes?: Record<string, unknown>;
     actorId?: string;
 }
 export interface MessageActivityData {

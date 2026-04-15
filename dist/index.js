@@ -30,7 +30,14 @@ __exportStar(require("./channels"), exports);
 __exportStar(require("./shifts"), exports);
 __exportStar(require("./skills"), exports);
 __exportStar(require("./company-integrations"), exports);
-__exportStar(require("./assignment"), exports);
+// Context-users (shared enums for channels-users / funnels-users / ticket-pipelines-users)
+__exportStar(require("./context-users"), exports);
+// Distribution engine (replaces legacy assignments module — coexists with it until Phase 10)
+__exportStar(require("./distribution"), exports);
+// Funnels-Users pivot (visibility + scope + attendant pool for funnels)
+__exportStar(require("./funnels-users"), exports);
+// Ticket-Pipelines-Users pivot (visibility + scope + attendant pool for ticket pipelines)
+__exportStar(require("./ticket-pipelines-users"), exports);
 __exportStar(require("./app-integrations"), exports);
 __exportStar(require("./user-integrations"), exports);
 __exportStar(require("./api-keys"), exports);

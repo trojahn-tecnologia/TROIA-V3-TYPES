@@ -35,7 +35,6 @@ import type { Team, TeamUser, TeamResource } from './teams';
 import type { Shift } from './shifts';
 import type { Level } from './levels';
 import type { Plan } from './plans';
-import type { Assignment } from './assignment';
 import type { EmailTemplateResponse } from './email-templates';
 import type { AppIntegrationResponse } from './app-integrations';
 import type { CompanyIntegrationResponse } from './company-integrations';
@@ -332,12 +331,10 @@ export type CalendarEventModel = ToModel<
   'createdAt' | 'updatedAt'
 >;
 
-/** Assignment - Atribuição */
-export type AssignmentModel = ToModel<
-  Assignment,
-  never,
-  never
->;
+// NOTA: AssignmentModel foi removido — a collection `assignments` foi
+// dropada na Fase 1b (Distribution & Context-Users Refactor). Distribuição
+// e rotação agora moram diretamente em channels/funnels/pipelines via
+// `assignmentConfig: DistributionConfig` + `lastAssignedUserId: number`.
 
 // ============================================================================
 // HELPER: ID Fields per Model (for preprocessCreate reference)

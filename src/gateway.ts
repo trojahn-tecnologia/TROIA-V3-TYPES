@@ -169,8 +169,8 @@ export interface GatewayEventData {
   // Common fields
   timestamp: string;  // ISO 8601 format
   metadata?: {
-    originalPayload?: any;
-    [key: string]: any;
+    originalPayload?: Record<string, unknown>;
+    [key: string]: unknown;
   };
 }
 

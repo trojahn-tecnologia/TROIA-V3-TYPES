@@ -76,7 +76,7 @@ export interface CalendarEvent extends FullBaseDocument {
     syncStatus: 'pending' | 'synced' | 'failed';
     lastSyncAt: string;              // ISO 8601
     syncError?: string;              // Error message if failed
-    metadata?: Record<string, any>;  // Provider-specific data
+    metadata?: Record<string, unknown>;  // Provider-specific data
   }>;
 
   // Conference/Meeting Link
@@ -156,7 +156,7 @@ export interface CreateCalendarEventRequest {
     syncStatus: 'pending' | 'synced' | 'failed';
     lastSyncAt?: string;              // ISO 8601
     syncError?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }>;
 }
 
@@ -359,7 +359,7 @@ export interface FollowUpAction {
 
     // webhook: URL e payload
     webhookUrl?: string;
-    webhookPayload?: Record<string, any>;
+    webhookPayload?: Record<string, unknown>;
     webhookHeaders?: Record<string, string>;
 
     // move_to_step: ID do funil e da etapa destino
@@ -452,7 +452,7 @@ export interface FollowUpExecutionJobData {
 export interface ConditionEvaluationResult {
   shouldExecute: boolean;
   reason: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -463,7 +463,7 @@ export interface ActionExecutionResult {
   actionType: FollowUpActionType;
   message: string;
   error?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**

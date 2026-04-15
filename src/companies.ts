@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { TenantAwareDocument, FullTenantDocument, ActiveStatus, Address, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
-import { AssignmentConfig } from './assignment';
+import type { DistributionConfig } from './distribution';
 import type { TenantThemeOverrides } from './theme';
 import type { CompanyCard, CompanyCardResponse, CreditBalance, CreditSubscription, CreditAlert, CreditInvoice } from './credits';
+import type { UserResponse } from './user';
 
 export type CompanyDocumentType = 'CPF' | 'CNPJ';
 
@@ -17,13 +18,17 @@ export interface Company extends FullTenantDocument {
   status: ActiveStatus;
   defaultCountryCode?: string;
   address: Address;
-  defaultAssignmentConfig?: AssignmentConfig;
+  defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;
   cards: CompanyCard[];
   creditBalance: CreditBalance;
   creditSubscription?: CreditSubscription;
   creditAlerts: CreditAlert[];
   invoices: CreditInvoice[];
+  qualityInsights?: {
+    enabled: boolean;
+    sampleRate: number; // 0.0–1.0
+  };
 }
 
 
@@ -53,13 +58,13 @@ export interface UpdateCompanyRequest {
   status?: ActiveStatus;
   defaultCountryCode?: string;
   address?: Partial<Address>;
-  defaultAssignmentConfig?: AssignmentConfig;
+  defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;
 }
 
 // Assignment configuration specific request
 export interface UpdateCompanyAssignmentConfigRequest {
-  defaultAssignmentConfig: AssignmentConfig;
+  defaultAssignmentConfig: DistributionConfig;
 }
 
 export type CompanyStatus = ActiveStatus;
@@ -88,13 +93,17 @@ export interface CompanyResponse {
   status: ActiveStatus;
   defaultCountryCode?: string;
   address: Address;
-  defaultAssignmentConfig?: AssignmentConfig;
+  defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;
   cards: CompanyCardResponse[];
   creditBalance: CreditBalance;
   creditSubscription?: CreditSubscription;
   creditAlerts: CreditAlert[];
   invoices: CreditInvoice[];
+  qualityInsights?: {
+    enabled: boolean;
+    sampleRate: number;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -108,5 +117,5 @@ export interface CompanyQueryOptions extends GenericQueryOptions<CompanyQuery> {
 // Special response for company registration (company + user)
 export interface CompanyRegistrationResponse {
   company: CompanyResponse;
-  user: any; // Will be UserResponse when we import it
+  user: UserResponse;
 }

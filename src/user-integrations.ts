@@ -194,7 +194,7 @@ export interface ProviderAuthError {
   timestamp: Date;
 
   /** Dados adicionais do erro (opcional) */
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**

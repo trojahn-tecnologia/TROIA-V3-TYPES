@@ -1,20 +1,29 @@
 import { ObjectId } from 'mongodb';
 /**
- * Node Types - All supported node types for workflows
+ * Node Types - All supported node types for workflows.
+ *
+ * SINGLE SOURCE OF TRUTH: add new node types here only.
+ * The WorkflowNodeType union is derived from this array so that
+ * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
+ * directly and stay in sync automatically.
  */
-export type WorkflowNodeType = 'trigger_webhook' | 'trigger_schedule' | 'trigger_event' | 'trigger_manual' | 'trigger_date_field' | 'trigger_inactivity' | 'action_send_message' | 'action_send_email' | 'action_http_request' | 'action_query_database' | 'action_create_lead' | 'action_update_contact' | 'action_assign' | 'action_set_variable' | 'action_create_conversation' | 'control_if' | 'control_switch' | 'control_delay' | 'control_loop' | 'ai_agent' | 'ai_processor';
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+/** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
+export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
- * Workflow Status
+ * Workflow Statuses — runtime constant + derived type.
  */
-export type WorkflowStatus = 'active' | 'inactive' | 'draft' | 'archived';
+export declare const WORKFLOW_STATUSES: readonly ["active", "inactive", "draft", "archived"];
+export type WorkflowStatus = (typeof WORKFLOW_STATUSES)[number];
 /**
- * Execution Status
+ * Execution Statuses — runtime constant + derived type.
  */
-export type WorkflowExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+export declare const WORKFLOW_EXECUTION_STATUSES: readonly ["pending", "running", "completed", "failed", "cancelled", "suspended"];
+export type WorkflowExecutionStatus = (typeof WORKFLOW_EXECUTION_STATUSES)[number];
 /**
- * Node Execution Status
+ * Node Run Entry Status
  */
-export type NodeExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
+export type NodeRunEntryStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped' | 'suspended';
 /**
  * Filter Condition - Standard format for workflow filters
  * Used by triggers and conditions to filter entities
@@ -294,42 +303,86 @@ export interface AIAgentNodeConfig {
     includeHistory?: boolean;
 }
 /**
- * AI Processor Node Configuration
+ * AI Agent Inline Node Configuration
  *
- * A standalone AI processor that receives tools from connected workflow nodes.
- * Unlike AI Agent, this node doesn't reference an existing agent - it defines
- * its own prompt, model, and receives tools via the 'tools' targetHandle.
+ * A standalone Mastra Agent built inline inside the workflow. Unlike AIAgentNodeConfig
+ * (which references an existing AIAgent entity), this node defines its own system
+ * prompt, model, memory and receives tools dynamically from connected action nodes
+ * via the 'tools' targetHandle.
  *
- * Use this when you want the AI to have access to specific workflow actions
- * without creating a full AI Agent entity.
+ * Use this when you want a custom AI agent tailored to this workflow, without
+ * creating a full AI Agent entity in the database.
  */
-export interface AIProcessorNodeConfig {
-    /** System prompt defining the AI's behavior */
+export interface AIAgentInlineConfig {
+    /** Display name of the agent (used in logs and traces) */
+    nodeName?: string;
+    /** System prompt that defines the agent behavior */
     systemPrompt: string;
-    /** Model to use (defaults to configured provider's default) */
-    model?: string;
-    /** Temperature for response generation (0-2, default: 0.7) */
+    /** LLM model id (e.g. 'gpt-4o-mini', 'claude-haiku-4-5') — provider resolved automatically */
+    model: string;
+    /** Sampling temperature (0-2, default: 0.7) */
     temperature?: number;
-    /** Maximum tokens for response */
+    /** Maximum tokens for the response */
     maxTokens?: number;
-    /** Context type - defaults to 'conversation' */
-    contextType?: 'conversation' | 'contact' | 'lead';
-    /** Optional context entity ID */
-    contextId?: string;
-    /** Whether to wait for AI response before continuing workflow */
-    waitForResponse?: boolean;
+    /** Maximum iterations of the tool-calling loop (default: 5) */
+    maxIterations?: number;
+    /** Memory mode: 'thread' persists history per conversation, 'ephemeral' is stateless */
+    memoryMode: 'thread' | 'ephemeral';
+    /** Input template (supports {{variable}} substitution from workflow context) */
+    input: string;
     /**
      * IDs of workflow nodes connected as tools (via 'tools' targetHandle).
-     * These are automatically populated by the WorkflowExecutor when
-     * processing edges with targetHandle='tools'.
-     * Action nodes connected here become available tools for the AI processor.
+     * Auto-populated by the WorkflowExecutor when processing edges with targetHandle='tools'.
      */
     toolNodeIds?: string[];
+    /** Preferred context type (defaults to 'conversation') */
+    contextType?: 'conversation' | 'contact' | 'lead';
+}
+/**
+ * Skill Input Node Configuration
+ *
+ * Entry point of a workflow being used as a skill.
+ * Replaces the trigger for skill-type workflows and carries the skill metadata.
+ */
+export interface SkillInputConfig {
+    /** Descrição que o LLM lê pra decidir quando chamar */
+    description: string;
+    /** Modo de execução do skill */
+    executionMode: 'sync' | 'async';
+    /** JSON Schema dos parâmetros de entrada */
+    inputSchema: {
+        type: 'object';
+        properties: Record<string, {
+            type: 'string' | 'number' | 'boolean' | 'array';
+            description?: string;
+            enum?: string[];
+        }>;
+        required?: string[];
+    };
+    /** JSON Schema do retorno (opcional) */
+    outputSchema?: {
+        type: 'object';
+        properties: Record<string, {
+            type: 'string' | 'number' | 'boolean' | 'array' | 'object';
+            description?: string;
+        }>;
+    };
+}
+/**
+ * Skill Output Node Configuration
+ *
+ * Marks the exit point of a workflow being used as a skill.
+ * Maps workflow variables to the skill's output payload.
+ */
+export interface SkillOutputConfig {
+    /** Mapeamento de variáveis do contexto para o output do skill.
+     *  Ex: { "precoTotal": "{{variables.total}}" } */
+    outputMapping: Record<string, string>;
 }
 /**
  * Node Configuration - Union of all config types
  */
-export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | DelayControlConfig | LoopControlConfig | AIAgentNodeConfig | AIProcessorNodeConfig | Record<string, unknown>;
+export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | DelayControlConfig | LoopControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
 /**
  * Workflow Variable Value - Type-safe recursive value type for workflow variables
  */
@@ -371,10 +424,10 @@ export interface WorkflowEdge {
     id: string;
     source: string;
     target: string;
-    sourceHandle?: string;
-    targetHandle?: string;
-    label?: string;
-    condition?: string;
+    sourceHandle?: string | undefined;
+    targetHandle?: string | undefined;
+    label?: string | undefined;
+    condition?: string | undefined;
 }
 /**
  * Workflow Definition
@@ -390,9 +443,9 @@ export interface WorkflowViewport {
 export interface WorkflowDefinition {
     nodes: WorkflowNode[];
     edges: WorkflowEdge[];
-    variables?: WorkflowVariables;
-    version?: number;
-    viewport?: WorkflowViewport;
+    variables?: WorkflowVariables | undefined;
+    version?: number | undefined;
+    viewport?: WorkflowViewport | undefined;
 }
 /**
  * Workflow Folder Entity (Database Document)
@@ -479,6 +532,8 @@ export interface Workflow {
     status: WorkflowStatus;
     definition: WorkflowDefinition;
     folderId?: ObjectId;
+    /** Classificação de uso. Default: 'automation' */
+    usageType?: 'automation' | 'skill';
     /** Environment where this workflow was created (development, production, etc.) */
     environment?: string;
     appId: ObjectId;
@@ -502,18 +557,29 @@ export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'a
     deletedAt?: string;
 }
 /**
- * Node Execution Record
+ * Single run entry for a node (supports multiple iterations/retries).
+ * Inspired by n8n runData format: one entry per execution attempt.
  */
-export interface NodeExecution {
-    nodeId: string;
-    nodeType: WorkflowNodeType;
-    status: NodeExecutionStatus;
-    startedAt: Date;
-    completedAt?: Date;
+export interface NodeRunEntry {
+    runIndex: number;
+    status: NodeRunEntryStatus;
+    startedAt: string;
+    completedAt?: string;
     input?: Record<string, unknown>;
     output?: Record<string, unknown>;
     error?: string;
     duration?: number;
+    suspendedPayload?: unknown;
+}
+/**
+ * Snapshot metadata for suspended/resumed executions (Mastra suspend/resume).
+ */
+export interface WorkflowSnapshotMeta {
+    runId: string;
+    workflowId: string;
+    status: 'running' | 'suspended' | 'completed' | 'failed' | 'cancelled';
+    suspendedAt?: string;
+    resumeAt?: string;
 }
 /**
  * Workflow Execution Entity (Database Document)
@@ -527,7 +593,10 @@ export interface WorkflowExecution {
     triggerData?: Record<string, unknown>;
     context: Record<string, unknown>;
     variables: WorkflowVariables;
-    nodeExecutions: NodeExecution[];
+    /** Map<nodeId, run entries[]> — formato runData estilo n8n */
+    runData: Record<string, NodeRunEntry[]>;
+    /** Ordem de primeira execução dos nós, para rendering da UI timeline */
+    nodeOrder: string[];
     currentNodeId?: string;
     startedAt: Date;
     completedAt?: Date;
@@ -537,19 +606,22 @@ export interface WorkflowExecution {
     isTest?: boolean;
     appId: ObjectId;
     companyId: ObjectId;
+    /**
+     * UUID do run Mastra associado a esta execução.
+     * Persiste o vínculo mastraRunId → executionId mesmo após restart do processo
+     * (o Map em memória do ExecutionRecorder é transitório).
+     * Usado por findExecutionIdByRunId para resume de runs suspensos.
+     */
+    mastraRunId?: string;
 }
 /**
  * Workflow Execution Response (API Response)
  */
-export interface WorkflowExecutionResponse extends Omit<WorkflowExecution, '_id' | 'workflowId' | 'appId' | 'companyId' | 'nodeExecutions' | 'startedAt' | 'completedAt'> {
+export interface WorkflowExecutionResponse extends Omit<WorkflowExecution, '_id' | 'workflowId' | 'appId' | 'companyId' | 'startedAt' | 'completedAt'> {
     id: string;
     workflowId: string;
     appId: string;
     companyId: string;
-    nodeExecutions: Array<Omit<NodeExecution, 'startedAt' | 'completedAt'> & {
-        startedAt: string;
-        completedAt?: string;
-    }>;
     startedAt: string;
     completedAt?: string;
 }
@@ -585,7 +657,7 @@ export interface WorkflowTriggerCountResponse extends Omit<WorkflowTriggerCount,
 /**
  * Workflow Event Types
  */
-export type WorkflowEventType = 'message.received' | 'message.sent' | 'message.delivered' | 'message.read' | 'conversation.created' | 'conversation.updated' | 'conversation.closed' | 'conversation.reopened' | 'conversation.assigned' | 'conversation.inactive' | 'contact.created' | 'contact.updated' | 'contact.deleted' | 'contact.tag_added' | 'contact.tag_removed' | 'contact.birthday' | 'contact.inactive' | 'lead.created' | 'lead.updated' | 'lead.stage_changed' | 'lead.won' | 'lead.lost' | 'lead.inactive' | 'ticket.created' | 'ticket.updated' | 'ticket.status_changed' | 'ticket.assigned' | 'ticket.resolved' | 'ticket.closed' | 'calendar_event.created' | 'calendar_event.updated' | 'calendar_event.cancelled' | 'webhook.received' | 'custom.event';
+export type WorkflowEventType = 'message.received' | 'message.sent' | 'message.delivered' | 'message.read' | 'conversation.created' | 'conversation.updated' | 'conversation.closed' | 'conversation.reopened' | 'conversation.assigned' | 'conversation.inactive' | 'contact.created' | 'contact.updated' | 'contact.deleted' | 'contact.tag_added' | 'contact.tag_removed' | 'contact.birthday' | 'contact.inactive' | 'lead.created' | 'lead.updated' | 'lead.stage_changed' | 'lead.won' | 'lead.lost' | 'lead.inactive' | 'ticket.created' | 'ticket.updated' | 'ticket.status_changed' | 'ticket.assigned' | 'ticket.resolved' | 'ticket.closed' | 'calendar_event.created' | 'calendar_event.updated' | 'calendar_event.cancelled' | 'database.document.created' | 'database.document.updated' | 'form.submitted' | 'instagram.comment.received' | 'webhook.received' | 'custom.event';
 /**
  * Workflow Event
  */
@@ -604,50 +676,50 @@ export interface WorkflowEvent {
  */
 export interface CreateWorkflowRequest {
     name: string;
-    description?: string;
-    status?: WorkflowStatus;
+    description?: string | undefined;
+    status?: WorkflowStatus | undefined;
     definition: WorkflowDefinition;
-    folderId?: string;
+    folderId?: string | undefined;
     /** Environment where this workflow is being created (auto-set by backend if not provided) */
-    environment?: string;
+    environment?: string | undefined;
 }
 /**
  * Update Workflow Request
  */
 export interface UpdateWorkflowRequest {
-    name?: string;
-    description?: string;
-    status?: WorkflowStatus;
-    definition?: WorkflowDefinition;
-    folderId?: string | null;
+    name?: string | undefined;
+    description?: string | undefined;
+    status?: WorkflowStatus | undefined;
+    definition?: WorkflowDefinition | undefined;
+    folderId?: string | null | undefined;
 }
 /**
  * Workflow Query Parameters
  */
 export interface WorkflowQuery {
-    page?: number;
-    limit?: number;
-    search?: string;
-    status?: WorkflowStatus;
-    folderId?: string | null;
+    page?: number | undefined;
+    limit?: number | undefined;
+    search?: string | undefined;
+    status?: WorkflowStatus | undefined;
+    folderId?: string | null | undefined;
     /** Filter workflows by environment */
-    environment?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    environment?: string | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: 'asc' | 'desc' | undefined;
 }
 /**
  * Workflow Execution Query Parameters
  */
 export interface WorkflowExecutionQuery {
-    page?: number;
-    limit?: number;
-    workflowId?: string;
-    status?: WorkflowExecutionStatus;
-    triggerType?: WorkflowNodeType;
-    startDate?: string;
-    endDate?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    page?: number | undefined;
+    limit?: number | undefined;
+    workflowId?: string | undefined;
+    status?: WorkflowExecutionStatus | undefined;
+    triggerType?: WorkflowNodeType | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: 'asc' | 'desc' | undefined;
 }
 /**
  * Trigger Workflow Request
@@ -759,10 +831,14 @@ export interface NodeHandlerResult {
 }
 /**
  * Node Handler Interface
+ *
+ * The optional third `workflow` parameter allows handlers that need access to
+ * the full workflow definition (e.g. AIAgentInlineHandler builds tools from
+ * connected action nodes). Most handlers ignore it.
  */
 export interface INodeHandler {
     nodeType: WorkflowNodeType;
-    execute(node: WorkflowNode, context: WorkflowExecutionContext): Promise<NodeHandlerResult>;
+    execute(node: WorkflowNode, context: WorkflowExecutionContext, workflow?: WorkflowResponse): Promise<NodeHandlerResult>;
     validate?(node: WorkflowNode): boolean | string;
 }
 /**

@@ -1,4 +1,5 @@
 import { PaginationQuery, ListResponse, AppAwareDocument, ActiveStatus } from './common';
+import type { DistributionConfig } from './distribution';
 export type TicketStatusCategory = 'new' | 'in_progress' | 'waiting' | 'resolved' | 'closed';
 export type SLABehavior = 'running' | 'paused' | 'stopped';
 export interface TicketStatusCategoryConfig {
@@ -13,12 +14,23 @@ export interface TicketPipeline extends AppAwareDocument {
     color: string;
     order: number;
     status: ActiveStatus;
+    /**
+     * Distribuição automática de tickets — config unificada (D8, D9).
+     * Mesmo shape que `Funnel.assignmentConfig` e `Channel.assignmentConfig`.
+     */
+    assignmentConfig?: DistributionConfig;
+    /**
+     * Contador monotônico de rotação usado por `DistributionService`.
+     * Incrementado atomicamente via `$inc` a cada atribuição.
+     */
+    lastAssignedUserId?: number;
 }
 export interface CreateTicketPipelineRequest {
     name: string;
     description?: string;
     color: string;
     order?: number;
+    assignmentConfig?: DistributionConfig;
 }
 export interface UpdateTicketPipelineRequest {
     name?: string;
@@ -26,6 +38,7 @@ export interface UpdateTicketPipelineRequest {
     color?: string;
     order?: number;
     status?: ActiveStatus;
+    assignmentConfig?: DistributionConfig;
 }
 export type TicketPipelineResponse = Omit<TicketPipeline, '_id'> & {
     id: string;

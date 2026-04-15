@@ -66,7 +66,7 @@ export interface ReactionContent {
 export interface SystemContent {
     type: 'system';
     action: 'conversation_started' | 'conversation_ended' | 'user_joined' | 'user_left' | 'assignment_changed' | 'status_changed';
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
 }
 export interface ButtonItem {
     id: string;
@@ -127,7 +127,7 @@ export interface ConversationMessage {
     senderName?: string;
     senderType?: 'contact' | 'user' | 'system' | 'ai' | 'automation' | 'automation-follow';
     providerMessageId?: string;
-    providerData?: Record<string, any>;
+    providerData?: Record<string, unknown>;
     replyToMessageId?: string;
     reply?: Partial<ConversationMessage>;
     forwardedFromMessageId?: string;
@@ -146,7 +146,7 @@ export interface ConversationMessage {
     toolCall?: {
         id: string;
         name: string;
-        arguments: Record<string, any>;
+        arguments: Record<string, unknown>;
     };
     toolResult?: {
         tool_call_id: string;
@@ -156,12 +156,12 @@ export interface ConversationMessage {
     toolCalls?: Array<{
         id: string;
         name: string;
-        arguments: Record<string, any>;
+        arguments: Record<string, unknown>;
     }>;
     toolResults?: Array<{
         tool_call_id: string;
         tool_name: string;
-        output: any;
+        output: unknown;
     }>;
     internalNote?: string;
     isInternal: boolean;
@@ -187,7 +187,7 @@ export interface CreateConversationMessageRequest {
     senderName?: string;
     senderType: 'contact' | 'user' | 'system' | 'ai' | 'automation' | 'automation-follow';
     providerMessageId?: string;
-    providerData?: Record<string, any>;
+    providerData?: Record<string, unknown>;
     replyToMessageId?: string;
     forwardedFromMessageId?: string;
     threadId?: string;
@@ -197,7 +197,7 @@ export interface CreateConversationMessageRequest {
     toolCall?: {
         id: string;
         name: string;
-        arguments: Record<string, any>;
+        arguments: Record<string, unknown>;
     };
     toolResult?: {
         tool_call_id: string;
@@ -207,12 +207,12 @@ export interface CreateConversationMessageRequest {
     toolCalls?: Array<{
         id: string;
         name: string;
-        arguments: Record<string, any>;
+        arguments: Record<string, unknown>;
     }>;
     toolResults?: Array<{
         tool_call_id: string;
         tool_name: string;
-        output: any;
+        output: unknown;
     }>;
     reasoningContent?: string;
 }

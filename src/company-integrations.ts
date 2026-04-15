@@ -52,7 +52,7 @@ export interface CompanyIntegration {
 
 export interface IntegrationConfig {
   // Generic fields for providers not yet specifically typed
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Integration credentials (encrypted in database) - using shared type from providers
@@ -93,7 +93,7 @@ export interface CompanyIntegrationResponse {
   // Instance management fields (for providers like Gateway)
   instanceKey?: string;      // Key da instância no provider
   instanceToken?: string;    // Token da instância no provider
-  instanceData?: any;        // Dados completos da instância
+  instanceData?: Record<string, unknown>;        // Dados completos da instância
 
   createdAt: string;
   updatedAt: string;
@@ -140,20 +140,20 @@ export interface UpdateCompanyIntegrationRequest {
   // Instance management fields (for providers like Gateway)
   instanceKey?: string;      // Key da instância no provider
   instanceToken?: string;    // Token da instância no provider
-  instanceData?: any;        // Dados completos da instância
+  instanceData?: Record<string, unknown>;        // Dados completos da instância
 }
 
 // Integration test types
 export interface TestIntegrationRequest {
   integrationId: string;
   testType: 'send_email' | 'send_message' | 'send_webhook';
-  testData?: Record<string, any>;
+  testData?: Record<string, unknown>;
 }
 
 export interface TestIntegrationResponse {
   success: boolean;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   executedAt: Date;
 }
 
@@ -161,7 +161,7 @@ export interface TestIntegrationResponse {
 export interface SyncIntegrationRequest {
   integrationId: string;
   syncType: 'full' | 'incremental' | 'contacts' | 'messages';
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 export interface SyncIntegrationResponse {

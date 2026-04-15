@@ -119,8 +119,8 @@ export interface GatewayEventData {
     errorCode?: string;
     timestamp: string;
     metadata?: {
-        originalPayload?: any;
-        [key: string]: any;
+        originalPayload?: Record<string, unknown>;
+        [key: string]: unknown;
     };
 }
 /**

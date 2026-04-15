@@ -2,6 +2,77 @@ import { ObjectId } from 'mongodb';
 import { ActiveStatus, PaginationQuery } from './common';
 
 /**
+ * Categoria funcional do agente — descreve O QUE ele FAZ.
+ *
+ * Usada pela tab "Treinar Agente" (Sprint UI-2) para filtrar cenários
+ * de teste relevantes: um agente SDR é testado com cenários de
+ * qualificação/agendamento, um agente SUPORTE com abertura de tickets, etc.
+ *
+ * Combina com `AgentSegment` (indústria) pra matriz de especialização.
+ */
+export enum AgentCategory {
+  SDR = 'sdr',
+  ATENDENTE = 'atendente',
+  SUPORTE = 'suporte',
+  FINANCEIRO = 'financeiro',
+  VENDAS = 'vendas',
+  AGENDAMENTO = 'agendamento',
+  OUTRO = 'outro',
+}
+
+/**
+ * Segmento de mercado do agente — descreve PRA QUAL indústria ele atende.
+ *
+ * Combina com `AgentCategory` (função) pra matriz de testes: um agente
+ * "SDR de imobiliária" recebe cenários diferentes de um "SDR de SaaS".
+ */
+export enum AgentSegment {
+  EDUCACIONAL = 'educacional',
+  IMOBILIARIA = 'imobiliaria',
+  SAUDE = 'saude',
+  ECOMMERCE = 'ecommerce',
+  SERVICOS = 'servicos',
+  SAAS = 'saas',
+  CONTABILIDADE = 'contabilidade',
+  ADVOCACIA = 'advocacia',
+  ALIMENTACAO = 'alimentacao',
+  AUTOMOTIVO = 'automotivo',
+  ENERGIA_SOLAR = 'energia-solar',
+  CONFECCAO = 'confeccao',
+  GENERICO = 'generico',
+}
+
+/**
+ * Metadata de configuração pra tabela "amigável" de categorias/segmentos
+ * exibida no form do agente. Mantida aqui pra ser single source of truth.
+ */
+export const AGENT_CATEGORY_LABELS: Record<AgentCategory, string> = {
+  [AgentCategory.SDR]: 'SDR (Prospecção)',
+  [AgentCategory.ATENDENTE]: 'Atendente',
+  [AgentCategory.SUPORTE]: 'Suporte Técnico',
+  [AgentCategory.FINANCEIRO]: 'Financeiro',
+  [AgentCategory.VENDAS]: 'Vendas',
+  [AgentCategory.AGENDAMENTO]: 'Agendamento',
+  [AgentCategory.OUTRO]: 'Outro',
+};
+
+export const AGENT_SEGMENT_LABELS: Record<AgentSegment, string> = {
+  [AgentSegment.EDUCACIONAL]: 'Educacional',
+  [AgentSegment.IMOBILIARIA]: 'Imobiliária',
+  [AgentSegment.SAUDE]: 'Saúde',
+  [AgentSegment.ECOMMERCE]: 'E-commerce',
+  [AgentSegment.SERVICOS]: 'Serviços',
+  [AgentSegment.SAAS]: 'SaaS / Software',
+  [AgentSegment.CONTABILIDADE]: 'Contabilidade',
+  [AgentSegment.ADVOCACIA]: 'Advocacia',
+  [AgentSegment.ALIMENTACAO]: 'Alimentação',
+  [AgentSegment.AUTOMOTIVO]: 'Automotivo',
+  [AgentSegment.ENERGIA_SOLAR]: 'Energia Solar',
+  [AgentSegment.CONFECCAO]: 'Confecção',
+  [AgentSegment.GENERICO]: 'Genérico',
+};
+
+/**
  * Keyword matching modes for message_received trigger
  */
 export type KeywordMatchMode =
@@ -18,6 +89,53 @@ export type KeywordMatchLogic =
   | 'OR'   // Match if ANY keyword matches (default)
   | 'AND'; // Match if ALL keywords match
 
+// ─── Tool Preconditions ─────────────────────────────────────────────────
+
+export interface QuestionsAnsweredRule {
+  type: 'questions_answered';
+  /** Perguntas que o cliente deve ter respondido na conversa */
+  questions: string[];
+}
+
+export interface ContextCheckRule {
+  type: 'context_check';
+  /** Pergunta sim/não que o LLM juiz responde analisando o histórico */
+  question: string;
+}
+
+export interface TagPresentRule {
+  type: 'tag_present';
+  tag: string;
+}
+
+export interface FieldValueRule {
+  type: 'field_value';
+  field: string;
+  operator: '=' | '!=' | '>' | '<' | 'contains';
+  value: string;
+}
+
+export interface TimeWindowRule {
+  type: 'time_window';
+  startHour: number;
+  endHour: number;
+  /** Dias permitidos: 0=dom, 1=seg, ..., 6=sab. Undefined = todos. */
+  allowedDays?: number[];
+}
+
+export type PreconditionRule =
+  | QuestionsAnsweredRule
+  | ContextCheckRule
+  | TagPresentRule
+  | FieldValueRule
+  | TimeWindowRule;
+
+export interface ToolPrecondition {
+  /** ID da tool: 'create_lead', 'consultar_erp', 'skill_abc123' */
+  toolId: string;
+  conditions: PreconditionRule[];
+}
+
 export interface AIAgent {
   _id?: ObjectId;
   id?: string;
@@ -30,8 +148,24 @@ export interface AIAgent {
   maxTokens: number;
   delay: number;                            // Debounce delay in seconds (10-120) before agent responds
   version?: string;                         // Semver version (e.g., "1.0.0")
+  /**
+   * Categoria funcional do agente — usada pra filtrar cenários de teste
+   * relevantes no fluxo de treinamento. Opcional por retrocompatibilidade:
+   * agentes sem categoria caem em `AgentCategory.OUTRO` no runtime.
+   */
+  category?: AgentCategory;
+  /**
+   * Segmento de mercado do agente — combinado com `category` pra
+   * selecionar cenários de teste mais específicos. Opcional por
+   * retrocompatibilidade: agentes sem segmento caem em `AgentSegment.GENERICO`.
+   */
+  segment?: AgentSegment;
   triggers: AIAgentTriggers;
   customActionIds: string[];
+  /** IDs dos workflows (usageType='skill') que este agente pode invocar */
+  skillWorkflowIds?: string[];
+  /** Pré-condições configuráveis por ferramenta */
+  toolPreconditions?: ToolPrecondition[];
   databases?: string[];                     // Database IDs that the agent can access
   voiceEnabled: boolean;
   voiceConfig?: {
@@ -128,7 +262,7 @@ export interface AIAgentCapabilityConfig {
     transferMessage?: string;            // Mensagem padrão ao transferir
 
     // Generic config for future capabilities
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -160,8 +294,16 @@ export interface CreateAIAgentRequest {
   temperature: number;
   maxTokens: number;
   delay?: number;
+  /** Categoria funcional (SDR, ATENDENTE, etc). Default 'outro' se omitido. */
+  category?: AgentCategory;
+  /** Segmento de mercado (EDUCACIONAL, IMOBILIARIA, etc). Default 'generico' se omitido. */
+  segment?: AgentSegment;
   triggers: AIAgentTriggers;
   customActionIds?: string[];
+  /** IDs dos workflows (usageType='skill') que este agente pode invocar */
+  skillWorkflowIds?: string[];
+  /** Pré-condições configuráveis por ferramenta */
+  toolPreconditions?: ToolPrecondition[];
   databases?: string[];                     // Database IDs that the agent can access
   voiceEnabled?: boolean;
   voiceConfig?: {
@@ -180,8 +322,14 @@ export interface UpdateAIAgentRequest {
   temperature?: number;
   maxTokens?: number;
   delay?: number;
+  category?: AgentCategory;
+  segment?: AgentSegment;
   triggers?: AIAgentTriggers;
   customActionIds?: string[];
+  /** IDs dos workflows (usageType='skill') que este agente pode invocar */
+  skillWorkflowIds?: string[];
+  /** Pré-condições configuráveis por ferramenta */
+  toolPreconditions?: ToolPrecondition[];
   databases?: string[];                     // Database IDs that the agent can access
   voiceEnabled?: boolean;
   voiceConfig?: {
@@ -190,11 +338,22 @@ export interface UpdateAIAgentRequest {
   };
   enabledCapabilities?: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
   webhooks?: Omit<AIAgentWebhook, 'createdAt' | 'updatedAt'>[];
+  /**
+   * ID do `agent-quality-snapshots` doc que originou este update (Sprint UI-4).
+   * Quando presente, o backend grava o ID na nova versão criada, permitindo
+   * que a tab "Versões" exiba o score do treino que originou a versão como
+   * "herdado" em vez de "sem treino".
+   *
+   * Populado automaticamente pelo fluxo de `AgentTrainModal` quando o
+   * cliente aplica sugestões do Prompt Coach. Não é persistido no doc do
+   * agente — apenas consumido pelo service ao criar a versão.
+   */
+  baseSnapshotId?: string;
 }
 
 export interface AIAgentQuery extends PaginationQuery {
-  status?: ActiveStatus;
-  voiceEnabled?: boolean;
+  status?: ActiveStatus | undefined;
+  voiceEnabled?: boolean | undefined;
 }
 
 /**
@@ -215,6 +374,17 @@ export interface AgentVersion {
   appId: ObjectId | string;
   companyId: ObjectId | string;
   createdAt: Date | string;
+  /**
+   * ID do snapshot de quality test (`agent-quality-snapshots`) que
+   * originou esta versão (Sprint UI-4). Presente apenas quando a
+   * versão foi criada aplicando sugestões do Prompt Coach. `undefined`
+   * para versões criadas manualmente ou pela criação inicial.
+   *
+   * A tab "Versões" usa esse campo para exibir o score do treino que
+   * originou a versão como "herdado" — ex: "Score 82% (herdado do
+   * treino da versão anterior)".
+   */
+  baseSnapshotId?: ObjectId | string;
 }
 
 /**
@@ -228,3 +398,113 @@ export interface AgentVersionResponse extends Omit<AgentVersion, '_id'> {
  * Query parameters for agent versions
  */
 export interface AgentVersionQuery extends PaginationQuery {}
+
+// ============================================================================
+// Agent Test Scenarios (Sprint UI-2+: cenários de teste por categoria/segmento)
+// ============================================================================
+
+/**
+ * Cenário de teste usado pelo fluxo "Treinar Agente".
+ *
+ * Cada cenário simula uma conversa real de cliente e pode ser filtrado
+ * por categoria do agente (O QUE ele faz) e/ou segmento (PRA QUAL
+ * indústria). Arrays vazios significam "qualquer" — um cenário com
+ * `categories: []` e `segments: []` é universal (ex: "saudação").
+ *
+ * Cenários vivem na collection `agent-test-scenarios` e podem ser:
+ * - **System**: predefinidos pela Troia (`isSystem: true`, sem appId/companyId)
+ * - **Custom**: criados pelo tenant (`isSystem: false`, com appId + companyId)
+ */
+export interface AgentTestScenario {
+  _id?: ObjectId;
+  /** Se true = cenário do sistema Troia (visível a todos os tenants) */
+  isSystem: boolean;
+  /** Presente apenas se isSystem=false */
+  appId?: ObjectId | string;
+  /** Presente apenas se isSystem=false */
+  companyId?: ObjectId | string;
+  /**
+   * Chave estável pra identificar o cenário entre runs. Snake-case.
+   * Ex: "saudacao-simples", "preco-imovel-alto-padrao".
+   */
+  scenarioKey: string;
+  /** Label humano exibido na UI */
+  label: string;
+  /** Mensagem do cliente como seria em produção */
+  customerMessage: string;
+  /**
+   * Categorias de agente que podem usar este cenário. Array vazio = qualquer
+   * categoria (cenário universal ou só filtrado por segmento).
+   */
+  categories: AgentCategory[];
+  /**
+   * Segmentos de mercado que podem usar este cenário. Array vazio = qualquer
+   * segmento (universal ou só filtrado por categoria).
+   */
+  segments: AgentSegment[];
+  /** Score mínimo esperado de relevance pra considerar aprovado */
+  expectedMinRelevance: number;
+  /** Tools que idealmente deveriam ter sido chamadas */
+  expectedTools?: string[];
+  /** Tools que NÃO deveriam ter sido chamadas */
+  forbiddenTools?: string[];
+  /** Rubric — o que torna esta conversa boa/ruim (texto explicativo) */
+  rubric: string;
+  /** Ativo = true (default). Se false, ignorado na seleção de cenários */
+  active: boolean;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  deletedAt?: Date | string;
+}
+
+export interface AgentTestScenarioResponse
+  extends Omit<AgentTestScenario, '_id' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
+  id: string;
+  appId?: string;
+  companyId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAgentTestScenarioRequest {
+  scenarioKey: string;
+  label: string;
+  customerMessage: string;
+  categories: AgentCategory[];
+  segments: AgentSegment[];
+  expectedMinRelevance?: number;
+  expectedTools?: string[];
+  forbiddenTools?: string[];
+  rubric: string;
+  active?: boolean;
+}
+
+export interface UpdateAgentTestScenarioRequest {
+  scenarioKey?: string;
+  label?: string;
+  customerMessage?: string;
+  categories?: AgentCategory[];
+  segments?: AgentSegment[];
+  expectedMinRelevance?: number;
+  expectedTools?: string[];
+  forbiddenTools?: string[];
+  rubric?: string;
+  active?: boolean;
+}
+
+/**
+ * Query pra listar cenários. Filtros usam o mesmo padrão de matching
+ * M-para-M: passar `agentCategory` retorna cenários cuja lista de
+ * categorias inclui esse valor OU está vazia (universais).
+ */
+export interface AgentTestScenarioQuery extends PaginationQuery {
+  /** Filtra cenários por categoria (retorna cenários aplicáveis) */
+  agentCategory?: AgentCategory;
+  /** Filtra cenários por segmento (retorna cenários aplicáveis) */
+  agentSegment?: AgentSegment;
+  /** Se true = só cenários do sistema. false = só custom. omitido = ambos */
+  isSystem?: boolean;
+  /** Só cenários ativos (default true). Passar false inclui inativos */
+  activeOnly?: boolean;
+  search?: string;
+}

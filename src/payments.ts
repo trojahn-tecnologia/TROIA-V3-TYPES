@@ -115,7 +115,7 @@ export interface CustomerData {
   company?: string;
   providerCustomerId?: string;
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CardData {
@@ -141,7 +141,7 @@ export interface UniversalPaymentData {
   paymentMethod: PaymentMethod;
   dueDate?: string;
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 
   // Customer data (provider decides if creates or uses inline)
   customer: CustomerData;
@@ -209,8 +209,8 @@ export interface PaymentResponse {
 
   externalReference?: string;
   createdAt: string;
-  metadata?: Record<string, any>;
-  providerData?: any;
+  metadata?: Record<string, unknown>;
+  providerData?: Record<string, unknown>;
 }
 
 export interface PIXResponse {
@@ -249,7 +249,7 @@ export interface PaymentCustomerResponse {
   status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'DELETED';
   createdAt: string;
   updatedAt: string;
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 }
 
 export interface PaymentCustomerListResponse extends ListResponse<PaymentCustomerResponse> {}
@@ -279,7 +279,7 @@ export interface TokenResponse {
   expiryYear: string;
   status: 'ACTIVE' | 'EXPIRED' | 'BLOCKED';
   createdAt: string;
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 }
 
 export interface TokenListResponse {
@@ -294,7 +294,7 @@ export interface TokenPaymentData {
   installments?: number;
   dueDate?: string;
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ================================
@@ -323,7 +323,7 @@ export interface SubscriptionData {
 
   // Metadata
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SubscriptionResponse {
@@ -351,7 +351,7 @@ export interface SubscriptionResponse {
   isInTrial: boolean;
 
   externalReference?: string;
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 }
 
 export interface SubscriptionPaymentListResponse {
@@ -396,7 +396,7 @@ export interface RecurringPaymentSetup {
   };
 
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RecurringSetupResponse {
@@ -405,7 +405,7 @@ export interface RecurringSetupResponse {
   status: 'ACTIVE' | 'SCHEDULED' | 'PAUSED' | 'FAILED';
   managedBy: 'INTERNAL_CRON' | 'PROVIDER_NATIVE';
   nextExecutionDate?: string;
-  providerData?: any;
+  providerData?: Record<string, unknown>;
 }
 
 export interface TokenizationSetupResponse {
@@ -416,7 +416,7 @@ export interface TokenizationSetupResponse {
   cronExpression: string;
   nextExecutionDate: string;
   managedBy: 'INTERNAL_CRON';
-  providerData: any;
+  providerData: Record<string, unknown>;
 }
 
 // ================================
@@ -430,8 +430,8 @@ export interface WebhookResponse {
   customerId?: string;
   status?: PaymentStatus;
   amount?: number;
-  metadata?: Record<string, any>;
-  providerData?: any;
+  metadata?: Record<string, unknown>;
+  providerData?: Record<string, unknown>;
 }
 
 // ================================
@@ -487,7 +487,7 @@ export interface PaymentDetails extends PaymentResponse {
     eventType: string;
     timestamp: string;
     description: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }[];
 }
 
@@ -504,7 +504,7 @@ export interface PaymentProviderConfig {
   merchantId?: string;
   publicKey?: string;
   secretKey?: string;
-  customSettings?: Record<string, any>;
+  customSettings?: Record<string, unknown>;
 
   // Metadata
   configSource?: 'app' | 'company';
@@ -607,7 +607,7 @@ export interface TokenizedSubscription {
   retryIntervalHours: number;
 
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // 🔥 NEW: Generic subscription request interfaces
@@ -627,14 +627,14 @@ export interface CreateSubscriptionWithSavedCardRequest {
   maxFailures?: number;
   retryIntervalHours?: number;
   externalReference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateSubscriptionResponse {
   id: string;
   status: 'ACTIVE' | 'SCHEDULED' | 'FAILED';
   context: SubscriptionContext;
-  contextEntity?: any;       // Plan or Service data
+  contextEntity?: Record<string, unknown>;       // Plan or Service data
   nextChargeDate: string;
   message: string;
   subscription?: TokenizedSubscription;
@@ -674,7 +674,7 @@ export interface CompanyService {
   terms?: string;           // Terms and conditions
   createdAt: Date;
   updatedAt: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateCompanyServiceRequest {
@@ -686,7 +686,7 @@ export interface CreateCompanyServiceRequest {
   description: string;
   features?: string[];
   terms?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CompanyServiceResponse {
@@ -703,7 +703,7 @@ export interface CompanyServiceResponse {
   terms?: string;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CompanyServiceQuery extends PaginationQuery {
@@ -731,7 +731,7 @@ export interface CompanyServiceActivation {
   reason?: string;
   createdAt: Date;
   updatedAt: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ================================
@@ -743,7 +743,7 @@ export interface PaymentContext {
   entityId: string;        // app/company/order ID
   customerId: string;      // Who pays
   providerId: string;      // Which provider to use
-  metadata: Record<string, any>; // Context-specific data
+  metadata: Record<string, unknown>; // Context-specific data
 }
 
 // ================================
@@ -753,7 +753,7 @@ export interface PaymentContext {
 export interface PaymentError {
   code: string;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   provider?: string;
   paymentId?: string;
 }

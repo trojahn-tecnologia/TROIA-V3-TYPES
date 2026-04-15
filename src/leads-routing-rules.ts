@@ -15,14 +15,21 @@ export interface LeadRoutingCondition {
  * Rules are linked to funnels and evaluated BEFORE the Lottery Engine
  */
 export interface LeadRoutingRule {
-  _id?: ObjectId;
-  id?: string;
+  _id?: ObjectId | undefined;
+  id?: string | undefined;
   name: string;
-  description?: string;
+  description?: string | undefined;
   funnelId: string;
   assigneeId: string;
   assigneeIds: string[];
-  lastAssignedUserId?: string;
+  /**
+   * Contador monotônico de rotação incrementado atomicamente via `$inc`.
+   * O userId escolhido é `assigneeIds[lastAssignedUserId % assigneeIds.length]`.
+   *
+   * Ver decisão D4 no plano ASSIGNMENTS_REMOVAL.md — substitui o mecanismo
+   * legado de guardar o último userId (que tinha race condition).
+   */
+  lastAssignedUserId?: number | undefined;
   conditions: LeadRoutingCondition[];
   priority: number;
   status: ActiveStatus;
@@ -30,7 +37,7 @@ export interface LeadRoutingRule {
   companyId: ObjectId | string;
   createdAt: Date | string;
   updatedAt: Date | string;
-  deletedAt?: Date | string;
+  deletedAt?: Date | string | undefined;
 }
 
 export interface LeadRoutingRuleResponse extends Omit<LeadRoutingRule, '_id'> {
@@ -39,22 +46,22 @@ export interface LeadRoutingRuleResponse extends Omit<LeadRoutingRule, '_id'> {
 
 export interface CreateLeadRoutingRuleRequest {
   name: string;
-  description?: string;
+  description?: string | undefined;
   funnelId: string;
-  assigneeId?: string;
-  assigneeIds?: string[];
+  assigneeId?: string | undefined;
+  assigneeIds?: string[] | undefined;
   conditions: LeadRoutingCondition[];
   priority: number;
 }
 
 export interface UpdateLeadRoutingRuleRequest {
-  name?: string;
-  description?: string;
-  funnelId?: string;
-  assigneeId?: string;
-  assigneeIds?: string[];
-  conditions?: LeadRoutingCondition[];
-  priority?: number;
+  name?: string | undefined;
+  description?: string | undefined;
+  funnelId?: string | undefined;
+  assigneeId?: string | undefined;
+  assigneeIds?: string[] | undefined;
+  conditions?: LeadRoutingCondition[] | undefined;
+  priority?: number | undefined;
 }
 
 /**
@@ -67,6 +74,6 @@ export interface LeadRoutingEvaluationResult {
 }
 
 export interface LeadRoutingRuleQuery extends PaginationQuery {
-  status?: ActiveStatus;
-  funnelId?: string;
+  status?: ActiveStatus | undefined;
+  funnelId?: string | undefined;
 }

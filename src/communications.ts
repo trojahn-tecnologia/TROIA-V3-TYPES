@@ -74,7 +74,7 @@ export interface WebhookData {
   url: string;
   method?: 'POST' | 'PUT' | 'PATCH';
   headers?: Record<string, string>;
-  body: any;
+  body: unknown;
   timeout?: number;
 }
 
