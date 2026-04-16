@@ -11,12 +11,12 @@ import { ActiveStatus, PaginationQuery } from './common';
  */
 export declare enum AgentCategory {
     SDR = "sdr",
-    ATENDENTE = "atendente",
-    SUPORTE = "suporte",
-    FINANCEIRO = "financeiro",
-    VENDAS = "vendas",
-    AGENDAMENTO = "agendamento",
-    OUTRO = "outro"
+    ATTENDANT = "attendant",
+    SUPPORT = "support",
+    FINANCIAL = "financial",
+    SALES = "sales",
+    SCHEDULING = "scheduling",
+    OTHER = "other"
 }
 /**
  * Segmento de mercado do agente — descreve PRA QUAL indústria ele atende.
@@ -25,19 +25,19 @@ export declare enum AgentCategory {
  * "SDR de imobiliária" recebe cenários diferentes de um "SDR de SaaS".
  */
 export declare enum AgentSegment {
-    EDUCACIONAL = "educacional",
-    IMOBILIARIA = "imobiliaria",
-    SAUDE = "saude",
+    EDUCATIONAL = "educational",
+    REAL_ESTATE = "real_estate",
+    HEALTHCARE = "healthcare",
     ECOMMERCE = "ecommerce",
-    SERVICOS = "servicos",
+    SERVICES = "services",
     SAAS = "saas",
-    CONTABILIDADE = "contabilidade",
-    ADVOCACIA = "advocacia",
-    ALIMENTACAO = "alimentacao",
-    AUTOMOTIVO = "automotivo",
-    ENERGIA_SOLAR = "energia-solar",
-    CONFECCAO = "confeccao",
-    GENERICO = "generico"
+    ACCOUNTING = "accounting",
+    LAW = "law",
+    FOOD = "food",
+    AUTOMOTIVE = "automotive",
+    SOLAR_ENERGY = "solar_energy",
+    APPAREL = "apparel",
+    GENERIC = "generic"
 }
 /**
  * Metadata de configuração pra tabela "amigável" de categorias/segmentos
@@ -101,13 +101,13 @@ export interface AIAgent {
     /**
      * Categoria funcional do agente — usada pra filtrar cenários de teste
      * relevantes no fluxo de treinamento. Opcional por retrocompatibilidade:
-     * agentes sem categoria caem em `AgentCategory.OUTRO` no runtime.
+     * agentes sem categoria caem em `AgentCategory.OTHER` no runtime.
      */
     category?: AgentCategory;
     /**
      * Segmento de mercado do agente — combinado com `category` pra
      * selecionar cenários de teste mais específicos. Opcional por
-     * retrocompatibilidade: agentes sem segmento caem em `AgentSegment.GENERICO`.
+     * retrocompatibilidade: agentes sem segmento caem em `AgentSegment.GENERIC`.
      */
     segment?: AgentSegment;
     triggers: AIAgentTriggers;

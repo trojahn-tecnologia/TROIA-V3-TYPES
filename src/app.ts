@@ -21,6 +21,7 @@ export interface App extends FullBaseDocument {
   backendUrl: string;
   websiteUrl?: string;
   widgetUrl?: string;
+  apiUrl?: string;
   support?: AppSupport;
   costs: CreditCostEntry[];
   pwaIcons?: PwaIcons;
@@ -45,6 +46,7 @@ export interface CreateAppRequest {
   backendUrl: string;
   websiteUrl?: string;
   widgetUrl?: string;
+  apiUrl?: string;
   support?: AppSupport;
 }
 
@@ -60,6 +62,7 @@ export interface UpdateAppRequest {
   backendUrl?: string;
   websiteUrl?: string;
   widgetUrl?: string;
+  apiUrl?: string;
   support?: AppSupport;
   pwaIcons?: PwaIcons;
 }
@@ -90,6 +93,7 @@ export interface AppResponse {
   backendUrl: string;
   websiteUrl?: string;
   widgetUrl?: string;
+  apiUrl?: string;
   support?: AppSupport;
   costs: CreditCostEntry[];
   pwaIcons?: PwaIcons;

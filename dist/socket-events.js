@@ -23,6 +23,7 @@ exports.SOCKET_EVENTS = {
     MESSAGE_DELIVERED: 'message:delivered',
     MESSAGE_READ: 'message:read',
     MESSAGE_DELETED: 'message:deleted',
+    MESSAGE_REACTION: 'message:reaction', // ✅ Reaction added/removed on a message
     // Channel Events
     CHANNEL_QR: 'channel:qr',
     CHANNEL_CONNECTED: 'channel:connected',

@@ -23,6 +23,7 @@ export const SOCKET_EVENTS = {
   MESSAGE_DELIVERED: 'message:delivered',
   MESSAGE_READ: 'message:read',
   MESSAGE_DELETED: 'message:deleted',
+  MESSAGE_REACTION: 'message:reaction',             // ✅ Reaction added/removed on a message
 
   // Channel Events
   CHANNEL_QR: 'channel:qr',
@@ -203,6 +204,24 @@ export interface MessageReadEvent {
   messageId: string;
   conversationId: string;
   readAt: string;
+}
+
+/**
+ * Message Reaction Event
+ * Fired when a reaction is added or removed on a message (via webhook or UI)
+ */
+export interface MessageReactionEvent {
+  conversationId: string;
+  messageId: string;            // MongoDB _id da mensagem alvo
+  reaction: {
+    emoji: string;
+    userId?: string;            // Reactions de usuários da plataforma (UI)
+    userName?: string;
+    remoteJid?: string;         // Reactions de contatos WhatsApp (webhook)
+    contactName?: string;
+    createdAt: string;
+  };
+  action: 'add' | 'remove';
 }
 
 /**
@@ -599,6 +618,7 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.MESSAGE_STATUS]: MessageStatusEvent;           // ✅ Generic status event
   [SOCKET_EVENTS.MESSAGE_DELIVERED]: MessageDeliveredEvent;
   [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
+  [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;       // ✅ Reaction add/remove
 
   // Channel Events
   [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;

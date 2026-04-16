@@ -15,6 +15,7 @@ export declare const SOCKET_EVENTS: {
     readonly MESSAGE_DELIVERED: "message:delivered";
     readonly MESSAGE_READ: "message:read";
     readonly MESSAGE_DELETED: "message:deleted";
+    readonly MESSAGE_REACTION: "message:reaction";
     readonly CHANNEL_QR: "channel:qr";
     readonly CHANNEL_CONNECTED: "channel:connected";
     readonly CHANNEL_DISCONNECTED: "channel:disconnected";
@@ -149,6 +150,23 @@ export interface MessageReadEvent {
     messageId: string;
     conversationId: string;
     readAt: string;
+}
+/**
+ * Message Reaction Event
+ * Fired when a reaction is added or removed on a message (via webhook or UI)
+ */
+export interface MessageReactionEvent {
+    conversationId: string;
+    messageId: string;
+    reaction: {
+        emoji: string;
+        userId?: string;
+        userName?: string;
+        remoteJid?: string;
+        contactName?: string;
+        createdAt: string;
+    };
+    action: 'add' | 'remove';
 }
 /**
  * Channel QR Code Event
@@ -506,6 +524,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.MESSAGE_STATUS]: MessageStatusEvent;
     [SOCKET_EVENTS.MESSAGE_DELIVERED]: MessageDeliveredEvent;
     [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
+    [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;
     [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
     [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
     [SOCKET_EVENTS.USER_TYPING]: UserTypingEvent;

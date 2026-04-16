@@ -12,12 +12,12 @@ import { ActiveStatus, PaginationQuery } from './common';
  */
 export enum AgentCategory {
   SDR = 'sdr',
-  ATENDENTE = 'atendente',
-  SUPORTE = 'suporte',
-  FINANCEIRO = 'financeiro',
-  VENDAS = 'vendas',
-  AGENDAMENTO = 'agendamento',
-  OUTRO = 'outro',
+  ATTENDANT = 'attendant',
+  SUPPORT = 'support',
+  FINANCIAL = 'financial',
+  SALES = 'sales',
+  SCHEDULING = 'scheduling',
+  OTHER = 'other',
 }
 
 /**
@@ -27,19 +27,19 @@ export enum AgentCategory {
  * "SDR de imobiliária" recebe cenários diferentes de um "SDR de SaaS".
  */
 export enum AgentSegment {
-  EDUCACIONAL = 'educacional',
-  IMOBILIARIA = 'imobiliaria',
-  SAUDE = 'saude',
+  EDUCATIONAL = 'educational',
+  REAL_ESTATE = 'real_estate',
+  HEALTHCARE = 'healthcare',
   ECOMMERCE = 'ecommerce',
-  SERVICOS = 'servicos',
+  SERVICES = 'services',
   SAAS = 'saas',
-  CONTABILIDADE = 'contabilidade',
-  ADVOCACIA = 'advocacia',
-  ALIMENTACAO = 'alimentacao',
-  AUTOMOTIVO = 'automotivo',
-  ENERGIA_SOLAR = 'energia-solar',
-  CONFECCAO = 'confeccao',
-  GENERICO = 'generico',
+  ACCOUNTING = 'accounting',
+  LAW = 'law',
+  FOOD = 'food',
+  AUTOMOTIVE = 'automotive',
+  SOLAR_ENERGY = 'solar_energy',
+  APPAREL = 'apparel',
+  GENERIC = 'generic',
 }
 
 /**
@@ -48,28 +48,28 @@ export enum AgentSegment {
  */
 export const AGENT_CATEGORY_LABELS: Record<AgentCategory, string> = {
   [AgentCategory.SDR]: 'SDR (Prospecção)',
-  [AgentCategory.ATENDENTE]: 'Atendente',
-  [AgentCategory.SUPORTE]: 'Suporte Técnico',
-  [AgentCategory.FINANCEIRO]: 'Financeiro',
-  [AgentCategory.VENDAS]: 'Vendas',
-  [AgentCategory.AGENDAMENTO]: 'Agendamento',
-  [AgentCategory.OUTRO]: 'Outro',
+  [AgentCategory.ATTENDANT]: 'Atendente',
+  [AgentCategory.SUPPORT]: 'Suporte Técnico',
+  [AgentCategory.FINANCIAL]: 'Financeiro',
+  [AgentCategory.SALES]: 'Vendas',
+  [AgentCategory.SCHEDULING]: 'Agendamento',
+  [AgentCategory.OTHER]: 'Outro',
 };
 
 export const AGENT_SEGMENT_LABELS: Record<AgentSegment, string> = {
-  [AgentSegment.EDUCACIONAL]: 'Educacional',
-  [AgentSegment.IMOBILIARIA]: 'Imobiliária',
-  [AgentSegment.SAUDE]: 'Saúde',
+  [AgentSegment.EDUCATIONAL]: 'Educacional',
+  [AgentSegment.REAL_ESTATE]: 'Imobiliária',
+  [AgentSegment.HEALTHCARE]: 'Saúde',
   [AgentSegment.ECOMMERCE]: 'E-commerce',
-  [AgentSegment.SERVICOS]: 'Serviços',
+  [AgentSegment.SERVICES]: 'Serviços',
   [AgentSegment.SAAS]: 'SaaS / Software',
-  [AgentSegment.CONTABILIDADE]: 'Contabilidade',
-  [AgentSegment.ADVOCACIA]: 'Advocacia',
-  [AgentSegment.ALIMENTACAO]: 'Alimentação',
-  [AgentSegment.AUTOMOTIVO]: 'Automotivo',
-  [AgentSegment.ENERGIA_SOLAR]: 'Energia Solar',
-  [AgentSegment.CONFECCAO]: 'Confecção',
-  [AgentSegment.GENERICO]: 'Genérico',
+  [AgentSegment.ACCOUNTING]: 'Contabilidade',
+  [AgentSegment.LAW]: 'Advocacia',
+  [AgentSegment.FOOD]: 'Alimentação',
+  [AgentSegment.AUTOMOTIVE]: 'Automotivo',
+  [AgentSegment.SOLAR_ENERGY]: 'Energia Solar',
+  [AgentSegment.APPAREL]: 'Confecção',
+  [AgentSegment.GENERIC]: 'Genérico',
 };
 
 /**
@@ -151,13 +151,13 @@ export interface AIAgent {
   /**
    * Categoria funcional do agente — usada pra filtrar cenários de teste
    * relevantes no fluxo de treinamento. Opcional por retrocompatibilidade:
-   * agentes sem categoria caem em `AgentCategory.OUTRO` no runtime.
+   * agentes sem categoria caem em `AgentCategory.OTHER` no runtime.
    */
   category?: AgentCategory;
   /**
    * Segmento de mercado do agente — combinado com `category` pra
    * selecionar cenários de teste mais específicos. Opcional por
-   * retrocompatibilidade: agentes sem segmento caem em `AgentSegment.GENERICO`.
+   * retrocompatibilidade: agentes sem segmento caem em `AgentSegment.GENERIC`.
    */
   segment?: AgentSegment;
   triggers: AIAgentTriggers;

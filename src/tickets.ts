@@ -51,6 +51,14 @@ export interface Ticket {
   resolvedAt?: string;
   closedAt?: string;
   dueDate?: string;
+  /**
+   * ISO string do valor de `dueDate` para o qual já foi enviado o
+   * alerta de vencimento (24h antes). Usado para idempotência: se o
+   * `dueDate` for editado, este campo fica diferente do novo valor e o
+   * ticket volta a ser elegível para alerta. Campo interno — não aceito
+   * em CreateTicketRequest/UpdateTicketRequest.
+   */
+  dueDateAlertSentFor?: string;
 
   // Internal notes and resolution
   internalNotes?: string;

@@ -254,8 +254,10 @@ export interface ConversationMessage {
 
 export interface MessageReaction {
   emoji: string;
-  userId: string;
+  userId?: string;       // Reactions de usuários da plataforma (UI)
   userName?: string;
+  remoteJid?: string;    // Reactions de contatos WhatsApp (webhook)
+  contactName?: string;  // Nome do contato (se disponível)
   createdAt: string;
 }
 

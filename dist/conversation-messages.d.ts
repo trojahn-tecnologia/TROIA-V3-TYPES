@@ -173,8 +173,10 @@ export interface ConversationMessage {
 }
 export interface MessageReaction {
     emoji: string;
-    userId: string;
+    userId?: string;
     userName?: string;
+    remoteJid?: string;
+    contactName?: string;
     createdAt: string;
 }
 export interface CreateConversationMessageRequest {

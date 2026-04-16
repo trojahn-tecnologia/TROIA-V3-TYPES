@@ -13,12 +13,12 @@ exports.AGENT_SEGMENT_LABELS = exports.AGENT_CATEGORY_LABELS = exports.AgentSegm
 var AgentCategory;
 (function (AgentCategory) {
     AgentCategory["SDR"] = "sdr";
-    AgentCategory["ATENDENTE"] = "atendente";
-    AgentCategory["SUPORTE"] = "suporte";
-    AgentCategory["FINANCEIRO"] = "financeiro";
-    AgentCategory["VENDAS"] = "vendas";
-    AgentCategory["AGENDAMENTO"] = "agendamento";
-    AgentCategory["OUTRO"] = "outro";
+    AgentCategory["ATTENDANT"] = "attendant";
+    AgentCategory["SUPPORT"] = "support";
+    AgentCategory["FINANCIAL"] = "financial";
+    AgentCategory["SALES"] = "sales";
+    AgentCategory["SCHEDULING"] = "scheduling";
+    AgentCategory["OTHER"] = "other";
 })(AgentCategory || (exports.AgentCategory = AgentCategory = {}));
 /**
  * Segmento de mercado do agente — descreve PRA QUAL indústria ele atende.
@@ -28,19 +28,19 @@ var AgentCategory;
  */
 var AgentSegment;
 (function (AgentSegment) {
-    AgentSegment["EDUCACIONAL"] = "educacional";
-    AgentSegment["IMOBILIARIA"] = "imobiliaria";
-    AgentSegment["SAUDE"] = "saude";
+    AgentSegment["EDUCATIONAL"] = "educational";
+    AgentSegment["REAL_ESTATE"] = "real_estate";
+    AgentSegment["HEALTHCARE"] = "healthcare";
     AgentSegment["ECOMMERCE"] = "ecommerce";
-    AgentSegment["SERVICOS"] = "servicos";
+    AgentSegment["SERVICES"] = "services";
     AgentSegment["SAAS"] = "saas";
-    AgentSegment["CONTABILIDADE"] = "contabilidade";
-    AgentSegment["ADVOCACIA"] = "advocacia";
-    AgentSegment["ALIMENTACAO"] = "alimentacao";
-    AgentSegment["AUTOMOTIVO"] = "automotivo";
-    AgentSegment["ENERGIA_SOLAR"] = "energia-solar";
-    AgentSegment["CONFECCAO"] = "confeccao";
-    AgentSegment["GENERICO"] = "generico";
+    AgentSegment["ACCOUNTING"] = "accounting";
+    AgentSegment["LAW"] = "law";
+    AgentSegment["FOOD"] = "food";
+    AgentSegment["AUTOMOTIVE"] = "automotive";
+    AgentSegment["SOLAR_ENERGY"] = "solar_energy";
+    AgentSegment["APPAREL"] = "apparel";
+    AgentSegment["GENERIC"] = "generic";
 })(AgentSegment || (exports.AgentSegment = AgentSegment = {}));
 /**
  * Metadata de configuração pra tabela "amigável" de categorias/segmentos
@@ -48,25 +48,25 @@ var AgentSegment;
  */
 exports.AGENT_CATEGORY_LABELS = {
     [AgentCategory.SDR]: 'SDR (Prospecção)',
-    [AgentCategory.ATENDENTE]: 'Atendente',
-    [AgentCategory.SUPORTE]: 'Suporte Técnico',
-    [AgentCategory.FINANCEIRO]: 'Financeiro',
-    [AgentCategory.VENDAS]: 'Vendas',
-    [AgentCategory.AGENDAMENTO]: 'Agendamento',
-    [AgentCategory.OUTRO]: 'Outro',
+    [AgentCategory.ATTENDANT]: 'Atendente',
+    [AgentCategory.SUPPORT]: 'Suporte Técnico',
+    [AgentCategory.FINANCIAL]: 'Financeiro',
+    [AgentCategory.SALES]: 'Vendas',
+    [AgentCategory.SCHEDULING]: 'Agendamento',
+    [AgentCategory.OTHER]: 'Outro',
 };
 exports.AGENT_SEGMENT_LABELS = {
-    [AgentSegment.EDUCACIONAL]: 'Educacional',
-    [AgentSegment.IMOBILIARIA]: 'Imobiliária',
-    [AgentSegment.SAUDE]: 'Saúde',
+    [AgentSegment.EDUCATIONAL]: 'Educacional',
+    [AgentSegment.REAL_ESTATE]: 'Imobiliária',
+    [AgentSegment.HEALTHCARE]: 'Saúde',
     [AgentSegment.ECOMMERCE]: 'E-commerce',
-    [AgentSegment.SERVICOS]: 'Serviços',
+    [AgentSegment.SERVICES]: 'Serviços',
     [AgentSegment.SAAS]: 'SaaS / Software',
-    [AgentSegment.CONTABILIDADE]: 'Contabilidade',
-    [AgentSegment.ADVOCACIA]: 'Advocacia',
-    [AgentSegment.ALIMENTACAO]: 'Alimentação',
-    [AgentSegment.AUTOMOTIVO]: 'Automotivo',
-    [AgentSegment.ENERGIA_SOLAR]: 'Energia Solar',
-    [AgentSegment.CONFECCAO]: 'Confecção',
-    [AgentSegment.GENERICO]: 'Genérico',
+    [AgentSegment.ACCOUNTING]: 'Contabilidade',
+    [AgentSegment.LAW]: 'Advocacia',
+    [AgentSegment.FOOD]: 'Alimentação',
+    [AgentSegment.AUTOMOTIVE]: 'Automotivo',
+    [AgentSegment.SOLAR_ENERGY]: 'Energia Solar',
+    [AgentSegment.APPAREL]: 'Confecção',
+    [AgentSegment.GENERIC]: 'Genérico',
 };
