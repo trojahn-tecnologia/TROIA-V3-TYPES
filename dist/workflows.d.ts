@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
  * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
  * directly and stay in sync automatically.
  */
-export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
@@ -133,15 +133,16 @@ export interface InactivityTriggerConfig {
  * Send Message Action Configuration
  */
 export interface SendMessageActionConfig {
-    conversationId?: string;
-    contactId?: string;
-    contactIds?: string[];
+    targetType?: 'current' | 'new_conversation';
     channelId?: string;
-    message: string;
-    messageType?: 'text' | 'template';
-    templateId?: string;
-    templateVariables?: Record<string, string>;
-    targetType?: 'existing' | 'new_conversation';
+    contactSource?: 'context' | 'specific';
+    contactId?: string;
+    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document';
+    message?: string;
+    mediaUrl?: string;
+    caption?: string;
+    filename?: string;
+    conversationId?: string;
 }
 /**
  * Send Email Action Configuration
@@ -339,6 +340,31 @@ export interface AIAgentInlineConfig {
     contextType?: 'conversation' | 'contact' | 'lead';
 }
 /**
+ * Create Database Document Action Configuration
+ * Creates a new document in the databases-documents collection.
+ * Used for blog article generation, knowledge base entries, etc.
+ */
+export interface CreateDatabaseDocumentActionConfig {
+    /** ID do banco de dados onde salvar o documento */
+    databaseId: string;
+    /** Tipo do documento (default: 'documents') */
+    documentType?: string;
+    /** Título — suporta {{variável}} */
+    title: string;
+    /** Conteúdo — suporta {{variável}} */
+    content: string;
+    /** Resumo — suporta {{variável}} */
+    summary?: string;
+    /** Categoria do documento (default: 'article') */
+    category?: string;
+    /** Autor — suporta {{variável}} */
+    author?: string;
+    /** Keywords — separadas por vírgula ou {{variável}} */
+    keywords?: string;
+    /** Status inicial (default: 'draft') */
+    itemStatus?: 'published' | 'draft';
+}
+/**
  * Skill Input Node Configuration
  *
  * Entry point of a workflow being used as a skill.
@@ -382,7 +408,7 @@ export interface SkillOutputConfig {
 /**
  * Node Configuration - Union of all config types
  */
-export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | DelayControlConfig | LoopControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
+export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | DelayControlConfig | LoopControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
 /**
  * Workflow Variable Value - Type-safe recursive value type for workflow variables
  */

@@ -39,6 +39,7 @@ exports.WORKFLOW_NODE_TYPES = [
     'action_create_ticket',
     'action_internal_notification',
     'action_find_leads',
+    'action_create_database_document',
     // Controls
     'control_if',
     'control_switch',

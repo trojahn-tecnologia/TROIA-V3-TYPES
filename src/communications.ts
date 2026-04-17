@@ -64,6 +64,7 @@ export interface MessageData {
   reaction?: {
     emoji: string;
     targetMessageId: string;
+    fromMe?: boolean;  // true se a mensagem alvo foi enviada por nós (outbound)
   };
 
   // Interactive message data (buttons, list, template)

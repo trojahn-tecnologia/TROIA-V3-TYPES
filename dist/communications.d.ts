@@ -51,6 +51,7 @@ export interface MessageData {
     reaction?: {
         emoji: string;
         targetMessageId: string;
+        fromMe?: boolean;
     };
     interactiveData?: Record<string, unknown>;
 }

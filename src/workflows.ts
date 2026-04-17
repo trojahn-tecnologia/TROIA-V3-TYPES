@@ -39,6 +39,7 @@ export const WORKFLOW_NODE_TYPES = [
   'action_create_ticket',
   'action_internal_notification',
   'action_find_leads',
+  'action_create_database_document',
   // Controls
   'control_if',
   'control_switch',
@@ -202,15 +203,21 @@ export interface InactivityTriggerConfig {
  * Send Message Action Configuration
  */
 export interface SendMessageActionConfig {
-  conversationId?: string;
-  contactId?: string;
-  contactIds?: string[];
+  // Destino
+  targetType?: 'current' | 'new_conversation';
   channelId?: string;
-  message: string;
-  messageType?: 'text' | 'template';
-  templateId?: string;
-  templateVariables?: Record<string, string>;
-  targetType?: 'existing' | 'new_conversation';
+  contactSource?: 'context' | 'specific';
+  contactId?: string;
+
+  // Conteúdo
+  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document';
+  message?: string;
+  mediaUrl?: string;
+  caption?: string;
+  filename?: string;
+
+  // Legacy (compat)
+  conversationId?: string;
 }
 
 /**
@@ -426,6 +433,32 @@ export interface AIAgentInlineConfig {
 }
 
 /**
+ * Create Database Document Action Configuration
+ * Creates a new document in the databases-documents collection.
+ * Used for blog article generation, knowledge base entries, etc.
+ */
+export interface CreateDatabaseDocumentActionConfig {
+  /** ID do banco de dados onde salvar o documento */
+  databaseId: string;
+  /** Tipo do documento (default: 'documents') */
+  documentType?: string;
+  /** Título — suporta {{variável}} */
+  title: string;
+  /** Conteúdo — suporta {{variável}} */
+  content: string;
+  /** Resumo — suporta {{variável}} */
+  summary?: string;
+  /** Categoria do documento (default: 'article') */
+  category?: string;
+  /** Autor — suporta {{variável}} */
+  author?: string;
+  /** Keywords — separadas por vírgula ou {{variável}} */
+  keywords?: string;
+  /** Status inicial (default: 'draft') */
+  itemStatus?: 'published' | 'draft';
+}
+
+/**
  * Skill Input Node Configuration
  *
  * Entry point of a workflow being used as a skill.
@@ -491,6 +524,7 @@ export type NodeConfig =
   | LoopControlConfig
   | AIAgentNodeConfig
   | AIAgentInlineConfig
+  | CreateDatabaseDocumentActionConfig
   | SkillInputConfig
   | SkillOutputConfig
   | Record<string, unknown>;
