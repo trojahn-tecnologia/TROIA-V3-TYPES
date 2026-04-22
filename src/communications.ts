@@ -33,7 +33,7 @@ export interface MessageData {
   message?: string;
   messageId?: string;  // ✅ MongoDB message ID for correlation
   replyToMessageId?: string;  // ✅ ID of message being replied to (for quoted messages)
-  type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction';
+  type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction' | 'edit' | 'delete';
 
   // ✅ Structured media object
   media?: MediaData;
@@ -65,6 +65,17 @@ export interface MessageData {
     emoji: string;
     targetMessageId: string;
     fromMe?: boolean;  // true se a mensagem alvo foi enviada por nós (outbound)
+  };
+
+  // ✅ Edit data — para editar uma mensagem já enviada (só outbound, janela de 15min no WhatsApp)
+  edit?: {
+    targetMessageId: string;  // providerMessageId da mensagem original no WhatsApp
+    newText: string;          // Novo conteúdo em texto puro
+  };
+
+  // ✅ Revoke data — para deletar/revogar uma mensagem já enviada (WhatsApp "apagar para todos")
+  revoke?: {
+    targetMessageId: string;  // providerMessageId da mensagem original no WhatsApp
   };
 
   // Interactive message data (buttons, list, template)

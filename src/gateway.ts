@@ -96,7 +96,7 @@ export interface MessageGroup {
  */
 export interface GatewayWebhookPayload {
   instanceKey: string;
-  event: 'message' | 'status' | 'connect' | 'disconnect' | 'error';
+  event: 'message' | 'status' | 'connect' | 'disconnect' | 'error' | 'account.updated';
   data: GatewayEventData;
 }
 
@@ -113,7 +113,7 @@ export interface GatewayEventData {
   to?: string;  // Recipient (empresa/bot number)
   fromMe?: boolean;  // ✅ Message direction: true = sent by us, false = received
   message?: string;
-  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'poll' | 'buttons' | 'list' | 'unknown';
+  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'poll' | 'buttons' | 'list' | 'unknown';
 
   // ✅ Structured sender information (NUNCA string)
   from?: MessageSender;
@@ -147,6 +147,15 @@ export interface GatewayEventData {
     targetRemoteJid?: string;
   };
 
+  // Edit data (cliente editou mensagem anterior no WhatsApp)
+  edit?: {
+    targetMessageId: string;  // providerMessageId da mensagem editada
+    newText: string;
+  };
+
+  // ✅ Flag de mensagem encaminhada (WhatsApp ContextInfo.isForwarded)
+  isForwarded?: boolean;
+
   // Quoted message data
   quoted?: {
     messageId: string;
@@ -161,6 +170,33 @@ export interface GatewayEventData {
   // Connection data (when event = 'connect' | 'disconnect')
   phoneNumber?: string;
   clientId?: string;
+
+  // Account info (when event = 'account.updated' ou 'connect')
+  // Sempre normalizado: identifier é apenas dígitos.
+  accountInfo?: {
+    identifier: string;            // Ex: "5511999887766" (apenas dígitos)
+    pushName?: string;
+    verifiedName?: string;
+    businessName?: string;
+    platform?: string;
+    profilePictureUrl?: string;
+    hasProfilePicture?: boolean;
+    coverPhotoUrl?: string;
+    status?: string;
+    description?: string;
+    email?: string;
+    address?: string;
+    websites?: string[];
+    category?: string;
+    categories?: string[];
+    businessHours?: Array<{
+      dayOfWeek: string;
+      mode: string;
+      openTime?: number;
+      closeTime?: number;
+    }>;
+    timezone?: string;
+  };
 
   // Error data (when event = 'error')
   error?: string;

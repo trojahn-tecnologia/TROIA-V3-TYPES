@@ -27,6 +27,11 @@ export interface Group {
     allowMemberAdd?: boolean;
   };
 
+  // Mute preference per-user — lista de userIds que silenciaram notificações
+  // deste grupo. Toggle via POST /conversations/:id/mute|unmute (backend roteia
+  // pro Group quando conv é de grupo).
+  mutedBy?: string[];
+
   // Dates
   createdAt: string;
   updatedAt: string;

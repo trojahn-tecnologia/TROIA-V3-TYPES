@@ -18,17 +18,26 @@ export const SOCKET_EVENTS = {
   CONVERSATION_ERROR: 'conversation:error',             // ✅ Arch 3.4: Error in conversation operations
   UNREAD_COUNT_UPDATE: 'unread-count:update',         // ✅ Optimization: Backend sends updated counters
 
+  // ✅ Transient notification trigger — emitido user-specific APENAS para
+  // destinatários elegíveis (não-mutados) quando chega mensagem inbound.
+  // Presença do evento = permissão pra tocar toast+som. Diferente de
+  // CONVERSATION_MESSAGE (broadcast pra UI state), este é dedicado ao
+  // gatilho de notificação — sem cache no frontend, sem leak de mutedBy.
+  CONVERSATION_MESSAGE_NOTIFY: 'conversation:message:notify',
+
   // Message Events
   MESSAGE_STATUS: 'message:status',                 // ✅ Generic status update (sent, delivered, read, failed)
   MESSAGE_DELIVERED: 'message:delivered',
   MESSAGE_READ: 'message:read',
   MESSAGE_DELETED: 'message:deleted',
   MESSAGE_REACTION: 'message:reaction',             // ✅ Reaction added/removed on a message
+  MESSAGE_EDITED: 'message:edited',                 // ✅ Message content edited (inbound via webhook / outbound via UI)
 
   // Channel Events
   CHANNEL_QR: 'channel:qr',
   CHANNEL_CONNECTED: 'channel:connected',
   CHANNEL_DISCONNECTED: 'channel:disconnected',
+  CHANNEL_ACCOUNT_UPDATED: 'channel:account-updated', // ✅ Info da conta conectada atualizada (foto, push name, etc.)
 
   // User Events
   USER_TYPING: 'user:typing',
@@ -151,6 +160,37 @@ export interface ConversationMessageEvent {
     emoji: string;
     targetMessageId: string;
   };
+
+  // ✅ Forwarded flags — mensagem encaminhada (inbound via webhook ou outbound via UI)
+  isForwarded?: boolean;
+  forwardedFromMessageId?: string;
+
+  // ✅ Contexto da conversation anexado ao payload do evento — permite que
+  // handlers globais decidam comportamento (ex: tocar som diferente quando
+  // a conversa ainda está 'waiting' vs 'active') sem round-trip extra.
+  conversationStatus?: 'waiting' | 'active' | 'closed';
+  conversationAssigneeId?: string;
+}
+
+/**
+ * Payload do evento `CONVERSATION_MESSAGE_NOTIFY` — user-specific.
+ *
+ * Emitido pelo backend APENAS nos rooms `user:{userId}` dos destinatários
+ * elegíveis (não-mutados). Frontend: presença do evento é permissão pra
+ * tocar toast+som — sem lookup de cache, sem check de mute.
+ *
+ * Carrega mínimo necessário pra:
+ *   - identificar conv (conversationId)
+ *   - escolher som (conversationStatus → active=message.mp3, outros=queue.wav)
+ *   - logs/debug (direction sempre 'inbound' nesse evento)
+ */
+export interface ConversationMessageNotifyEvent {
+  conversationId: string;
+  direction: 'inbound';
+  conversationStatus: 'waiting' | 'active' | 'closed';
+  conversationAssigneeId?: string;
+  contactId?: string;
+  groupId?: string;
 }
 
 /**
@@ -225,6 +265,20 @@ export interface MessageReactionEvent {
 }
 
 /**
+ * Message Edited Event
+ * Emitido quando uma mensagem é editada (inbound via webhook ou outbound via UI).
+ * Frontend deve atualizar content/plainText e marcar visualmente como editada.
+ */
+export interface MessageEditedEvent {
+  conversationId: string;
+  messageId: string;            // MongoDB _id da mensagem editada
+  newContent: unknown;          // Novo MessageContent[] (tipo serializado)
+  newPlainText: string;
+  editedAt: string;
+  source: 'webhook' | 'ui';     // webhook = cliente editou no WhatsApp; ui = usuário TROIA editou
+}
+
+/**
  * Channel QR Code Event
  */
 export interface ChannelQREvent {
@@ -240,6 +294,40 @@ export interface ChannelConnectedEvent {
   instanceKey: string;
   channelId: string;
   connectedAt: string;
+}
+
+/**
+ * Channel Account Updated Event
+ * Emitido quando o provider envia informações atualizadas da conta conectada
+ * (nome, foto, plataforma, etc.) — frontend atualiza o card em tempo real.
+ */
+export interface ChannelAccountUpdatedEvent {
+  channelId: string;
+  identifier: string;            // apenas dígitos
+  accountInfo: {
+    pushName?: string;
+    verifiedName?: string;
+    businessName?: string;
+    platform?: string;
+    profilePictureUrl?: string;
+    hasProfilePicture?: boolean;
+    coverPhotoUrl?: string;
+    status?: string;
+    description?: string;
+    email?: string;
+    address?: string;
+    websites?: string[];
+    category?: string;
+    categories?: string[];
+    businessHours?: Array<{
+      dayOfWeek: string;
+      mode: string;
+      openTime?: number;
+      closeTime?: number;
+    }>;
+    timezone?: string;
+    updatedAt: string;
+  };
 }
 
 /**
@@ -274,6 +362,7 @@ export interface AssignmentUpdatedEvent {
     priority?: string;
   };
 }
+
 
 /**
  * Conversation Open Event (Arch 3.4)
@@ -607,6 +696,7 @@ export interface CreditPaymentConfirmedEvent {
 export interface SocketEventMap {
   // Conversation Events
   [SOCKET_EVENTS.CONVERSATION_MESSAGE]: ConversationMessageEvent;
+  [SOCKET_EVENTS.CONVERSATION_MESSAGE_NOTIFY]: ConversationMessageNotifyEvent;  // ✅ user-specific notify
   [SOCKET_EVENTS.CONVERSATION_UPDATED]: ConversationUpdatedEvent;
   [SOCKET_EVENTS.CONVERSATION_DELETED]: ConversationDeletedEvent;
   [SOCKET_EVENTS.CONVERSATION_OPEN]: ConversationOpenEvent;               // ✅ Arch 3.4
@@ -619,10 +709,12 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.MESSAGE_DELIVERED]: MessageDeliveredEvent;
   [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
   [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;       // ✅ Reaction add/remove
+  [SOCKET_EVENTS.MESSAGE_EDITED]: MessageEditedEvent;           // ✅ Message content edited
 
   // Channel Events
   [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
   [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
+  [SOCKET_EVENTS.CHANNEL_ACCOUNT_UPDATED]: ChannelAccountUpdatedEvent;
 
   // User Events
   [SOCKET_EVENTS.USER_TYPING]: UserTypingEvent;

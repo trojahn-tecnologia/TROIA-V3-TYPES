@@ -18,16 +18,24 @@ exports.SOCKET_EVENTS = {
     CONVERSATION_UNREAD_RESET: 'conversation:unread-reset', // ✅ Arch 3.4: Unread counter reset
     CONVERSATION_ERROR: 'conversation:error', // ✅ Arch 3.4: Error in conversation operations
     UNREAD_COUNT_UPDATE: 'unread-count:update', // ✅ Optimization: Backend sends updated counters
+    // ✅ Transient notification trigger — emitido user-specific APENAS para
+    // destinatários elegíveis (não-mutados) quando chega mensagem inbound.
+    // Presença do evento = permissão pra tocar toast+som. Diferente de
+    // CONVERSATION_MESSAGE (broadcast pra UI state), este é dedicado ao
+    // gatilho de notificação — sem cache no frontend, sem leak de mutedBy.
+    CONVERSATION_MESSAGE_NOTIFY: 'conversation:message:notify',
     // Message Events
     MESSAGE_STATUS: 'message:status', // ✅ Generic status update (sent, delivered, read, failed)
     MESSAGE_DELIVERED: 'message:delivered',
     MESSAGE_READ: 'message:read',
     MESSAGE_DELETED: 'message:deleted',
     MESSAGE_REACTION: 'message:reaction', // ✅ Reaction added/removed on a message
+    MESSAGE_EDITED: 'message:edited', // ✅ Message content edited (inbound via webhook / outbound via UI)
     // Channel Events
     CHANNEL_QR: 'channel:qr',
     CHANNEL_CONNECTED: 'channel:connected',
     CHANNEL_DISCONNECTED: 'channel:disconnected',
+    CHANNEL_ACCOUNT_UPDATED: 'channel:account-updated', // ✅ Info da conta conectada atualizada (foto, push name, etc.)
     // User Events
     USER_TYPING: 'user:typing',
     USER_ONLINE: 'user:online',

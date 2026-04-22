@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NotificationCategory = exports.NotificationPriority = exports.NotificationType = void 0;
+exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS = exports.NotificationCategory = exports.NotificationPriority = exports.NotificationType = void 0;
+exports.getSupportedChannelsForType = getSupportedChannelsForType;
 // ============================================================================
 // NOTIFICATION TYPES AND ENUMS
 // ============================================================================
@@ -79,3 +80,20 @@ var NotificationCategory;
     NotificationCategory["TEAM"] = "team";
     NotificationCategory["CUSTOM"] = "custom";
 })(NotificationCategory || (exports.NotificationCategory = NotificationCategory = {}));
+/**
+ * Canais suportados por tipo de notificação.
+ *
+ * Mapa sparse: tipos AUSENTES aqui aceitam TODOS os 4 canais (default).
+ * Tipos presentes ficam restritos à lista declarada — frontend esconde
+ * canais não-suportados na UI de preferências e backend filtra no dispatch.
+ */
+exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS = {
+    [NotificationType.CONVERSATION_MESSAGE_RECEIVED]: ['push'],
+};
+/**
+ * Retorna os canais suportados pra um tipo. Default: todos os 4.
+ */
+function getSupportedChannelsForType(type) {
+    const restricted = exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS[type];
+    return restricted ?? ['inApp', 'push', 'email', 'whatsapp'];
+}

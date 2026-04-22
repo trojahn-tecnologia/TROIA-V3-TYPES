@@ -132,6 +132,7 @@ export interface ConversationMessage {
     reply?: Partial<ConversationMessage>;
     forwardedFromMessageId?: string;
     forwarded?: Partial<ConversationMessage>;
+    isForwarded?: boolean;
     threadId?: string;
     status: 'sent' | 'delivered' | 'read' | 'failed' | 'pending';
     deliveredAt?: string;
@@ -192,6 +193,7 @@ export interface CreateConversationMessageRequest {
     providerData?: Record<string, unknown>;
     replyToMessageId?: string;
     forwardedFromMessageId?: string;
+    isForwarded?: boolean;
     threadId?: string;
     internalNote?: string;
     isInternal?: boolean;
@@ -272,6 +274,21 @@ export interface ForwardMessageRequest {
     additionalContent?: MessageContent[];
     internalNote?: string;
 }
+/**
+ * Resposta detalhada do forward: separa sucessos e falhas por contato,
+ * para o frontend poder mostrar ao usuário exatamente o que funcionou.
+ */
+export interface ForwardMessageResponse {
+    successful: Array<{
+        contactId: string;
+        conversationId: string;
+        messageId: string;
+    }>;
+    failed: Array<{
+        contactId: string;
+        reason: string;
+    }>;
+}
 export interface AddReactionRequest {
     messageId: string;
     emoji: string;
@@ -286,6 +303,7 @@ export interface MarkAsReadRequest {
 export interface DeleteMessageRequest {
     messageId: string;
     reason?: string;
+    deleteForEveryone?: boolean;
 }
 export interface MessageSearchRequest {
     query: string;

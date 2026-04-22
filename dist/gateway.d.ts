@@ -70,7 +70,7 @@ export interface MessageGroup {
  */
 export interface GatewayWebhookPayload {
     instanceKey: string;
-    event: 'message' | 'status' | 'connect' | 'disconnect' | 'error';
+    event: 'message' | 'status' | 'connect' | 'disconnect' | 'error' | 'account.updated';
     data: GatewayEventData;
 }
 /**
@@ -85,7 +85,7 @@ export interface GatewayEventData {
     to?: string;
     fromMe?: boolean;
     message?: string;
-    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'poll' | 'buttons' | 'list' | 'unknown';
+    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'poll' | 'buttons' | 'list' | 'unknown';
     from?: MessageSender;
     group?: MessageGroup;
     media?: MediaData;
@@ -106,6 +106,11 @@ export interface GatewayEventData {
         targetMessageId: string;
         targetRemoteJid?: string;
     };
+    edit?: {
+        targetMessageId: string;
+        newText: string;
+    };
+    isForwarded?: boolean;
     quoted?: {
         messageId: string;
         participant: string;
@@ -115,6 +120,30 @@ export interface GatewayEventData {
     status?: 'sent' | 'delivered' | 'read' | 'failed';
     phoneNumber?: string;
     clientId?: string;
+    accountInfo?: {
+        identifier: string;
+        pushName?: string;
+        verifiedName?: string;
+        businessName?: string;
+        platform?: string;
+        profilePictureUrl?: string;
+        hasProfilePicture?: boolean;
+        coverPhotoUrl?: string;
+        status?: string;
+        description?: string;
+        email?: string;
+        address?: string;
+        websites?: string[];
+        category?: string;
+        categories?: string[];
+        businessHours?: Array<{
+            dayOfWeek: string;
+            mode: string;
+            openTime?: number;
+            closeTime?: number;
+        }>;
+        timezone?: string;
+    };
     error?: string;
     errorCode?: string;
     timestamp: string;

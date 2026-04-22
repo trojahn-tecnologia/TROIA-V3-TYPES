@@ -16,6 +16,7 @@ export interface Group {
         onlyAdminsCanEdit?: boolean;
         allowMemberAdd?: boolean;
     };
+    mutedBy?: string[];
     createdAt: string;
     updatedAt: string;
     deletedAt?: string;

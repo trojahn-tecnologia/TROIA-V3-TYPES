@@ -66,6 +66,18 @@ export declare enum NotificationCategory {
  */
 export type NotificationChannel = 'email' | 'whatsapp' | 'push' | 'inApp';
 /**
+ * Canais suportados por tipo de notificação.
+ *
+ * Mapa sparse: tipos AUSENTES aqui aceitam TODOS os 4 canais (default).
+ * Tipos presentes ficam restritos à lista declarada — frontend esconde
+ * canais não-suportados na UI de preferências e backend filtra no dispatch.
+ */
+export declare const NOTIFICATION_TYPE_SUPPORTED_CHANNELS: Partial<Record<NotificationType, NotificationChannel[]>>;
+/**
+ * Retorna os canais suportados pra um tipo. Default: todos os 4.
+ */
+export declare function getSupportedChannelsForType(type: NotificationType | string): NotificationChannel[];
+/**
  * Status de entrega por canal
  */
 export interface ChannelDeliveryStatus {

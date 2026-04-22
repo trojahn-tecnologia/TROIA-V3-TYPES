@@ -47,6 +47,40 @@ export interface ChannelUser {
     status: 'active' | 'inactive';
     assignedAt: string;
 }
+/**
+ * Horário de funcionamento para contas Business.
+ * open_time/close_time são minutos desde meia-noite (ex: 480 = 08:00).
+ */
+export interface ChannelBusinessHours {
+    dayOfWeek: string;
+    mode: string;
+    openTime?: number;
+    closeTime?: number;
+}
+/**
+ * Informações da conta conectada — preenchidas pelo provider (Baileys/whatsmeow)
+ * no momento da conexão e em eventos de atualização. Permite enriquecer a UI do
+ * card de canal com foto, nome de exibição, business profile e plataforma reais.
+ */
+export interface ChannelAccountInfo {
+    pushName?: string;
+    verifiedName?: string;
+    businessName?: string;
+    platform?: string;
+    profilePictureUrl?: string;
+    hasProfilePicture?: boolean;
+    coverPhotoUrl?: string;
+    status?: string;
+    description?: string;
+    email?: string;
+    address?: string;
+    websites?: string[];
+    category?: string;
+    categories?: string[];
+    businessHours?: ChannelBusinessHours[];
+    timezone?: string;
+    updatedAt?: string;
+}
 export interface Channel {
     name: string;
     integrationId: ObjectId;
@@ -55,6 +89,7 @@ export interface Channel {
     instanceKey?: string;
     instanceToken?: string;
     identifyUser?: boolean;
+    accountInfo?: ChannelAccountInfo;
     /** Configuração de expiração automática de atendimentos */
     expirationConfig?: ChannelExpirationConfig;
     /**
@@ -100,6 +135,15 @@ export type ChannelResponse = Omit<Channel, '_id' | 'createdAt' | 'updatedAt' | 
     integration?: {
         instanceKey: string | null;
         instanceToken: string | null;
+    };
+    /**
+     * Métricas agregadas do canal — populadas no list/getById.
+     * `messagesLast7Days`: contagem de mensagens (inbound + outbound) dos últimos 7 dias.
+     * `conversations`: conversas ativas/waiting no canal.
+     */
+    stats?: {
+        messagesLast7Days?: number;
+        conversations?: number;
     };
 };
 export interface ChannelProviderListResponse extends ListResponse<ChannelProviderResponse> {

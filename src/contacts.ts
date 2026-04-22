@@ -61,6 +61,13 @@ export interface Contact {
   // Interaction tracking
   lastInteractionAt?: string;  // Updated when client SENDS a message
 
+  // Mute preference per-user — lista de userIds que silenciaram notificações
+  // deste contato. Persiste entre lifecycles de conversation (quando conv fecha
+  // e novo atendimento é aberto, o mute segue o contato, não a conv).
+  // Toggle via POST /conversations/:id/mute|unmute (backend roteia pro Contact
+  // quando conv é individual).
+  mutedBy?: string[];
+
   createdAt: string;
   updatedAt: string;
 }

@@ -40,6 +40,7 @@ export interface Conversation {
     name: string;       // Contact name
     picture?: string;   // Contact avatar URL
     phone?: string;     // Contact primary phone
+    tags?: string[];    // Contact tags (populated for list rendering)
   };
 
   // ✅ Populated via aggregation (not stored in database)
@@ -116,6 +117,17 @@ export interface Conversation {
 
   // Privacy settings
   privacy?: ConversationPrivacy;
+
+  // Preferência de silenciamento per-usuário.
+  // ✅ Computed: `true` quando o userId do request silenciou o alvo.
+  //    O mute é armazenado em `Contact.mutedBy` (conv individual) ou
+  //    `Group.mutedBy` (conv grupo) — NUNCA no próprio Conversation.
+  //    Isso garante que o mute de individual persiste quando a conv fecha
+  //    e uma nova é criada pro mesmo contato.
+  //    Populado via `mapToResponse(doc, userId)` no backend.
+  // ⚠️ A lista bruta de userIds nunca é exposta — frontend usa só `muted`.
+  //    Toggle via POST /conversations/:id/mute e /unmute (backend roteia).
+  muted?: boolean;
 
   // Channel-based permissions
   userRole?: 'viewer' | 'attendant'; // role do usuário logado no canal da conversa

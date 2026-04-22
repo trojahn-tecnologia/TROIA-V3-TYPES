@@ -344,8 +344,19 @@ export interface AgentTestScenario {
     scenarioKey: string;
     /** Label humano exibido na UI */
     label: string;
-    /** Mensagem do cliente como seria em produção */
-    customerMessage: string;
+    /**
+     * Turnos sequenciais do CLIENTE — SEMPRE multi-turn (length ≥ 1).
+     * Cenários de 1 turno representam o caso degenerado (uma única mensagem),
+     * mas passam pelo mesmo runner. Cenários de 2+ turnos exercitam os 4 eixos
+     * MultiChallenge (ICLR 2025): retenção de instrução, memória de dados do
+     * usuário, edição com mudança de ideia, auto-coerência entre turnos.
+     *
+     * O runner do `AgentQualityTestService` persiste cada turno como
+     * `conversation-messages` na mesma conversa sandbox e chama
+     * `executeAgent` N vezes. Apenas o ÚLTIMO turno é avaliado pelos
+     * evaluators — os anteriores constroem o contexto natural.
+     */
+    customerTurns: string[];
     /**
      * Categorias de agente que podem usar este cenário. Array vazio = qualquer
      * categoria (cenário universal ou só filtrado por segmento).
@@ -380,7 +391,8 @@ export interface AgentTestScenarioResponse extends Omit<AgentTestScenario, '_id'
 export interface CreateAgentTestScenarioRequest {
     scenarioKey: string;
     label: string;
-    customerMessage: string;
+    /** Turnos do cliente (1+). Todos os cenários são multi-turn por padrão. */
+    customerTurns: string[];
     categories: AgentCategory[];
     segments: AgentSegment[];
     expectedMinRelevance?: number;
@@ -392,7 +404,7 @@ export interface CreateAgentTestScenarioRequest {
 export interface UpdateAgentTestScenarioRequest {
     scenarioKey?: string;
     label?: string;
-    customerMessage?: string;
+    customerTurns?: string[];
     categories?: AgentCategory[];
     segments?: AgentSegment[];
     expectedMinRelevance?: number;

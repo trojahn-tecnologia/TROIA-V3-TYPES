@@ -73,14 +73,59 @@ export interface ChannelUser {
 // CHANNEL ENTITY
 // ============================================================================
 
+/**
+ * Horário de funcionamento para contas Business.
+ * open_time/close_time são minutos desde meia-noite (ex: 480 = 08:00).
+ */
+export interface ChannelBusinessHours {
+  dayOfWeek: string;             // mon, tue, wed, thu, fri, sat, sun
+  mode: string;                  // 'open_24h' | 'appointment_only' | 'specific_hours'
+  openTime?: number;             // minutos desde meia-noite
+  closeTime?: number;
+}
+
+/**
+ * Informações da conta conectada — preenchidas pelo provider (Baileys/whatsmeow)
+ * no momento da conexão e em eventos de atualização. Permite enriquecer a UI do
+ * card de canal com foto, nome de exibição, business profile e plataforma reais.
+ */
+export interface ChannelAccountInfo {
+  // Identidade básica
+  pushName?: string;             // Nome do perfil (ex: "João Silva")
+  verifiedName?: string;         // Nome verificado em contas Business
+  businessName?: string;         // Nome comercial (para Business)
+  platform?: string;             // ios, android, web, windows, mac
+
+  // Imagens
+  profilePictureUrl?: string;    // URL da foto de perfil (WhatsApp CDN — pode expirar)
+  hasProfilePicture?: boolean;   // true quando a conta tem foto mas o servidor bloqueou URL (anti-scraping)
+  coverPhotoUrl?: string;        // URL da foto de capa (apenas contas Business)
+
+  // Recado/status do perfil
+  status?: string;
+
+  // Business profile (só preenchido em contas Business)
+  description?: string;          // Descrição do negócio
+  email?: string;
+  address?: string;
+  websites?: string[];
+  category?: string;             // Categoria principal
+  categories?: string[];         // Todas as categorias (Go expõe lista)
+  businessHours?: ChannelBusinessHours[];
+  timezone?: string;             // IANA TZ (ex: "America/Sao_Paulo")
+
+  updatedAt?: string;            // ISO timestamp da última atualização
+}
+
 export interface Channel {
   name: string;
   integrationId: ObjectId;    // Reference to the automatically created integration
-  identifier: string;
+  identifier: string;         // ✅ Apenas dígitos (ex: "5511999887766") — normalizado
   providerId?: string;        // Provider ID for conditional UI rendering
   instanceKey?: string;       // For Gateway providers
   instanceToken?: string;     // For Gateway providers
   identifyUser?: boolean;     // If true, operator name is added to outgoing messages
+  accountInfo?: ChannelAccountInfo; // ✅ Dados vindos do provider ao conectar
   /** Configuração de expiração automática de atendimentos */
   expirationConfig?: ChannelExpirationConfig;
   /**
@@ -131,6 +176,15 @@ export type ChannelResponse = Omit<Channel, '_id' | 'createdAt' | 'updatedAt' | 
   integration?: {             // Integration credentials from company-integrations
     instanceKey: string | null;
     instanceToken: string | null;
+  };
+  /**
+   * Métricas agregadas do canal — populadas no list/getById.
+   * `messagesLast7Days`: contagem de mensagens (inbound + outbound) dos últimos 7 dias.
+   * `conversations`: conversas ativas/waiting no canal.
+   */
+  stats?: {
+    messagesLast7Days?: number;
+    conversations?: number;
   };
 };
 

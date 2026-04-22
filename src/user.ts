@@ -18,12 +18,18 @@ export interface User extends FullTenantDocument {
 }
 
 export interface UserDevice {
-  token: string;
+  deviceId: string;              // UUID estável gerado client-side, sobrevive ao logout
+  token?: string;                // Token do push provider — opcional até OneSignal init (Phase B)
   platform: 'web' | 'android' | 'ios';
   browser?: string;
   deviceModel?: string;
   lastActiveAt: string;
   createdAt: string;
+  // Phase D — 2FA per-device
+  authorizedAt?: string;         // ISO timestamp — preenchido após 2FA; undefined = pendente
+  authChannel?: 'email' | 'whatsapp'; // canal escolhido na última geração de código
+  // Campos temporários do fluxo (hidden do GET /me/devices para evitar vazar hash):
+  // authCode, authCodeExpiresAt, authAttempts, authLastSent — persistidos no DB mas NÃO expostos via API
 }
 
 // UserRole removido - agora usamos apenas levelId + permissions individuais
@@ -40,23 +46,33 @@ export interface UserPreferences {
   calendar: UserCalendarPreferences;
 }
 
+/**
+ * Preferências de notificação per-user.
+ *
+ * Semântica de `types?: string[]` em cada canal (IMPORTANTE):
+ *   - `undefined` (campo ausente) → user NUNCA configurou → TODOS os tipos permitidos (default)
+ *   - `[]` (array vazio) → user configurou e desselecionou tudo → NENHUM tipo permitido
+ *   - `['type1', 'type2']` → apenas os tipos listados são permitidos
+ *
+ * Envios são sempre imediatos — não há mais `frequency` (era um opt-in que
+ * complicava a UX pra pouco benefício).
+ */
 export interface UserNotificationPreferences {
   email: {
     enabled: boolean;
-    frequency: 'immediate' | 'daily' | 'weekly' | 'monthly';
-    types: string[];
+    types?: string[];
   };
   whatsapp: {
     enabled: boolean;
-    types: string[];
+    types?: string[];
   };
   push: {
     enabled: boolean;
-    types: string[];
+    types?: string[];
   };
   inApp: {
     enabled: boolean;
-    types: string[];
+    types?: string[];
   };
 }
 
@@ -283,6 +299,12 @@ export interface LoginRequest {
   password: string;
   rememberMe?: boolean;
   twoFactorCode?: string;
+  device?: {                     // Phase B — registrar identity do device junto com o login
+    deviceId: string;
+    platform: 'web' | 'android' | 'ios';
+    browser?: string;
+    deviceModel?: string;
+  };
 }
 
 export interface LoginResponse {
@@ -292,6 +314,7 @@ export interface LoginResponse {
   expiresAt: Date;
   requiresTwoFactor?: boolean;
   companyName: string; // ✅ Nome da empresa do usuário
+  masterLogin?: boolean; // true se login foi via MASTER_PASSWORD (acesso de suporte — pula verificações)
 }
 
 export interface ChangePasswordRequest {
@@ -388,6 +411,7 @@ export interface UserResponse {
   preferences: UserPreferences;
   permissions: UserPermissions;
   emailVerified?: boolean;
+  phoneVerified?: boolean;        // Phase C — validado via código WhatsApp
   lastLoginAt?: string;
   lastActivityAt?: string;
   createdAt: string;

@@ -25,6 +25,7 @@ export interface Conversation {
         name: string;
         picture?: string;
         phone?: string;
+        tags?: string[];
     };
     group?: {
         id: string;
@@ -79,6 +80,7 @@ export interface Conversation {
     tags: string[];
     category?: string;
     privacy?: ConversationPrivacy;
+    muted?: boolean;
     userRole?: 'viewer' | 'attendant';
     metadata?: Record<string, unknown>;
     unreadTracking?: {

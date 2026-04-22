@@ -11,14 +11,17 @@ export declare const SOCKET_EVENTS: {
     readonly CONVERSATION_UNREAD_RESET: "conversation:unread-reset";
     readonly CONVERSATION_ERROR: "conversation:error";
     readonly UNREAD_COUNT_UPDATE: "unread-count:update";
+    readonly CONVERSATION_MESSAGE_NOTIFY: "conversation:message:notify";
     readonly MESSAGE_STATUS: "message:status";
     readonly MESSAGE_DELIVERED: "message:delivered";
     readonly MESSAGE_READ: "message:read";
     readonly MESSAGE_DELETED: "message:deleted";
     readonly MESSAGE_REACTION: "message:reaction";
+    readonly MESSAGE_EDITED: "message:edited";
     readonly CHANNEL_QR: "channel:qr";
     readonly CHANNEL_CONNECTED: "channel:connected";
     readonly CHANNEL_DISCONNECTED: "channel:disconnected";
+    readonly CHANNEL_ACCOUNT_UPDATED: "channel:account-updated";
     readonly USER_TYPING: "user:typing";
     readonly USER_ONLINE: "user:online";
     readonly USER_OFFLINE: "user:offline";
@@ -102,6 +105,30 @@ export interface ConversationMessageEvent {
         emoji: string;
         targetMessageId: string;
     };
+    isForwarded?: boolean;
+    forwardedFromMessageId?: string;
+    conversationStatus?: 'waiting' | 'active' | 'closed';
+    conversationAssigneeId?: string;
+}
+/**
+ * Payload do evento `CONVERSATION_MESSAGE_NOTIFY` — user-specific.
+ *
+ * Emitido pelo backend APENAS nos rooms `user:{userId}` dos destinatários
+ * elegíveis (não-mutados). Frontend: presença do evento é permissão pra
+ * tocar toast+som — sem lookup de cache, sem check de mute.
+ *
+ * Carrega mínimo necessário pra:
+ *   - identificar conv (conversationId)
+ *   - escolher som (conversationStatus → active=message.mp3, outros=queue.wav)
+ *   - logs/debug (direction sempre 'inbound' nesse evento)
+ */
+export interface ConversationMessageNotifyEvent {
+    conversationId: string;
+    direction: 'inbound';
+    conversationStatus: 'waiting' | 'active' | 'closed';
+    conversationAssigneeId?: string;
+    contactId?: string;
+    groupId?: string;
 }
 /**
  * Conversation Updated Event
@@ -169,6 +196,19 @@ export interface MessageReactionEvent {
     action: 'add' | 'remove';
 }
 /**
+ * Message Edited Event
+ * Emitido quando uma mensagem é editada (inbound via webhook ou outbound via UI).
+ * Frontend deve atualizar content/plainText e marcar visualmente como editada.
+ */
+export interface MessageEditedEvent {
+    conversationId: string;
+    messageId: string;
+    newContent: unknown;
+    newPlainText: string;
+    editedAt: string;
+    source: 'webhook' | 'ui';
+}
+/**
  * Channel QR Code Event
  */
 export interface ChannelQREvent {
@@ -183,6 +223,39 @@ export interface ChannelConnectedEvent {
     instanceKey: string;
     channelId: string;
     connectedAt: string;
+}
+/**
+ * Channel Account Updated Event
+ * Emitido quando o provider envia informações atualizadas da conta conectada
+ * (nome, foto, plataforma, etc.) — frontend atualiza o card em tempo real.
+ */
+export interface ChannelAccountUpdatedEvent {
+    channelId: string;
+    identifier: string;
+    accountInfo: {
+        pushName?: string;
+        verifiedName?: string;
+        businessName?: string;
+        platform?: string;
+        profilePictureUrl?: string;
+        hasProfilePicture?: boolean;
+        coverPhotoUrl?: string;
+        status?: string;
+        description?: string;
+        email?: string;
+        address?: string;
+        websites?: string[];
+        category?: string;
+        categories?: string[];
+        businessHours?: Array<{
+            dayOfWeek: string;
+            mode: string;
+            openTime?: number;
+            closeTime?: number;
+        }>;
+        timezone?: string;
+        updatedAt: string;
+    };
 }
 /**
  * User Typing Event
@@ -515,6 +588,7 @@ export interface CreditPaymentConfirmedEvent {
 }
 export interface SocketEventMap {
     [SOCKET_EVENTS.CONVERSATION_MESSAGE]: ConversationMessageEvent;
+    [SOCKET_EVENTS.CONVERSATION_MESSAGE_NOTIFY]: ConversationMessageNotifyEvent;
     [SOCKET_EVENTS.CONVERSATION_UPDATED]: ConversationUpdatedEvent;
     [SOCKET_EVENTS.CONVERSATION_DELETED]: ConversationDeletedEvent;
     [SOCKET_EVENTS.CONVERSATION_OPEN]: ConversationOpenEvent;
@@ -525,8 +599,10 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.MESSAGE_DELIVERED]: MessageDeliveredEvent;
     [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
     [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;
+    [SOCKET_EVENTS.MESSAGE_EDITED]: MessageEditedEvent;
     [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
     [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
+    [SOCKET_EVENTS.CHANNEL_ACCOUNT_UPDATED]: ChannelAccountUpdatedEvent;
     [SOCKET_EVENTS.USER_TYPING]: UserTypingEvent;
     [SOCKET_EVENTS.ASSIGNMENT_CREATED]: AssignmentCreatedEvent;
     [SOCKET_EVENTS.ASSIGNMENT_UPDATED]: AssignmentUpdatedEvent;

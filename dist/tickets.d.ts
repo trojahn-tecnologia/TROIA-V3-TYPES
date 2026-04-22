@@ -135,4 +135,26 @@ export interface TicketSLA {
     actualResponseTime?: number;
     actualResolutionTime?: number;
 }
+export interface TicketExportQuery {
+    pipelineId?: string;
+    stageId?: string;
+    assigneeId?: string;
+    assigneeIds?: string[];
+    teamId?: string;
+    status?: string;
+    priority?: 'low' | 'medium' | 'high' | 'urgent';
+    category?: string;
+    tags?: string[];
+    slaBreached?: boolean;
+    channelId?: string;
+    contactId?: string;
+    customerId?: string;
+    createdFrom?: string;
+    createdTo?: string;
+    dueFrom?: string;
+    dueTo?: string;
+    resolvedFrom?: string;
+    resolvedTo?: string;
+    search?: string;
+}
 import { PaginationQuery, ListResponse } from './common';

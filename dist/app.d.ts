@@ -84,6 +84,8 @@ export interface AppResponse {
     pwaIcons?: PwaIcons;
     createdAt: string;
     updatedAt: string;
+    hasEmailProvider: boolean;
+    hasWhatsAppProvider: boolean;
 }
 export interface AppListResponse extends ListResponse<AppResponse> {
 }

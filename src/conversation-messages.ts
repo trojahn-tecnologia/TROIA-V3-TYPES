@@ -180,8 +180,9 @@ export interface ConversationMessage {
   // Message relationships
   replyToMessageId?: string; // Message this replies to
   reply?: Partial<ConversationMessage>; // ✅ NOVO: Populated reply message via aggregation (partial to avoid circular reference)
-  forwardedFromMessageId?: string; // Original message if forwarded
+  forwardedFromMessageId?: string; // Original message if forwarded (só preenchido quando a plataforma encaminhou)
   forwarded?: Partial<ConversationMessage>; // ✅ NOVO: Populated forwarded message via aggregation (partial to avoid circular reference)
+  isForwarded?: boolean; // true se mensagem foi recebida com flag isForwarded do WhatsApp (inbound) ou encaminhada pela plataforma (outbound)
   threadId?: string; // For threaded conversations
 
   // Status and delivery
@@ -274,6 +275,7 @@ export interface CreateConversationMessageRequest {
   providerData?: Record<string, unknown>;
   replyToMessageId?: string;
   forwardedFromMessageId?: string;
+  isForwarded?: boolean; // true se a mensagem é um forward (inbound via WhatsApp ou outbound via UI)
   threadId?: string;
   internalNote?: string;
   isInternal?: boolean;
@@ -365,9 +367,25 @@ export interface EditMessageRequest {
 
 export interface ForwardMessageRequest {
   originalMessageId: string;
-  contactIds: string[]; // Backend busca/cria conversas para cada contato no mesmo canal da mensagem original
+  contactIds: string[]; // Backend busca/cria conversas para cada contato no mesmo canal da mensagem original (máx 5)
   additionalContent?: MessageContent[];
   internalNote?: string;
+}
+
+/**
+ * Resposta detalhada do forward: separa sucessos e falhas por contato,
+ * para o frontend poder mostrar ao usuário exatamente o que funcionou.
+ */
+export interface ForwardMessageResponse {
+  successful: Array<{
+    contactId: string;
+    conversationId: string;
+    messageId: string;
+  }>;
+  failed: Array<{
+    contactId: string;
+    reason: string;
+  }>;
 }
 
 export interface AddReactionRequest {
@@ -387,6 +405,9 @@ export interface MarkAsReadRequest {
 export interface DeleteMessageRequest {
   messageId: string;
   reason?: string;
+  // true: revoke no WhatsApp (apagar para todos) — só outbound com providerMessageId
+  // false/undefined: soft-delete apenas local (apagar para mim)
+  deleteForEveryone?: boolean;
 }
 
 // Message search

@@ -28,7 +28,7 @@ export interface MessageData {
     message?: string;
     messageId?: string;
     replyToMessageId?: string;
-    type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction';
+    type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction' | 'edit' | 'delete';
     media?: MediaData;
     /** @deprecated Use media.url instead */
     mediaUrl?: string;
@@ -52,6 +52,13 @@ export interface MessageData {
         emoji: string;
         targetMessageId: string;
         fromMe?: boolean;
+    };
+    edit?: {
+        targetMessageId: string;
+        newText: string;
+    };
+    revoke?: {
+        targetMessageId: string;
     };
     interactiveData?: Record<string, unknown>;
 }

@@ -33,6 +33,7 @@ export interface Contact {
     assigneeId?: string;
     teamId?: string;
     lastInteractionAt?: string;
+    mutedBy?: string[];
     createdAt: string;
     updatedAt: string;
 }

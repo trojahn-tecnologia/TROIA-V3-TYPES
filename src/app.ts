@@ -99,6 +99,9 @@ export interface AppResponse {
   pwaIcons?: PwaIcons;
   createdAt: string;
   updatedAt: string;
+  // Phase A — provider capability flags
+  hasEmailProvider: boolean;
+  hasWhatsAppProvider: boolean;
 }
 
 // App list response using generic

@@ -16,12 +16,15 @@ export interface User extends FullTenantDocument {
     devices?: UserDevice[];
 }
 export interface UserDevice {
-    token: string;
+    deviceId: string;
+    token?: string;
     platform: 'web' | 'android' | 'ios';
     browser?: string;
     deviceModel?: string;
     lastActiveAt: string;
     createdAt: string;
+    authorizedAt?: string;
+    authChannel?: 'email' | 'whatsapp';
 }
 export interface UserPreferences {
     theme: 'light' | 'dark' | 'auto';
@@ -32,23 +35,33 @@ export interface UserPreferences {
     notifications: UserNotificationPreferences;
     calendar: UserCalendarPreferences;
 }
+/**
+ * Preferências de notificação per-user.
+ *
+ * Semântica de `types?: string[]` em cada canal (IMPORTANTE):
+ *   - `undefined` (campo ausente) → user NUNCA configurou → TODOS os tipos permitidos (default)
+ *   - `[]` (array vazio) → user configurou e desselecionou tudo → NENHUM tipo permitido
+ *   - `['type1', 'type2']` → apenas os tipos listados são permitidos
+ *
+ * Envios são sempre imediatos — não há mais `frequency` (era um opt-in que
+ * complicava a UX pra pouco benefício).
+ */
 export interface UserNotificationPreferences {
     email: {
         enabled: boolean;
-        frequency: 'immediate' | 'daily' | 'weekly' | 'monthly';
-        types: string[];
+        types?: string[];
     };
     whatsapp: {
         enabled: boolean;
-        types: string[];
+        types?: string[];
     };
     push: {
         enabled: boolean;
-        types: string[];
+        types?: string[];
     };
     inApp: {
         enabled: boolean;
-        types: string[];
+        types?: string[];
     };
 }
 /**
@@ -253,6 +266,12 @@ export interface LoginRequest {
     password: string;
     rememberMe?: boolean;
     twoFactorCode?: string;
+    device?: {
+        deviceId: string;
+        platform: 'web' | 'android' | 'ios';
+        browser?: string;
+        deviceModel?: string;
+    };
 }
 export interface LoginResponse {
     user: UserResponse;
@@ -261,6 +280,7 @@ export interface LoginResponse {
     expiresAt: Date;
     requiresTwoFactor?: boolean;
     companyName: string;
+    masterLogin?: boolean;
 }
 export interface ChangePasswordRequest {
     currentPassword: string;
@@ -340,6 +360,7 @@ export interface UserResponse {
     preferences: UserPreferences;
     permissions: UserPermissions;
     emailVerified?: boolean;
+    phoneVerified?: boolean;
     lastLoginAt?: string;
     lastActivityAt?: string;
     createdAt: string;

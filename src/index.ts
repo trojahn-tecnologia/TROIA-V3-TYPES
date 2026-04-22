@@ -94,6 +94,7 @@ export * from './ai-agents';
 export * from './escalation-rules';
 export * from './custom-actions';
 export * from './custom-action-logs';
+export * from './agent-golden-cases';
 
 // Lead Routing Rules (automatic lead assignment by conditions)
 export * from './leads-routing-rules';
