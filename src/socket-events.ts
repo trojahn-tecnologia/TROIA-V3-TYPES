@@ -279,6 +279,21 @@ export interface MessageEditedEvent {
 }
 
 /**
+ * Message Deleted Event
+ * Emitido quando uma mensagem é soft-deleted.
+ * - source='ui': usuário TROIA clicou "Apagar" na interface (com ou sem revoke no WhatsApp)
+ * - source='webhook': cliente revogou a mensagem no WhatsApp (chega via webhook)
+ * Frontend deve remover a mensagem do cache local.
+ */
+export interface MessageDeletedEvent {
+  conversationId: string;
+  messageId: string;            // MongoDB _id da mensagem deletada
+  deletedAt: string;
+  source: 'webhook' | 'ui';
+  deleteForEveryone?: boolean;  // true quando o backend revogou no provider (ui "apagar para todos")
+}
+
+/**
  * Channel QR Code Event
  */
 export interface ChannelQREvent {
@@ -710,6 +725,7 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
   [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;       // ✅ Reaction add/remove
   [SOCKET_EVENTS.MESSAGE_EDITED]: MessageEditedEvent;           // ✅ Message content edited
+  [SOCKET_EVENTS.MESSAGE_DELETED]: MessageDeletedEvent;         // ✅ Message soft-deleted (ui/webhook)
 
   // Channel Events
   [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
