@@ -126,3 +126,6 @@ export * from './theme';
 
 // Credits system (balance, transactions, subscriptions, cost table)
 export * from './credits';
+
+// Transfer requests (shared across conversations, tickets, leads transfer endpoints)
+export * from './transfer';

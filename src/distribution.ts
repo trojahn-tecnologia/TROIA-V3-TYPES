@@ -147,6 +147,8 @@ export interface DistributionResult {
 export type DistributionResultReason =
   /** Usuário selecionado com sucesso. */
   | 'assigned'
+  /** Contexto (canal/funil/pipeline) está inativo — sem context-users cadastrados. */
+  | 'context_inactive'
   /** `config.enabled === false`. */
   | 'disabled'
   /** Pool vazia (nenhum attendant elegível). */

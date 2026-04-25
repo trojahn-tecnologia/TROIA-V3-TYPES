@@ -114,3 +114,5 @@ __exportStar(require("./models"), exports);
 __exportStar(require("./theme"), exports);
 // Credits system (balance, transactions, subscriptions, cost table)
 __exportStar(require("./credits"), exports);
+// Transfer requests (shared across conversations, tickets, leads transfer endpoints)
+__exportStar(require("./transfer"), exports);

@@ -65,3 +65,4 @@ export * from './internal-chat';
 export * from './models';
 export * from './theme';
 export * from './credits';
+export * from './transfer';

@@ -345,9 +345,9 @@ export interface CreditDashboardResponse {
     planId: string;
     planName: string;
     creditsPerCycle: number;
-    currentCycleStart: string;
-    currentCycleEnd: string;
-    nextRenewalAt: string;
+    currentCycleStart: string | null;
+    currentCycleEnd: string | null;
+    nextRenewalAt: string | null;
     status: CreditSubscriptionStatus;
     paymentMethod: CreditPaymentMethod;
     pendingPlanChange?: {
