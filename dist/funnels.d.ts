@@ -58,6 +58,17 @@ export interface UpdateFunnelRequest {
 }
 export type FunnelResponse = Omit<Funnel, '_id'> & {
     id: string;
+    /**
+     * Scope do usuário logado neste funil (proveniente de `funnels-users`).
+     * - `'own'` | `'team'` | `'all'`: user tem entry ativa com esse scope
+     * - `null` ou ausente: user não tem entry ativa (D-context-gate inativo)
+     *
+     * Frontend usa pra esconder/filtrar UI:
+     * - Filtro de operadores aparece se `userScope === 'team' | 'all'`
+     * - Em `'team'` o dropdown de users deve ser filtrado pra mostrar só
+     *   operadores das mesmas teams que o user logado.
+     */
+    userScope?: 'own' | 'team' | 'all' | null;
 };
 export interface FunnelQuery extends PaginationQuery {
     filters?: {

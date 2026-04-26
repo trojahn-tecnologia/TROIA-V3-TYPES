@@ -42,6 +42,15 @@ export interface UpdateTicketPipelineRequest {
 }
 export type TicketPipelineResponse = Omit<TicketPipeline, '_id'> & {
     id: string;
+    /**
+     * Scope do usuário logado neste pipeline (proveniente de `ticket-pipelines-users`).
+     * Mesma semântica de `FunnelResponse.userScope`:
+     * - `'own'` | `'team'` | `'all'`: user tem entry ativa com esse scope
+     * - `null` ou ausente: D-context-gate inativo (sem entry)
+     *
+     * Frontend usa pra esconder/filtrar UI (filtro de operadores).
+     */
+    userScope?: 'own' | 'team' | 'all' | null;
 };
 export interface TicketPipelineQuery extends PaginationQuery {
     filters?: {
