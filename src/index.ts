@@ -129,3 +129,6 @@ export * from './credits';
 
 // Transfer requests (shared across conversations, tickets, leads transfer endpoints)
 export * from './transfer';
+
+// Assignment context (canonical metadata for assignment/transfer audit log)
+export * from './assignment-context';

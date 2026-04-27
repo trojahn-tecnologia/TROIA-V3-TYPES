@@ -116,3 +116,5 @@ __exportStar(require("./theme"), exports);
 __exportStar(require("./credits"), exports);
 // Transfer requests (shared across conversations, tickets, leads transfer endpoints)
 __exportStar(require("./transfer"), exports);
+// Assignment context (canonical metadata for assignment/transfer audit log)
+__exportStar(require("./assignment-context"), exports);
