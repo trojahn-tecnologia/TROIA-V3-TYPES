@@ -132,3 +132,6 @@ export * from './transfer';
 
 // Assignment context (canonical metadata for assignment/transfer audit log)
 export * from './assignment-context';
+
+// Channel rate limits (GET/PATCH/DELETE /channels/:id/rate-limits)
+export * from './channel-rate-limits';

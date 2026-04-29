@@ -118,3 +118,5 @@ __exportStar(require("./credits"), exports);
 __exportStar(require("./transfer"), exports);
 // Assignment context (canonical metadata for assignment/transfer audit log)
 __exportStar(require("./assignment-context"), exports);
+// Channel rate limits (GET/PATCH/DELETE /channels/:id/rate-limits)
+__exportStar(require("./channel-rate-limits"), exports);

@@ -67,3 +67,4 @@ export * from './theme';
 export * from './credits';
 export * from './transfer';
 export * from './assignment-context';
+export * from './channel-rate-limits';
