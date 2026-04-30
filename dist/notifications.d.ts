@@ -63,18 +63,37 @@ export declare enum NotificationCategory {
 }
 /**
  * Canais de entrega disponíveis
+ *
+ * `sound` é canal first-class (2026-04-29): emite socket `notification:sound`
+ * dedicado pra tocar áudio no cliente. Respeita preferences igual aos outros.
  */
-export type NotificationChannel = 'email' | 'whatsapp' | 'push' | 'inApp';
+export type NotificationChannel = 'email' | 'whatsapp' | 'push' | 'inApp' | 'sound';
+/**
+ * Sound keys disponíveis pro canal `sound`. Cada chave corresponde a um
+ * arquivo de áudio em `public/assets/notifications/audio/` no frontend.
+ *
+ * O backend (`resolveSoundKey`) decide qual chave usar baseado em
+ * `notification.type` + dados auxiliares. Adicionar tipo com som novo:
+ *   1. registrar `'sound'` em NOTIFICATION_TYPE_SUPPORTED_CHANNELS
+ *   2. acrescentar entrada nesse union (se for som novo)
+ *   3. estender `resolveSoundKey` no backend
+ *   4. registrar player no mapping `players` do frontend
+ */
+export type SoundKey = 'message' | 'queue' | 'lead' | 'ticket' | 'alert';
 /**
  * Canais suportados por tipo de notificação.
  *
- * Mapa sparse: tipos AUSENTES aqui aceitam TODOS os 4 canais (default).
- * Tipos presentes ficam restritos à lista declarada — frontend esconde
- * canais não-suportados na UI de preferências e backend filtra no dispatch.
+ * Mapa sparse: tipos AUSENTES aqui aceitam o conjunto default abaixo
+ * (`['inApp', 'push', 'email', 'whatsapp']`). `'sound'` NÃO está no default —
+ * é uma allowlist conservadora: cada tipo precisa listá-lo explicitamente
+ * pra ganhar checkbox na UI de preferências e dispatch no backend. Hoje só
+ * `CONVERSATION_MESSAGE_RECEIVED` declara, mas o caminho está aberto pra
+ * outros tipos (ex: `TICKET_ASSIGNED`).
  */
 export declare const NOTIFICATION_TYPE_SUPPORTED_CHANNELS: Partial<Record<NotificationType, NotificationChannel[]>>;
 /**
- * Retorna os canais suportados pra um tipo. Default: todos os 4.
+ * Retorna os canais suportados pra um tipo. Default: 4 canais clássicos
+ * (sem `sound` — opt-in explícito via mapa).
  */
 export declare function getSupportedChannelsForType(type: NotificationType | string): NotificationChannel[];
 /**

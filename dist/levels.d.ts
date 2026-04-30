@@ -1,9 +1,28 @@
 import { FullTenantDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from './common';
-import { ModulePermission } from './modules';
+import { ModulePermission, ValidModuleId } from './modules';
+/**
+ * Tela inicial atribuída ao Level — define onde o usuário cai ao logar.
+ *
+ * Validação backend: se definida, o Level precisa ter permission `read` no
+ * módulo correspondente (mesmo request).
+ *
+ * Default no frontend (quando undefined): 'dashboards-support'.
+ *
+ * Tipo derivado de `ValidModuleId` via `Extract<>` — adicionar um valor aqui
+ * que não exista em `ValidModuleId` é erro de compilação, garantindo a
+ * invariante "toda landing page é um moduleId válido" em compile-time.
+ */
+export type LandingPage = Extract<ValidModuleId, 'dashboards-commercial' | 'dashboards-support' | 'crm' | 'chat' | 'tickets' | 'calendar' | 'contacts'>;
+/**
+ * Default usado pelo frontend quando `Level.landingPage` é undefined.
+ * Backend redirect handler também deve referenciar essa constante (Phase 2).
+ */
+export declare const DEFAULT_LANDING_PAGE: LandingPage;
 export interface Level extends FullTenantDocument {
     name: string;
     description?: string;
     permissions: Record<string, ModulePermission>;
+    landingPage?: LandingPage;
     status: ActiveStatus;
 }
 export interface LevelQuery extends PaginationQuery {
@@ -15,6 +34,7 @@ export interface LevelResponse {
     name: string;
     description?: string;
     permissions: Record<string, ModulePermission>;
+    landingPage?: LandingPage;
     companyId: string;
     appId: string;
     status: ActiveStatus;
@@ -29,10 +49,12 @@ export interface CreateLevelRequest {
     name: string;
     description?: string;
     permissions: Record<string, ModulePermission>;
+    landingPage?: LandingPage;
 }
 export interface UpdateLevelRequest {
     name?: string;
     description?: string;
     permissions?: Record<string, ModulePermission>;
+    landingPage?: LandingPage;
     status?: ActiveStatus;
 }

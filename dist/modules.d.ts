@@ -1,5 +1,5 @@
 import { AppAwareDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from './common';
-export type ModuleCategory = 'core' | 'business' | 'integration' | 'analytics' | 'automation' | 'marketing' | 'communication';
+export type ModuleCategory = 'core' | 'business' | 'integration' | 'analytics' | 'automation' | 'marketing' | 'communication' | 'dashboards';
 export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'export' | 'import' | 'attend' | 'assign';
 export type PermissionScope = 'all' | 'own' | 'team';
 /**
@@ -12,7 +12,7 @@ export type PermissionScope = 'all' | 'own' | 'team';
  *
  * Adding a new module? Update this list first!
  */
-export type ValidModuleId = 'app' | 'users' | 'companies' | 'levels' | 'plans' | 'channels' | 'integrations' | 'company-integrations' | 'payments' | 'crm' | 'chat' | 'leads' | 'customers' | 'activities' | 'conversations' | 'conversation-messages' | 'tickets' | 'assignments' | 'contacts' | 'groups' | 'group-participants' | 'funnels' | 'funnel-steps' | 'products' | 'orders' | 'campaigns' | 'audiences' | 'templates' | 'calendar' | 'calls' | 'reports' | 'knowledge' | 'company' | 'teams' | 'skills' | 'shifts' | 'services' | 'email-templates' | 'email-domains' | 'saved-cards' | 'api-keys' | 'agents' | 'tools' | 'databases' | 'workflows' | 'websites' | 'voices' | 'forms' | 'ticket-pipelines' | 'ticket-stages' | 'quality';
+export type ValidModuleId = 'app' | 'users' | 'companies' | 'levels' | 'plans' | 'channels' | 'integrations' | 'company-integrations' | 'payments' | 'crm' | 'chat' | 'leads' | 'customers' | 'activities' | 'conversations' | 'conversation-messages' | 'tickets' | 'assignments' | 'contacts' | 'groups' | 'group-participants' | 'funnels' | 'funnel-steps' | 'goals' | 'products' | 'orders' | 'campaigns' | 'audiences' | 'templates' | 'calendar' | 'calls' | 'reports' | 'knowledge' | 'company' | 'teams' | 'skills' | 'shifts' | 'services' | 'email-templates' | 'email-domains' | 'saved-cards' | 'api-keys' | 'agents' | 'tools' | 'databases' | 'workflows' | 'websites' | 'voices' | 'forms' | 'ticket-pipelines' | 'ticket-stages' | 'dashboards-commercial' | 'dashboards-support' | 'quality';
 export interface Module extends AppAwareDocument {
     name: string;
     displayName: string;

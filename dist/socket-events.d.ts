@@ -3,6 +3,7 @@
  *
  * Prevents event name mismatches and ensures type safety for socket events
  */
+import type { SoundKey } from './notifications';
 export declare const SOCKET_EVENTS: {
     readonly CONVERSATION_MESSAGE: "conversation:message";
     readonly CONVERSATION_UPDATED: "conversation:updated";
@@ -40,6 +41,7 @@ export declare const SOCKET_EVENTS: {
     readonly DATABASE_SYNC_FAILED: "database:sync-failed";
     readonly NOTIFICATION_NEW: "notification:new";
     readonly NOTIFICATION_READ: "notification:read";
+    readonly NOTIFICATION_SOUND: "notification:sound";
     readonly TEMPLATE_STATUS_UPDATED: "template:status-updated";
     readonly AI_AGENT_EXECUTED: "ai:agent:executed";
     readonly CAMPAIGN_MESSAGE_STATUS: "campaign:message-status";
@@ -129,6 +131,21 @@ export interface ConversationMessageNotifyEvent {
     conversationAssigneeId?: string;
     contactId?: string;
     groupId?: string;
+}
+/**
+ * Payload do evento `NOTIFICATION_SOUND` — user-specific.
+ *
+ * Minimalista: o backend resolve a `soundKey` via `resolveSoundKey` (mapping
+ * notificationType → SoundKey) ANTES do dispatch. O frontend só executa via
+ * mapping `playSoundByKey`. Sem `notificationId`, `notificationType` ou
+ * `data` — observabilidade vive no audit `notification.deliveryStatus[]` no
+ * Mongo, não no payload do socket.
+ *
+ * Adicionar som novo: estender `SoundKey` em `notifications.ts` +
+ * `resolveSoundKey` (backend) + `players` (frontend).
+ */
+export interface SoundNotificationEvent {
+    soundKey: SoundKey;
 }
 /**
  * Conversation Updated Event
@@ -643,6 +660,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.TEAM_USER_OFFLINE]: TeamUserOfflineEvent;
     [SOCKET_EVENTS.TEAM_UNREAD_COUNT]: TeamUnreadCountEvent;
     [SOCKET_EVENTS.CREDIT_PAYMENT_CONFIRMED]: CreditPaymentConfirmedEvent;
+    [SOCKET_EVENTS.NOTIFICATION_SOUND]: SoundNotificationEvent;
 }
 export declare const SOCKET_ROOMS: {
     /**

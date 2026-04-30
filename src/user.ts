@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { TenantAwareDocument, FullTenantDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
+import type { LevelResponse } from './levels';
 
 export interface User extends FullTenantDocument {
   email: string;
@@ -71,6 +72,10 @@ export interface UserNotificationPreferences {
     types?: string[];
   };
   inApp: {
+    enabled: boolean;
+    types?: string[];
+  };
+  sound: {
     enabled: boolean;
     types?: string[];
   };
@@ -408,6 +413,7 @@ export interface UserResponse {
   appId: string;
   status: ActiveStatus;
   levelId?: string;
+  level?: LevelResponse | null;   // populated in /users/me and /users/login
   preferences: UserPreferences;
   permissions: UserPermissions;
   emailVerified?: boolean;

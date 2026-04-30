@@ -4,6 +4,8 @@
  * Prevents event name mismatches and ensures type safety for socket events
  */
 
+import type { SoundKey } from './notifications';
+
 // ============================================================================
 // EVENT NAMES (String Literals for Type Safety)
 // ============================================================================
@@ -68,6 +70,7 @@ export const SOCKET_EVENTS = {
   // Notification Events
   NOTIFICATION_NEW: 'notification:new',
   NOTIFICATION_READ: 'notification:read',
+  NOTIFICATION_SOUND: 'notification:sound',     // ✅ Canal `sound` first-class — backend emite quando preferences permitem
 
   // Template Events
   TEMPLATE_STATUS_UPDATED: 'template:status-updated',
@@ -191,6 +194,22 @@ export interface ConversationMessageNotifyEvent {
   conversationAssigneeId?: string;
   contactId?: string;
   groupId?: string;
+}
+
+/**
+ * Payload do evento `NOTIFICATION_SOUND` — user-specific.
+ *
+ * Minimalista: o backend resolve a `soundKey` via `resolveSoundKey` (mapping
+ * notificationType → SoundKey) ANTES do dispatch. O frontend só executa via
+ * mapping `playSoundByKey`. Sem `notificationId`, `notificationType` ou
+ * `data` — observabilidade vive no audit `notification.deliveryStatus[]` no
+ * Mongo, não no payload do socket.
+ *
+ * Adicionar som novo: estender `SoundKey` em `notifications.ts` +
+ * `resolveSoundKey` (backend) + `players` (frontend).
+ */
+export interface SoundNotificationEvent {
+  soundKey: SoundKey;
 }
 
 /**
@@ -776,6 +795,9 @@ export interface SocketEventMap {
 
   // Credit Payment Events
   [SOCKET_EVENTS.CREDIT_PAYMENT_CONFIRMED]: CreditPaymentConfirmedEvent;
+
+  // Notification Sound (canal `sound` first-class)
+  [SOCKET_EVENTS.NOTIFICATION_SOUND]: SoundNotificationEvent;
 }
 
 // ============================================================================

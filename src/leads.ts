@@ -41,6 +41,8 @@ export interface Lead {
   priority: 'low' | 'medium' | 'high' | 'urgent' | (string & {});
   temperature: 'cold' | 'warm' | 'hot' | (string & {});
   qualifyStatus: 'pending' | 'qualified' | 'disqualified' | (string & {});
+  /** Timestamp do último change em qualifyStatus — usado por métricas de qualificação no dashboard. */
+  qualifyStatusChangedAt?: Date | string;
 
   // Sales funnel
   funnelId?: string;

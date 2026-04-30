@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { AppAwareDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from './common';
 
-export type ModuleCategory = 'core' | 'business' | 'integration' | 'analytics' | 'automation' | 'marketing' | 'communication';
+export type ModuleCategory = 'core' | 'business' | 'integration' | 'analytics' | 'automation' | 'marketing' | 'communication' | 'dashboards';
 export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'export' | 'import' | 'attend' | 'assign';
 export type PermissionScope = 'all' | 'own' | 'team';
 
@@ -42,6 +42,7 @@ export type ValidModuleId =
   | 'group-participants'
   | 'funnels'
   | 'funnel-steps'
+  | 'goals'
 
   // Feature modules
   | 'products'
@@ -71,6 +72,11 @@ export type ValidModuleId =
   | 'forms'
   | 'ticket-pipelines'
   | 'ticket-stages'
+
+  // Dashboards modules
+  | 'dashboards-commercial'
+  | 'dashboards-support'
+
   | 'quality';
 
 export interface Module extends AppAwareDocument {

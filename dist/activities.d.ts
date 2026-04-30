@@ -218,3 +218,9 @@ export interface MessageActivityData {
     actorId?: string;
 }
 import { PaginationQuery, ListResponse } from './common';
+export declare const SALES_ACTIVITY_ACTIONS: {
+    readonly CALL_MADE: "Ligação realizada";
+    readonly LEAD_QUALIFIED: "Lead qualificado";
+    readonly PROPOSAL_SENT: "Proposta enviada";
+};
+export type SalesActivityAction = typeof SALES_ACTIVITY_ACTIONS[keyof typeof SALES_ACTIVITY_ACTIONS];

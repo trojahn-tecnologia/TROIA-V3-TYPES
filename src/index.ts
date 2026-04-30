@@ -135,3 +135,9 @@ export * from './assignment-context';
 
 // Channel rate limits (GET/PATCH/DELETE /channels/:id/rate-limits)
 export * from './channel-rate-limits';
+
+// Goals module (Phase 3 — commercial dashboard targets for users/teams/company)
+export * from './goals';
+
+// Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
+export * from './dashboards-commercial';

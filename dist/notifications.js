@@ -83,15 +83,19 @@ var NotificationCategory;
 /**
  * Canais suportados por tipo de notificação.
  *
- * Mapa sparse: tipos AUSENTES aqui aceitam TODOS os 4 canais (default).
- * Tipos presentes ficam restritos à lista declarada — frontend esconde
- * canais não-suportados na UI de preferências e backend filtra no dispatch.
+ * Mapa sparse: tipos AUSENTES aqui aceitam o conjunto default abaixo
+ * (`['inApp', 'push', 'email', 'whatsapp']`). `'sound'` NÃO está no default —
+ * é uma allowlist conservadora: cada tipo precisa listá-lo explicitamente
+ * pra ganhar checkbox na UI de preferências e dispatch no backend. Hoje só
+ * `CONVERSATION_MESSAGE_RECEIVED` declara, mas o caminho está aberto pra
+ * outros tipos (ex: `TICKET_ASSIGNED`).
  */
 exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS = {
-    [NotificationType.CONVERSATION_MESSAGE_RECEIVED]: ['push'],
+    [NotificationType.CONVERSATION_MESSAGE_RECEIVED]: ['push', 'sound'],
 };
 /**
- * Retorna os canais suportados pra um tipo. Default: todos os 4.
+ * Retorna os canais suportados pra um tipo. Default: 4 canais clássicos
+ * (sem `sound` — opt-in explícito via mapa).
  */
 function getSupportedChannelsForType(type) {
     const restricted = exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS[type];

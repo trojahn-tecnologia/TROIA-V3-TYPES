@@ -60,6 +60,7 @@ exports.SOCKET_EVENTS = {
     // Notification Events
     NOTIFICATION_NEW: 'notification:new',
     NOTIFICATION_READ: 'notification:read',
+    NOTIFICATION_SOUND: 'notification:sound', // ✅ Canal `sound` first-class — backend emite quando preferences permitem
     // Template Events
     TEMPLATE_STATUS_UPDATED: 'template:status-updated',
     // AI Agent Events

@@ -120,3 +120,7 @@ __exportStar(require("./transfer"), exports);
 __exportStar(require("./assignment-context"), exports);
 // Channel rate limits (GET/PATCH/DELETE /channels/:id/rate-limits)
 __exportStar(require("./channel-rate-limits"), exports);
+// Goals module (Phase 3 — commercial dashboard targets for users/teams/company)
+__exportStar(require("./goals"), exports);
+// Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
+__exportStar(require("./dashboards-commercial"), exports);

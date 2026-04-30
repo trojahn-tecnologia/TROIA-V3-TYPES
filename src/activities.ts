@@ -314,3 +314,21 @@ export interface MessageActivityData {
 
 // Import types
 import { PaginationQuery, ListResponse } from './common';
+
+// ============================================================================
+// Sales Activity Actions — usados pelo módulo `goals` (Phase 3 dashboards)
+// ============================================================================
+//
+// Constants padronizadas para registrar ações de vendas no módulo `activities`.
+// O dashboard comercial conta `Activity` documents filtrando por `action` para
+// apurar atingimento das metas (calls, meetings, proposalsSent).
+//
+// Fluxo típico: services de domínio (calls, calendar, leads) emitem activities
+// com `action: SALES_ACTIVITY_ACTIONS.CALL_MADE` ao registrar a ocorrência.
+export const SALES_ACTIVITY_ACTIONS = {
+  CALL_MADE: 'Ligação realizada',
+  LEAD_QUALIFIED: 'Lead qualificado',
+  PROPOSAL_SENT: 'Proposta enviada',
+} as const;
+
+export type SalesActivityAction = typeof SALES_ACTIVITY_ACTIONS[keyof typeof SALES_ACTIVITY_ACTIONS];
