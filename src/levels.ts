@@ -18,6 +18,7 @@ export type LandingPage = Extract<
   ValidModuleId,
   | 'dashboards-commercial'
   | 'dashboards-support'
+  | 'dashboards-marketing'
   | 'crm'
   | 'chat'
   | 'tickets'

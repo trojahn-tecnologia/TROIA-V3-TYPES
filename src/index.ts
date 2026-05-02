@@ -141,3 +141,7 @@ export * from './goals';
 
 // Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
 export * from './dashboards-commercial';
+
+// Marketing Dashboard module — request/response types for /api/dashboards/marketing
+// (Source/Medium/Channel enums vivem em ./leads — single source of truth canônica)
+export * from './dashboards-marketing';

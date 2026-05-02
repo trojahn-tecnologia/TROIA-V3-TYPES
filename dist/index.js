@@ -124,3 +124,6 @@ __exportStar(require("./channel-rate-limits"), exports);
 __exportStar(require("./goals"), exports);
 // Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
 __exportStar(require("./dashboards-commercial"), exports);
+// Marketing Dashboard module — request/response types for /api/dashboards/marketing
+// (Source/Medium/Channel enums vivem em ./leads — single source of truth canônica)
+__exportStar(require("./dashboards-marketing"), exports);

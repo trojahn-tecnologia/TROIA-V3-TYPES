@@ -12,7 +12,7 @@ import { ModulePermission, ValidModuleId } from './modules';
  * que não exista em `ValidModuleId` é erro de compilação, garantindo a
  * invariante "toda landing page é um moduleId válido" em compile-time.
  */
-export type LandingPage = Extract<ValidModuleId, 'dashboards-commercial' | 'dashboards-support' | 'crm' | 'chat' | 'tickets' | 'calendar' | 'contacts'>;
+export type LandingPage = Extract<ValidModuleId, 'dashboards-commercial' | 'dashboards-support' | 'dashboards-marketing' | 'crm' | 'chat' | 'tickets' | 'calendar' | 'contacts'>;
 /**
  * Default usado pelo frontend quando `Level.landingPage` é undefined.
  * Backend redirect handler também deve referenciar essa constante (Phase 2).

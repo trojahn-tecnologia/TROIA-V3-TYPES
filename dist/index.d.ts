@@ -70,3 +70,4 @@ export * from './assignment-context';
 export * from './channel-rate-limits';
 export * from './goals';
 export * from './dashboards-commercial';
+export * from './dashboards-marketing';

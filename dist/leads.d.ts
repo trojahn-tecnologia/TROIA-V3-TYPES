@@ -1,3 +1,24 @@
+/** Plataforma/origem de marketing do lead (espelha campos UTM). */
+export declare const LEAD_SOURCES: readonly ["meta", "google", "tiktok", "linkedin", "microsoft", "organic", "referral", "email", "offline", "partner", "outbound", "direct"];
+export type LeadSource = typeof LEAD_SOURCES[number];
+/** Tipo de tráfego (orgânico vs pago). */
+export declare const LEAD_MEDIUMS: readonly ["organic", "paid"];
+export type LeadMedium = typeof LEAD_MEDIUMS[number];
+/** Sub-canal semântico de captura (NÃO confundir com Channel collection / channelId). */
+export declare const LEAD_CHANNELS: readonly ["whatsapp", "instagram", "facebook", "messenger", "telegram", "email", "website", "phone", "google", "youtube", "tiktok", "linkedin", "bing", "other"];
+export type LeadChannel = typeof LEAD_CHANNELS[number];
+/** Labels pt-BR canônicos por enum — único lugar onde a string é definida. */
+export declare const LEAD_SOURCE_LABELS: Record<LeadSource, string>;
+export declare const LEAD_MEDIUM_LABELS: Record<LeadMedium, string>;
+export declare const LEAD_CHANNEL_LABELS: Record<LeadChannel, string>;
+/** Helpers — retornam label canônico ou o próprio valor (defensivo contra valores legacy). */
+export declare const getLeadSourceLabel: (s: string) => string;
+export declare const getLeadMediumLabel: (m: string) => string;
+export declare const getLeadChannelLabel: (c: string) => string;
+/** Type guards. */
+export declare const isLeadSource: (v: string) => v is LeadSource;
+export declare const isLeadMedium: (v: string) => v is LeadMedium;
+export declare const isLeadChannel: (v: string) => v is LeadChannel;
 export interface StepHistoryEntry {
     stepId: string;
     stepName?: string;
@@ -17,9 +38,9 @@ export interface Lead {
     score: number;
     segment: string;
     description?: string;
-    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
-    medium?: 'organic' | 'paid';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
+    source?: LeadSource;
+    medium?: LeadMedium;
+    channel?: LeadChannel;
     channelId?: string;
     type?: string;
     status: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
@@ -65,9 +86,9 @@ export interface CreateLeadRequest {
     score?: number;
     segment: string;
     description?: string;
-    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
-    medium?: 'organic' | 'paid';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
+    source?: LeadSource;
+    medium?: LeadMedium;
+    channel?: LeadChannel;
     channelId?: string;
     type?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
@@ -98,9 +119,9 @@ export interface UpdateLeadRequest {
     score?: number;
     segment?: string;
     description?: string;
-    source?: 'meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct';
-    medium?: 'organic' | 'paid';
-    channel?: 'whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other';
+    source?: LeadSource;
+    medium?: LeadMedium;
+    channel?: LeadChannel;
     channelId?: string;
     type?: string;
     status?: 'new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost' | (string & {});
@@ -175,9 +196,9 @@ export interface LeadQuery extends PaginationQuery {
     filters?: {
         contactId?: string;
         segment?: string | string[];
-        source?: ('meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct') | ('meta' | 'google' | 'tiktok' | 'linkedin' | 'microsoft' | 'organic' | 'referral' | 'email' | 'offline' | 'partner' | 'outbound' | 'direct')[];
-        medium?: ('organic' | 'paid') | ('organic' | 'paid')[];
-        channel?: ('whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other') | ('whatsapp' | 'instagram' | 'facebook' | 'messenger' | 'telegram' | 'email' | 'website' | 'phone' | 'google' | 'youtube' | 'tiktok' | 'linkedin' | 'bing' | 'other')[];
+        source?: LeadSource | LeadSource[];
+        medium?: LeadMedium | LeadMedium[];
+        channel?: LeadChannel | LeadChannel[];
         origin?: string | string[];
         channelId?: string | string[];
         status?: ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost') | ('new' | 'contacted' | 'qualified' | 'disqualified' | 'converted' | 'lost')[];
