@@ -11,6 +11,12 @@ export interface LeadRoutingCondition {
 /**
  * Lead Routing Rule - automatic lead assignment based on field conditions
  * Rules are linked to funnels and evaluated BEFORE the Lottery Engine
+ *
+ * NOTA HISTÓRICA: até a migration 2026-05-03-001 existia também o campo
+ * legacy `assigneeId: string` (single user, predecessor de `assigneeIds`).
+ * Foi removido — `assigneeIds` (array) é fonte única. Não confundir com
+ * `LeadRoutingEvaluationResult.assigneeId` abaixo, que é o user
+ * *escolhido* após rotação (output da avaliação, semântica diferente).
  */
 export interface LeadRoutingRule {
     _id?: ObjectId | undefined;
@@ -18,7 +24,6 @@ export interface LeadRoutingRule {
     name: string;
     description?: string | undefined;
     funnelId: string;
-    assigneeId: string;
     assigneeIds: string[];
     /**
      * Contador monotônico de rotação incrementado atomicamente via `$inc`.
@@ -44,8 +49,7 @@ export interface CreateLeadRoutingRuleRequest {
     name: string;
     description?: string | undefined;
     funnelId: string;
-    assigneeId?: string | undefined;
-    assigneeIds?: string[] | undefined;
+    assigneeIds: string[];
     conditions: LeadRoutingCondition[];
     priority: number;
 }
@@ -53,13 +57,17 @@ export interface UpdateLeadRoutingRuleRequest {
     name?: string | undefined;
     description?: string | undefined;
     funnelId?: string | undefined;
-    assigneeId?: string | undefined;
     assigneeIds?: string[] | undefined;
     conditions?: LeadRoutingCondition[] | undefined;
     priority?: number | undefined;
 }
 /**
- * Result of evaluating routing rules against lead data
+ * Result of evaluating routing rules against lead data.
+ *
+ * `assigneeId` aqui é o user *escolhido* após a rotação sobre `assigneeIds`
+ * — semântica completamente diferente do campo legacy removido em
+ * 2026-05-03-001. Esse campo é parte do contrato com o caller (leads
+ * service) e PERMANECE.
  */
 export interface LeadRoutingEvaluationResult {
     assigneeId: string;
