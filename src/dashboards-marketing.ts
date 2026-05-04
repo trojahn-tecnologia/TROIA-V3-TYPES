@@ -34,14 +34,19 @@ export interface MarketingDashboardQuery {
 }
 
 
-export type FunnelStageKey = 'visitors' | 'leads' | 'opportunities' | 'won';
+export type FunnelStageKey = 'visitors' | 'leads' | 'proposals' | 'won';
 
 export interface FunnelStageScore {
   key: FunnelStageKey;
   label: string;
   count: number;
-  /** 0-100. Saúde da etapa. */
-  score: number;
+  /**
+   * 0-100. Saúde da etapa. `null` quando o estágio não tem base sólida pra
+   * scoring — atualmente Visitantes (proxy) e Leads (estágio inicial).
+   * Score só populado em Propostas e Ganhos, onde existe transição de entrada
+   * mensurável (Lead→Proposta e Proposta→Ganho).
+   */
+  score: number | null;
   /** % de conversão para o próximo estágio. `null` no estágio final. */
   conversionToNext: number | null;
   /** Meta de conversão (%). `null` quando não há meta configurada. */
@@ -67,8 +72,9 @@ export interface ChannelFunnelStages {
   visitors: number;
   leads: number;
   leadsConvPct: number;
-  opportunities: number;
-  oppsConvPct: number;
+  /** Leads distintos que receberam activity `'Proposta enviada'` no período. */
+  proposals: number;
+  proposalsConvPct: number;
   won: number;
   wonConvPct: number;
 }
@@ -97,12 +103,14 @@ export interface CampaignMasterRow {
   source: MarketingSource;
   spend: number;
   leads: number;
+  /** Leads com `qualifyStatus='qualified'` no período. Coluna informativa. */
   qualified: number;
   leadToQualifiedPct: number;
-  opportunities: number;
-  qualifiedToOppPct: number;
+  /** Leads distintos com activity `'Proposta enviada'` no período. */
+  proposals: number;
+  qualifiedToProposalsPct: number;
   won: number;
-  oppToWonPct: number;
+  proposalsToWonPct: number;
   revenue: number;
   roas: number;
   lastActivityIso: string;
@@ -111,8 +119,8 @@ export interface CampaignMasterRow {
 
 export type LeakageTransitionKey =
   | 'visitors_to_leads'
-  | 'leads_to_opportunities'
-  | 'opportunities_to_won';
+  | 'leads_to_proposals'
+  | 'proposals_to_won';
 
 export interface LeakageStage {
   key: FunnelStageKey;
@@ -132,8 +140,8 @@ export interface LeakageReason {
 
 export interface LeakageReasonsByTransition {
   visitors_to_leads: LeakageReason[];
-  leads_to_opportunities: LeakageReason[];
-  opportunities_to_won: LeakageReason[];
+  leads_to_proposals: LeakageReason[];
+  proposals_to_won: LeakageReason[];
 }
 
 export interface LeakageCascade {
@@ -152,8 +160,8 @@ export interface ChannelLeakage {
   source: MarketingSource;
   label: string;
   visitToLeadLossPct: number;
-  leadToOppLossPct: number;
-  oppToWonLossPct: number;
+  leadToProposalsLossPct: number;
+  proposalsToWonLossPct: number;
   totalLost: number;
   diagnosis: ChannelLeakageDiagnosisKey;
   diagnosisLabel: string;
@@ -162,7 +170,8 @@ export interface ChannelLeakage {
 export interface MarketingDashboardKpis {
   visitors: KpiValue;
   leads: KpiValue;
-  opportunities: KpiValue;
+  /** Leads distintos com activity `'Proposta enviada'` (SALES_ACTIVITY_ACTIONS.PROPOSAL_SENT) no período. */
+  proposals: KpiValue;
   won: KpiValue;
   revenue: KpiValue;
 }
