@@ -89,6 +89,8 @@ __exportStar(require("./audiences"), exports);
 __exportStar(require("./databases"), exports);
 // AI Agents modules (Phase 1)
 __exportStar(require("./ai-agents"), exports);
+__exportStar(require("./agent-analytics"), exports);
+__exportStar(require("./agent-prompt-tags"), exports);
 __exportStar(require("./escalation-rules"), exports);
 __exportStar(require("./custom-actions"), exports);
 __exportStar(require("./custom-action-logs"), exports);
@@ -127,3 +129,6 @@ __exportStar(require("./dashboards-commercial"), exports);
 // Marketing Dashboard module — request/response types for /api/dashboards/marketing
 // (Source/Medium/Channel enums vivem em ./leads — single source of truth canônica)
 __exportStar(require("./dashboards-marketing"), exports);
+// Agent Evaluators catalog (labels, descriptions, tier, aliases) — single
+// source of truth pro sistema interno de qualidade dos agentes IA
+__exportStar(require("./agent-evaluators"), exports);

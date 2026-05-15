@@ -91,6 +91,8 @@ export * from './databases';
 
 // AI Agents modules (Phase 1)
 export * from './ai-agents';
+export * from './agent-analytics';
+export * from './agent-prompt-tags';
 export * from './escalation-rules';
 export * from './custom-actions';
 export * from './custom-action-logs';
@@ -145,3 +147,7 @@ export * from './dashboards-commercial';
 // Marketing Dashboard module — request/response types for /api/dashboards/marketing
 // (Source/Medium/Channel enums vivem em ./leads — single source of truth canônica)
 export * from './dashboards-marketing';
+
+// Agent Evaluators catalog (labels, descriptions, tier, aliases) — single
+// source of truth pro sistema interno de qualidade dos agentes IA
+export * from './agent-evaluators';

@@ -184,6 +184,8 @@ export interface AIAgent {
   createdAt: Date | string;
   updatedAt: Date | string;
   deletedAt?: Date | string;
+  /** Flag set by migration 2026-05-11-002 when systemPrompt is not in 5-section canonical format. UI can use this to suggest restructure. */
+  requiresSectionRestructure?: boolean;
 }
 
 export interface AIAgentTriggers {
