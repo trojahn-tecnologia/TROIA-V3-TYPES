@@ -289,25 +289,52 @@ export const AI_MODELS: AIModelDefinition[] = [
 
   // ═══════════════════════════════════════════════════════════════
   // DeepSeek
+  // IDs validados contra POST /chat/completions em 2026-05-17.
+  // A API aceita 4 IDs: 2 explícitos (v4-pro, v4-flash) + 2 aliases
+  // (deepseek-chat → V4-Pro, deepseek-reasoner → V4-Pro c/ thinking).
+  // GET /models só lista os 2 explícitos, mas POST /chat/completions
+  // aceita os 4. NÃO adicionar IDs sem validar via POST.
   // ═══════════════════════════════════════════════════════════════
   {
-    id: 'deepseek-chat',
-    name: 'DeepSeek V3.2',
+    id: 'deepseek-v4-pro',
+    name: 'DeepSeek V4-Pro',
     provider: 'deepseek',
     features: ['tools'],
-    highlight: 'Mais barato com tool use',
-    pricing: { input: 0.28, output: 0.42 },
-    contextWindow: 65_536,
+    highlight: 'Top open-weight 2026 — preço promocional até 31/mai/2026',
+    // Promo: $0.435 in / $0.87 out até 2026-05-31 15:59 UTC.
+    // Após essa data: ajustar para { input: 1.74, output: 3.48 }.
+    pricing: { input: 0.435, output: 0.87 },
+    contextWindow: 1_000_000,
+    maxOutputTokens: 8_192,
+  },
+  {
+    id: 'deepseek-v4-flash',
+    name: 'DeepSeek V4-Flash',
+    provider: 'deepseek',
+    features: ['tools'],
+    highlight: 'Variante leve e barata — fallback se Pro tiver downtime',
+    pricing: { input: 0.14, output: 0.28 },
+    contextWindow: 1_000_000,
+    maxOutputTokens: 8_192,
+  },
+  {
+    id: 'deepseek-chat',
+    name: 'DeepSeek Chat (alias V4-Pro)',
+    provider: 'deepseek',
+    features: ['tools'],
+    highlight: 'Alias estável — aponta sempre pro modelo chat mais recente',
+    pricing: { input: 0.435, output: 0.87 },
+    contextWindow: 1_000_000,
     maxOutputTokens: 8_192,
   },
   {
     id: 'deepseek-reasoner',
-    name: 'DeepSeek R1',
+    name: 'DeepSeek Reasoner (thinking mode)',
     provider: 'deepseek',
     features: ['tools', 'reasoning'],
-    highlight: 'Raciocínio profundo, custo baixo',
-    pricing: { input: 0.50, output: 2.18 },
-    contextWindow: 65_536,
+    highlight: 'Modo de raciocínio profundo — usa thinking tokens (mais lento + caro)',
+    pricing: { input: 0.435, output: 0.87 },
+    contextWindow: 1_000_000,
     maxOutputTokens: 8_192,
   },
 
@@ -358,17 +385,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     maxOutputTokens: 32_768,
     deprecated: true,
   },
-  {
-    id: 'gpt-5-turbo',
-    name: 'GPT-5 Turbo',
-    provider: 'openai',
-    features: ['pdf', 'image', 'tools'],
-    highlight: 'Legado',
-    pricing: { input: 1.50, output: 6.00 },
-    contextWindow: 256_000,
-    maxOutputTokens: 32_768,
-    deprecated: true,
-  },
+  // gpt-5-turbo removido em 2026-05-17 — não existe na API OpenAI (era ID inventado/obsoleto).
   {
     id: 'claude-sonnet-4-20250514',
     name: 'Claude Sonnet 4',
@@ -391,28 +408,8 @@ export const AI_MODELS: AIModelDefinition[] = [
     maxOutputTokens: 64_000,
     deprecated: true,
   },
-  {
-    id: 'claude-3-5-sonnet-latest',
-    name: 'Claude 3.5 Sonnet',
-    provider: 'anthropic',
-    features: ['pdf', 'image', 'tools'],
-    highlight: 'Legado',
-    pricing: { input: 3.00, output: 15.00 },
-    contextWindow: 200_000,
-    maxOutputTokens: 8_192,
-    deprecated: true,
-  },
-  {
-    id: 'claude-3-5-haiku-latest',
-    name: 'Claude 3.5 Haiku',
-    provider: 'anthropic',
-    features: ['tools'],
-    highlight: 'Legado',
-    pricing: { input: 1.00, output: 5.00 },
-    contextWindow: 200_000,
-    maxOutputTokens: 8_192,
-    deprecated: true,
-  },
+  // claude-3-5-sonnet-latest e claude-3-5-haiku-latest removidos em 2026-05-17
+  // — IDs com sufixo `-latest` não são aceitos pela API atual da Anthropic.
 ];
 
 // ============================================================================

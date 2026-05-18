@@ -1,5 +1,5 @@
 import { PaginationQuery, ListResponse, GenericQueryOptions, ExtendedStatus } from './common';
-import { ProviderConfig, CreateProviderIntegrationRequest, ProviderId } from './providers';
+import { ProviderConfig, CreateProviderIntegrationRequest, ProviderId, ProviderCapability } from './providers';
 
 /**
  * App Integrations Types (Core System Level)
@@ -56,6 +56,7 @@ export interface UpdateAppIntegrationRequest {
   config?: Record<string, unknown>;
   status?: 'active' | 'inactive' | 'error' | 'pending';
   isDefault?: boolean;
+  capabilities?: ProviderCapability[]; // ✅ Subset opt-in das capabilities suportadas pelo provider
   lastSyncAt?: string;            // ✅ ISO 8601 timestamp
   syncInterval?: number;          // ✅ Override sync interval (in minutes)
   lastError?: string;

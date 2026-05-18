@@ -278,6 +278,9 @@ export declare enum ProviderCapability {
     VECTOR_STORAGE = "vector_storage",
     AI_TEXT_GENERATION = "ai_text_generation",// LLM text generation (GPT, Claude, etc.)
     AI_CHAT_COMPLETION = "ai_chat_completion",// Chat completion with conversation history
+    AI_INTERNAL_JUDGE = "ai_internal_judge",// LlmJudgeService (10 evaluators), judge-llm tool, quality-test, ab-test
+    AI_INTERNAL_PROCESSING = "ai_internal_processing",// narration-cleaner, summarizer, lead-processor, wizard draft, workflow modifier
+    AI_INTERNAL_ANALYTICS = "ai_internal_analytics",// gap classifier/resolution, insights, topic-tagger, prompt coach/migration/rewriter, training
     TEXT_TO_SPEECH = "text_to_speech",// Convert text to audio (TTS)
     SPEECH_TO_TEXT = "speech_to_text",// Convert audio to text (STT/Whisper)
     TEMPLATE_MANAGEMENT = "template_management",// Submit, approve, manage templates

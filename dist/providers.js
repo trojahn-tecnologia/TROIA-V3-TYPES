@@ -196,6 +196,11 @@ var ProviderCapability;
     ProviderCapability["VECTOR_STORAGE"] = "vector_storage";
     ProviderCapability["AI_TEXT_GENERATION"] = "ai_text_generation";
     ProviderCapability["AI_CHAT_COMPLETION"] = "ai_chat_completion";
+    // Internal subagents (services da plataforma TROIA que usam LLM, agrupados por afinidade funcional).
+    // Cada tenant marca essas capabilities na integration que quer usar para cada grupo.
+    ProviderCapability["AI_INTERNAL_JUDGE"] = "ai_internal_judge";
+    ProviderCapability["AI_INTERNAL_PROCESSING"] = "ai_internal_processing";
+    ProviderCapability["AI_INTERNAL_ANALYTICS"] = "ai_internal_analytics";
     ProviderCapability["TEXT_TO_SPEECH"] = "text_to_speech";
     ProviderCapability["SPEECH_TO_TEXT"] = "speech_to_text";
     // Template Management

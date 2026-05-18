@@ -1,5 +1,5 @@
 import { PaginationQuery, ListResponse, GenericQueryOptions, ExtendedStatus } from './common';
-import { CreateProviderIntegrationRequest } from './providers';
+import { CreateProviderIntegrationRequest, ProviderCapability } from './providers';
 /**
  * App Integrations Types (Core System Level)
  * Used for system-level integrations like password reset email, system notifications, etc.
@@ -43,6 +43,7 @@ export interface UpdateAppIntegrationRequest {
     config?: Record<string, unknown>;
     status?: 'active' | 'inactive' | 'error' | 'pending';
     isDefault?: boolean;
+    capabilities?: ProviderCapability[];
     lastSyncAt?: string;
     syncInterval?: number;
     lastError?: string;
