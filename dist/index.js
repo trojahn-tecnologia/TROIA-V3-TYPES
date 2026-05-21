@@ -132,3 +132,5 @@ __exportStar(require("./dashboards-marketing"), exports);
 // Agent Evaluators catalog (labels, descriptions, tier, aliases) — single
 // source of truth pro sistema interno de qualidade dos agentes IA
 __exportStar(require("./agent-evaluators"), exports);
+// Widget configuration (chat widget + hosted page)
+__exportStar(require("./widget"), exports);

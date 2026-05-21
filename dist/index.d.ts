@@ -74,3 +74,4 @@ export * from './goals';
 export * from './dashboards-commercial';
 export * from './dashboards-marketing';
 export * from './agent-evaluators';
+export * from './widget';

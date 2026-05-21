@@ -151,3 +151,6 @@ export * from './dashboards-marketing';
 // Agent Evaluators catalog (labels, descriptions, tier, aliases) — single
 // source of truth pro sistema interno de qualidade dos agentes IA
 export * from './agent-evaluators';
+
+// Widget configuration (chat widget + hosted page)
+export * from './widget';
