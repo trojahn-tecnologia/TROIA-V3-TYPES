@@ -135,6 +135,10 @@ export type ChannelResponse = Omit<Channel, '_id' | 'createdAt' | 'updatedAt' | 
     integration?: {
         instanceKey: string | null;
         instanceToken: string | null;
+        /** WhatsApp Business — modo de conexão (intent do usuário). */
+        mode?: 'standalone' | 'coexistence';
+        /** WhatsApp Business — accountMode confirmado pela Meta. */
+        accountMode?: 'STANDALONE' | 'COEXISTENCE';
     };
     /**
      * Métricas agregadas do canal — populadas no list/getById.

@@ -23,6 +23,13 @@ export interface WhatsAppConfig {
   whatsappBusinessAccountId: string;
   phoneNumberId: string;
   webhookToken?: string;
+  // Coexistence mode (NUNCA add to Channel — provider-specific Meta concept)
+  /** Intent — escolha do usuário no onboarding via Embedded Signup. */
+  mode?: 'standalone' | 'coexistence';
+  /** Truth — mirror do GET /{wabaId}?fields=account_mode (Graph API). Source of truth pra runtime. */
+  accountMode?: 'STANDALONE' | 'COEXISTENCE';
+  /** ISO timestamp da última sincronização de accountMode com Meta. */
+  accountModeUpdatedAt?: string;
 }
 
 export interface FacebookMessengerConfig {
@@ -122,7 +129,17 @@ export interface DwvConfig {
 export interface MetaConfig {
   appId: string;             // Meta App ID
   appSecret: string;         // Meta App Secret
-  configId?: string;         // WhatsApp Embedded Signup Config ID (optional, for WABA signup)
+  configId?: string;         // WhatsApp Embedded Signup Config ID (mesmo config serve para standalone e coexistência — só muda o featureType em runtime, ver Meta docs)
+  /**
+   * Habilita a oferta do modo Coexistência para os tenants. Quando true, o frontend
+   * renderiza o picker (standalone vs coexistência) no WhatsAppBusinessForm. Quando
+   * false (ou undefined), apenas standalone é ofertado.
+   *
+   * Não confundir com um configId separado — Meta usa o mesmo Login Config; a
+   * diferença vem do `featureType` passado em runtime (`whatsapp_business_app_onboarding`
+   * vs `whatsapp_embedded_signup`).
+   */
+  coexistenceEnabled?: boolean;
   graphApiVersion: string;   // Graph API version (e.g., 'v21.0')
   systemUserAccessToken?: string; // SUAT - fallback token when code exchange token has insufficient scopes
 }
