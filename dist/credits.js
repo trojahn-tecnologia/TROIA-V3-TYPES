@@ -31,6 +31,7 @@ var CreditCategory;
     CreditCategory["BILLING_CANCELLATION"] = "billing.cancellation";
     CreditCategory["ADMIN_ADJUSTMENT"] = "admin.adjustment";
     CreditCategory["AI_CONVERSATION_QA"] = "ai.conversation.qa";
+    CreditCategory["MCP_TOOL_CALL"] = "mcp_tool_call";
 })(CreditCategory || (exports.CreditCategory = CreditCategory = {}));
 exports.CREDIT_CATEGORIES = {
     [CreditCategory.MESSAGE_CHAT]: { label: 'Mensagem de chat', unit: 'per_action', hasDirection: true, hasProviderId: true, providerType: 'messaging' },
@@ -59,4 +60,5 @@ exports.CREDIT_CATEGORIES = {
     [CreditCategory.BILLING_CANCELLATION]: { label: 'Cancelamento', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.ADMIN_ADJUSTMENT]: { label: 'Ajuste administrativo', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.AI_CONVERSATION_QA]: { label: 'Análise de qualidade (conversa)', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.MCP_TOOL_CALL]: { label: 'Chamada de tool MCP', unit: 'per_action', hasDirection: false, hasProviderId: false },
 };

@@ -15,6 +15,14 @@ export interface User extends FullTenantDocument {
     lastLoginAt?: Date;
     lastActivityAt?: Date;
     devices?: UserDevice[];
+    mcpToken?: {
+        hash: string;
+        prefix: string;
+        createdAt: string;
+        lastUsedAt?: string;
+        lastUsedIp?: string;
+        expiresAt?: string;
+    };
 }
 export interface UserDevice {
     deviceId: string;
@@ -26,6 +34,14 @@ export interface UserDevice {
     createdAt: string;
     authorizedAt?: string;
     authChannel?: 'email' | 'whatsapp';
+}
+export interface UserMcpTokenMetadata {
+    exists: boolean;
+    prefix?: string;
+    createdAt?: string;
+    lastUsedAt?: string;
+    lastUsedIp?: string;
+    expiresAt?: string;
 }
 export interface UserPreferences {
     theme: 'light' | 'dark' | 'auto';

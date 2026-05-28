@@ -24,7 +24,8 @@ export declare enum CreditCategory {
     BILLING_EXPIRATION = "billing.expiration",
     BILLING_CANCELLATION = "billing.cancellation",
     ADMIN_ADJUSTMENT = "admin.adjustment",
-    AI_CONVERSATION_QA = "ai.conversation.qa"
+    AI_CONVERSATION_QA = "ai.conversation.qa",
+    MCP_TOOL_CALL = "mcp_tool_call"
 }
 export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day';
 export interface CreditCategoryConfig {

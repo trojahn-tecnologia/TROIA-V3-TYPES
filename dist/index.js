@@ -24,6 +24,7 @@ __exportStar(require("./modules"), exports);
 __exportStar(require("./plans"), exports);
 __exportStar(require("./levels"), exports);
 __exportStar(require("./company-plans"), exports);
+__exportStar(require("./mcp"), exports);
 // Business modules
 __exportStar(require("./teams"), exports);
 __exportStar(require("./channels"), exports);

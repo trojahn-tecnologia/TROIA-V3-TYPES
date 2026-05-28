@@ -6,6 +6,7 @@ export * from './modules';
 export * from './plans';
 export * from './levels';
 export * from './company-plans';
+export * from './mcp';
 export * from './teams';
 export * from './channels';
 export * from './shifts';

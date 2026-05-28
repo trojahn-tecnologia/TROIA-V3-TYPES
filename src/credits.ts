@@ -28,6 +28,7 @@ export enum CreditCategory {
   BILLING_CANCELLATION      = 'billing.cancellation',
   ADMIN_ADJUSTMENT          = 'admin.adjustment',
   AI_CONVERSATION_QA        = 'ai.conversation.qa',
+  MCP_TOOL_CALL             = 'mcp_tool_call',
 }
 
 export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day';
@@ -68,6 +69,7 @@ export const CREDIT_CATEGORIES: Record<CreditCategory, CreditCategoryConfig> = {
   [CreditCategory.BILLING_CANCELLATION]:        { label: 'Cancelamento',           unit: 'per_action',    hasDirection: false, hasProviderId: false },
   [CreditCategory.ADMIN_ADJUSTMENT]:            { label: 'Ajuste administrativo',  unit: 'per_action',    hasDirection: false, hasProviderId: false },
   [CreditCategory.AI_CONVERSATION_QA]:         { label: 'Análise de qualidade (conversa)', unit: 'per_action', hasDirection: false, hasProviderId: false },
+  [CreditCategory.MCP_TOOL_CALL]:               { label: 'Chamada de tool MCP',    unit: 'per_action',    hasDirection: false, hasProviderId: false },
 };
 
 // === Cost Table (embedded in App) ===

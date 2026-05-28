@@ -16,6 +16,14 @@ export interface User extends FullTenantDocument {
   lastLoginAt?: Date;
   lastActivityAt?: Date;
   devices?: UserDevice[];
+  mcpToken?: {
+    hash: string;
+    prefix: string;
+    createdAt: string;
+    lastUsedAt?: string;
+    lastUsedIp?: string;
+    expiresAt?: string;
+  };
 }
 
 export interface UserDevice {
@@ -31,6 +39,15 @@ export interface UserDevice {
   authChannel?: 'email' | 'whatsapp'; // canal escolhido na última geração de código
   // Campos temporários do fluxo (hidden do GET /me/devices para evitar vazar hash):
   // authCode, authCodeExpiresAt, authAttempts, authLastSent — persistidos no DB mas NÃO expostos via API
+}
+
+export interface UserMcpTokenMetadata {
+  exists: boolean;
+  prefix?: string;
+  createdAt?: string;
+  lastUsedAt?: string;
+  lastUsedIp?: string;
+  expiresAt?: string;
 }
 
 // UserRole removido - agora usamos apenas levelId + permissions individuais

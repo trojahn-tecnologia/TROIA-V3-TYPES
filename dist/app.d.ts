@@ -19,6 +19,7 @@ export interface App extends FullBaseDocument {
     websiteUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
+    mcpUrl?: string;
     support?: AppSupport;
     costs: CreditCostEntry[];
     pwaIcons?: PwaIcons;
@@ -41,6 +42,7 @@ export interface CreateAppRequest {
     websiteUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
+    mcpUrl?: string;
     support?: AppSupport;
 }
 export interface UpdateAppRequest {
@@ -56,6 +58,7 @@ export interface UpdateAppRequest {
     websiteUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
+    mcpUrl?: string;
     support?: AppSupport;
     pwaIcons?: PwaIcons;
 }
@@ -79,6 +82,7 @@ export interface AppResponse {
     websiteUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
+    mcpUrl?: string;
     support?: AppSupport;
     costs: CreditCostEntry[];
     pwaIcons?: PwaIcons;
