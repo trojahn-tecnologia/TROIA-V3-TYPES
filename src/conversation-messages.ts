@@ -41,6 +41,7 @@ export interface DocumentContent {
   type: 'document';
   url: string;
   filename: string;
+  caption?: string;
   size?: number; // bytes
   mimeType?: string;
 }
