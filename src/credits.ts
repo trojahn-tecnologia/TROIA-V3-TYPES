@@ -185,6 +185,12 @@ export interface CreditSubscription {
 
   status: CreditSubscriptionStatus;
   pendingPlanChange?: PendingPlanChange;
+  discount?: SubscriptionDiscount;
+}
+
+export interface SubscriptionDiscount {
+  type: 'percent' | 'fixed';
+  value: number; // percent: 0–100 | fixed: valor na moeda do plano
 }
 
 // === Credit Alert (embedded in Company) ===
@@ -310,6 +316,7 @@ export interface SubscribePlanRequest {
   cardIndex?: number;
   newCard?: AddCardRequest;
   cycle: 'monthly' | 'yearly';
+  discount?: SubscriptionDiscount;
 }
 
 export interface PurchaseCreditsRequest {

@@ -134,6 +134,11 @@ export interface CreditSubscription {
     };
     status: CreditSubscriptionStatus;
     pendingPlanChange?: PendingPlanChange;
+    discount?: SubscriptionDiscount;
+}
+export interface SubscriptionDiscount {
+    type: 'percent' | 'fixed';
+    value: number;
 }
 export interface CreditAlert {
     trigger: {
@@ -236,6 +241,7 @@ export interface SubscribePlanRequest {
     cardIndex?: number;
     newCard?: AddCardRequest;
     cycle: 'monthly' | 'yearly';
+    discount?: SubscriptionDiscount;
 }
 export interface PurchaseCreditsRequest {
     amount: number;
