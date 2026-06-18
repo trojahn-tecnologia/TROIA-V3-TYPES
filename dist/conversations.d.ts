@@ -40,16 +40,6 @@ export interface Conversation {
         role: 'admin' | 'member';
         joinedAt: string;
     }>;
-    files?: Array<{
-        type: 'image' | 'video' | 'audio' | 'document';
-        url: string;
-        caption?: string;
-        filename?: string;
-        thumbnailUrl?: string;
-        size?: number;
-        mimeType?: string;
-        sentAt: string;
-    }>;
     leadId?: string;
     ticketId?: string;
     assigneeId?: string;
@@ -173,6 +163,35 @@ export interface ConversationQuery extends PaginationQuery {
     };
 }
 export interface ConversationListResponse extends ListResponse<ConversationResponse> {
+}
+export type ConversationMediaType = 'image' | 'video' | 'audio' | 'document';
+export interface ConversationMediaItem {
+    messageId: string;
+    type: ConversationMediaType;
+    url: string;
+    caption?: string;
+    filename?: string;
+    thumbnailUrl?: string;
+    size?: number;
+    mimeType?: string;
+    sentAt: string;
+}
+export interface ConversationMediaCounts {
+    total: number;
+    image: number;
+    video: number;
+    audio: number;
+    document: number;
+}
+export interface ConversationMediaQuery extends PaginationQuery {
+    type?: ConversationMediaType;
+}
+export interface ConversationMediaListResponse {
+    items: ConversationMediaItem[];
+    total: number;
+    page: number;
+    limit: number;
+    counts: ConversationMediaCounts;
 }
 export interface AssignConversationRequest {
     assigneeId?: string;

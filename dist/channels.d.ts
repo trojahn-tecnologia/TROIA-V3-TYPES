@@ -48,6 +48,16 @@ export interface ChannelUser {
     assignedAt: string;
 }
 /**
+ * Informações sobre a última desconexão do canal — preenchidas pelo backend
+ * ao detectar desconexão via provider oficial, gateway ou health check.
+ */
+export interface ChannelDisconnectInfo {
+    reason: string;
+    code?: string;
+    source: 'official_provider' | 'gateway' | 'health_check';
+    at: string;
+}
+/**
  * Horário de funcionamento para contas Business.
  * open_time/close_time são minutos desde meia-noite (ex: 480 = 08:00).
  */
@@ -90,6 +100,8 @@ export interface Channel {
     instanceToken?: string;
     identifyUser?: boolean;
     accountInfo?: ChannelAccountInfo;
+    /** Informações sobre a última desconexão — preenchidas ao detectar status 'error'/'pending' */
+    disconnectInfo?: ChannelDisconnectInfo;
     /** Configuração de expiração automática de atendimentos */
     expirationConfig?: ChannelExpirationConfig;
     /**
@@ -180,4 +192,41 @@ export interface UpdateChannelRequest {
     /** Configuração de expiração automática de atendimentos */
     expirationConfig?: ChannelExpirationConfig;
     status?: ExtendedStatus;
+}
+/**
+ * Reconexão de canal — body opcional do POST /channels/:id/reconnect.
+ * Sem credentials = comportamento legado (gateway QR / teste de conexão).
+ * Com credentials.accessToken = renovação de token de provider oficial.
+ */
+export interface ReconnectChannelRequest {
+    credentials?: {
+        accessToken: string;
+    };
+}
+/** Resultado do POST /channels/:id/reconnect. */
+export interface ReconnectChannelResult {
+    success: boolean;
+    qrCode?: string;
+    qrCodeExpires?: number;
+    instanceKey?: string;
+    message?: string;
+    /** Token salvo, mas a reassinatura do webhook falhou (aviso não-bloqueante). */
+    webhookWarning?: string;
+}
+/**
+ * Detalhes de conexão para pré-preencher o form de reconexão de provider oficial.
+ * GET /channels/:id/connection-details. Expõe o token atual — endpoint dedicado,
+ * permissão channels:update.
+ */
+export interface ChannelConnectionDetails {
+    providerId: string;
+    /** Token atual completo (editável no front). */
+    accessToken: string;
+    /** URL do webhook, derivada no servidor (read-only no front). */
+    webhookUrl: string;
+    /** Identificadores read-only — só os relevantes ao provider vêm preenchidos. */
+    whatsappBusinessAccountId?: string;
+    phoneNumberId?: string;
+    pageId?: string;
+    instagramBusinessAccountId?: string;
 }

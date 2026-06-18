@@ -17,6 +17,8 @@ export interface App extends FullBaseDocument {
     modules: string[];
     backendUrl: string;
     websiteUrl?: string;
+    /** Host base do render de websites do tenant — preview vive em {websiteId}.{renderUrl} */
+    renderUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
     mcpUrl?: string;
@@ -40,6 +42,8 @@ export interface CreateAppRequest {
     modules: string[];
     backendUrl: string;
     websiteUrl?: string;
+    /** Host base do render de websites do tenant — preview vive em {websiteId}.{renderUrl} */
+    renderUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
     mcpUrl?: string;
@@ -56,6 +60,8 @@ export interface UpdateAppRequest {
     modules?: string[];
     backendUrl?: string;
     websiteUrl?: string;
+    /** Host base do render de websites do tenant — preview vive em {websiteId}.{renderUrl} */
+    renderUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
     mcpUrl?: string;
@@ -80,6 +86,8 @@ export interface AppResponse {
     modules: string[];
     backendUrl: string;
     websiteUrl?: string;
+    /** Host base do render de websites do tenant — preview vive em {websiteId}.{renderUrl} */
+    renderUrl?: string;
     widgetUrl?: string;
     apiUrl?: string;
     mcpUrl?: string;

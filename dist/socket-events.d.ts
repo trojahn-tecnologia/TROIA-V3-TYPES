@@ -4,6 +4,7 @@
  * Prevents event name mismatches and ensures type safety for socket events
  */
 import type { SoundKey } from './notifications';
+import type { ChannelDisconnectInfo } from './channels';
 export declare const SOCKET_EVENTS: {
     readonly CONVERSATION_MESSAGE: "conversation:message";
     readonly CONVERSATION_UPDATED: "conversation:updated";
@@ -287,6 +288,16 @@ export interface ChannelAccountUpdatedEvent {
         timezone?: string;
         updatedAt: string;
     };
+}
+/**
+ * Channel Disconnected Event
+ * Emitido quando um canal perde a conexão via provider oficial, gateway ou health check.
+ * Frontend deve atualizar o status do canal em tempo real e exibir o motivo.
+ */
+export interface ChannelDisconnectedEvent {
+    channelId: string;
+    status: 'pending' | 'error';
+    disconnectInfo: ChannelDisconnectInfo;
 }
 /**
  * User Typing Event
@@ -634,6 +645,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.MESSAGE_DELETED]: MessageDeletedEvent;
     [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
     [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
+    [SOCKET_EVENTS.CHANNEL_DISCONNECTED]: ChannelDisconnectedEvent;
     [SOCKET_EVENTS.CHANNEL_ACCOUNT_UPDATED]: ChannelAccountUpdatedEvent;
     [SOCKET_EVENTS.USER_TYPING]: UserTypingEvent;
     [SOCKET_EVENTS.ASSIGNMENT_CREATED]: AssignmentCreatedEvent;

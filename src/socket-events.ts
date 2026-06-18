@@ -5,6 +5,7 @@
  */
 
 import type { SoundKey } from './notifications';
+import type { ChannelDisconnectInfo } from './channels';
 
 // ============================================================================
 // EVENT NAMES (String Literals for Type Safety)
@@ -362,6 +363,17 @@ export interface ChannelAccountUpdatedEvent {
     timezone?: string;
     updatedAt: string;
   };
+}
+
+/**
+ * Channel Disconnected Event
+ * Emitido quando um canal perde a conexão via provider oficial, gateway ou health check.
+ * Frontend deve atualizar o status do canal em tempo real e exibir o motivo.
+ */
+export interface ChannelDisconnectedEvent {
+  channelId: string;
+  status: 'pending' | 'error';
+  disconnectInfo: ChannelDisconnectInfo;
 }
 
 /**
@@ -749,6 +761,7 @@ export interface SocketEventMap {
   // Channel Events
   [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
   [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
+  [SOCKET_EVENTS.CHANNEL_DISCONNECTED]: ChannelDisconnectedEvent;
   [SOCKET_EVENTS.CHANNEL_ACCOUNT_UPDATED]: ChannelAccountUpdatedEvent;
 
   // User Events

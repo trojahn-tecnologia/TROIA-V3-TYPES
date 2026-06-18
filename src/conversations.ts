@@ -60,17 +60,12 @@ export interface Conversation {
     joinedAt: string;   // ✅ When participant joined
   }>;
 
-  // ✅ Conversation files (populated via aggregation, any conversation type)
-  files?: Array<{
-    type: 'image' | 'video' | 'audio' | 'document';  // Media type
-    url: string;                 // File URL
-    caption?: string;            // Optional caption
-    filename?: string;           // Original filename
-    thumbnailUrl?: string;       // Thumbnail for videos/documents
-    size?: number;               // File size in bytes
-    mimeType?: string;           // MIME type
-    sentAt: string;              // When file was sent
-  }>;
+  // ⚠️ Conversation media is NOT embedded on the conversation anymore.
+  //    Antes existia um `files?: []` populado via $lookup que agregava TODAS as
+  //    mídias num único documento — para conversas com muita mídia isso estourava
+  //    o limite de 16MB do MongoDB e quebrava qualquer leitura da conversa
+  //    (inclusive o caminho de criação de mensagem). Agora a mídia é servida
+  //    paginada via `GET /conversations/:id/media` → `ConversationMediaListResponse`.
 
   // Lead/Ticket integration
   leadId?: string;            // Associated lead
@@ -245,6 +240,47 @@ export interface ConversationQuery extends PaginationQuery {
 }
 
 export interface ConversationListResponse extends ListResponse<ConversationResponse> {}
+
+// ============================================================================
+// Conversation media (galeria de mídia paginada)
+// Servida por GET /conversations/:id/media — substitui o antigo `Conversation.files`
+// que era agregado inteiro num único documento (estourava o limite de 16MB do
+// MongoDB em conversas com muita mídia).
+// ============================================================================
+
+export type ConversationMediaType = 'image' | 'video' | 'audio' | 'document';
+
+export interface ConversationMediaItem {
+  messageId: string;            // ID da ConversationMessage de origem
+  type: ConversationMediaType;  // Tipo da mídia
+  url: string;                  // URL do arquivo
+  caption?: string;             // Legenda opcional
+  filename?: string;            // Nome original do arquivo
+  thumbnailUrl?: string;        // Thumbnail (vídeos/documentos)
+  size?: number;                // Tamanho em bytes
+  mimeType?: string;            // MIME type
+  sentAt: string;               // ISO — quando a mídia foi enviada
+}
+
+export interface ConversationMediaCounts {
+  total: number;     // Soma de todas as mídias (independente do filtro de tipo)
+  image: number;
+  video: number;
+  audio: number;
+  document: number;
+}
+
+export interface ConversationMediaQuery extends PaginationQuery {
+  type?: ConversationMediaType;  // Filtra por tipo de mídia (opcional)
+}
+
+export interface ConversationMediaListResponse {
+  items: ConversationMediaItem[];
+  total: number;                 // Total que casa com o filtro `type` (== counts.total quando sem filtro)
+  page: number;
+  limit: number;
+  counts: ConversationMediaCounts;
+}
 
 // Conversation assignment
 export interface AssignConversationRequest {

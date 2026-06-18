@@ -70,6 +70,21 @@ export interface ChannelUser {
 }
 
 // ============================================================================
+// CHANNEL DISCONNECT INFO
+// ============================================================================
+
+/**
+ * Informações sobre a última desconexão do canal — preenchidas pelo backend
+ * ao detectar desconexão via provider oficial, gateway ou health check.
+ */
+export interface ChannelDisconnectInfo {
+  reason: string;       // motivo técnico cru (texto do provider/gateway/health)
+  code?: string;        // ex: '190', 'health_check_failed', 'gateway'
+  source: 'official_provider' | 'gateway' | 'health_check';
+  at: string;           // ISO timestamp
+}
+
+// ============================================================================
 // CHANNEL ENTITY
 // ============================================================================
 
@@ -126,6 +141,8 @@ export interface Channel {
   instanceToken?: string;     // For Gateway providers
   identifyUser?: boolean;     // If true, operator name is added to outgoing messages
   accountInfo?: ChannelAccountInfo; // ✅ Dados vindos do provider ao conectar
+  /** Informações sobre a última desconexão — preenchidas ao detectar status 'error'/'pending' */
+  disconnectInfo?: ChannelDisconnectInfo;
   /** Configuração de expiração automática de atendimentos */
   expirationConfig?: ChannelExpirationConfig;
   /**
@@ -229,4 +246,48 @@ export interface UpdateChannelRequest {
   /** Configuração de expiração automática de atendimentos */
   expirationConfig?: ChannelExpirationConfig;
   status?: ExtendedStatus;
+}
+
+// ============================================================================
+// RECONNECT — provider oficial (whatsapp-business / facebook-messenger / instagram-messaging)
+// ============================================================================
+
+/**
+ * Reconexão de canal — body opcional do POST /channels/:id/reconnect.
+ * Sem credentials = comportamento legado (gateway QR / teste de conexão).
+ * Com credentials.accessToken = renovação de token de provider oficial.
+ */
+export interface ReconnectChannelRequest {
+  credentials?: {
+    accessToken: string;
+  };
+}
+
+/** Resultado do POST /channels/:id/reconnect. */
+export interface ReconnectChannelResult {
+  success: boolean;
+  qrCode?: string;
+  qrCodeExpires?: number;
+  instanceKey?: string;
+  message?: string;
+  /** Token salvo, mas a reassinatura do webhook falhou (aviso não-bloqueante). */
+  webhookWarning?: string;
+}
+
+/**
+ * Detalhes de conexão para pré-preencher o form de reconexão de provider oficial.
+ * GET /channels/:id/connection-details. Expõe o token atual — endpoint dedicado,
+ * permissão channels:update.
+ */
+export interface ChannelConnectionDetails {
+  providerId: string;
+  /** Token atual completo (editável no front). */
+  accessToken: string;
+  /** URL do webhook, derivada no servidor (read-only no front). */
+  webhookUrl: string;
+  /** Identificadores read-only — só os relevantes ao provider vêm preenchidos. */
+  whatsappBusinessAccountId?: string;
+  phoneNumberId?: string;
+  pageId?: string;
+  instagramBusinessAccountId?: string;
 }
