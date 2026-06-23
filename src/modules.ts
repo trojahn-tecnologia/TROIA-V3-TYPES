@@ -50,6 +50,7 @@ export type ValidModuleId =
   | 'campaigns'
   | 'audiences'
   | 'templates'
+  | 'quick-messages'
   | 'calendar'
   | 'calls'
   | 'reports'

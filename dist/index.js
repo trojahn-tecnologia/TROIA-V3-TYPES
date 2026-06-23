@@ -86,6 +86,8 @@ __exportStar(require("./message-chunks"), exports);
 __exportStar(require("./templates"), exports);
 __exportStar(require("./campaigns"), exports);
 __exportStar(require("./audiences"), exports);
+// Quick Messages (canned responses for the chat composer)
+__exportStar(require("./quick-messages"), exports);
 // Databases module (multi-purpose data segregation)
 __exportStar(require("./databases"), exports);
 // AI Agents modules (Phase 1)

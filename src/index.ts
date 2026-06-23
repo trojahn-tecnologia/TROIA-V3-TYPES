@@ -87,6 +87,9 @@ export * from './templates';
 export * from './campaigns';
 export * from './audiences';
 
+// Quick Messages (canned responses for the chat composer)
+export * from './quick-messages';
+
 // Databases module (multi-purpose data segregation)
 export * from './databases';
 

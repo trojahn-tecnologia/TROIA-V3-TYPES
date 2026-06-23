@@ -49,6 +49,7 @@ export * from './message-chunks';
 export * from './templates';
 export * from './campaigns';
 export * from './audiences';
+export * from './quick-messages';
 export * from './databases';
 export * from './ai-agents';
 export * from './agent-analytics';
