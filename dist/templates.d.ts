@@ -332,3 +332,14 @@ export interface TemplateApprovalStatusResponse {
     submittedAt?: Date;
     approvedAt?: Date;
 }
+/** Detalhe de template para preview cross-module (chat), sem exigir permissão `templates.read`. */
+export interface TemplateDropdownDetail {
+    id: string;
+    name: string;
+    description?: string;
+    channelId: string;
+    providerId: string;
+    status: TemplateStatus;
+    providerConfig: TemplateResponse['providerConfig'];
+    variables: TemplateVariable[];
+}

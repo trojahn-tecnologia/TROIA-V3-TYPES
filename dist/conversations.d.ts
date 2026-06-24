@@ -107,6 +107,10 @@ export interface CreateConversationRequest {
     category?: string;
     privacy?: ConversationPrivacy;
     metadata?: Record<string, unknown>;
+    /** Template oficial a enviar ao iniciar a conversa (canais whatsapp-business). */
+    templateId?: string;
+    /** Valores das variáveis do template, por posição: { "1": "João", "2": "ACME" }. */
+    templateVariables?: Record<string, string>;
 }
 export interface UpdateConversationRequest {
     subject?: string;

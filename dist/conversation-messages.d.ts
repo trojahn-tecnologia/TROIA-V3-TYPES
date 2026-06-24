@@ -269,6 +269,11 @@ export interface EditMessageRequest {
     content: MessageContent[];
     plainText?: string;
 }
+export interface SendTemplateRequest {
+    conversationId: string;
+    templateId: string;
+    variables: Record<string, string>;
+}
 export interface ForwardMessageRequest {
     originalMessageId: string;
     contactIds: string[];

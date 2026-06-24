@@ -366,6 +366,12 @@ export interface EditMessageRequest {
   plainText?: string;
 }
 
+export interface SendTemplateRequest {
+  conversationId: string;
+  templateId: string;
+  variables: Record<string, string>;
+}
+
 export interface ForwardMessageRequest {
   originalMessageId: string;
   contactIds: string[]; // Backend busca/cria conversas para cada contato no mesmo canal da mensagem original (máx 5)
