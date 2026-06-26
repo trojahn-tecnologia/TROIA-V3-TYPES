@@ -137,3 +137,5 @@ __exportStar(require("./dashboards-marketing"), exports);
 __exportStar(require("./agent-evaluators"), exports);
 // Widget configuration (chat widget + hosted page)
 __exportStar(require("./widget"), exports);
+// Conversation semantic search (MCP tool request/response)
+__exportStar(require("./conversation-search"), exports);

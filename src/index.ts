@@ -158,3 +158,6 @@ export * from './agent-evaluators';
 
 // Widget configuration (chat widget + hosted page)
 export * from './widget';
+
+// Conversation semantic search (MCP tool request/response)
+export * from './conversation-search';
