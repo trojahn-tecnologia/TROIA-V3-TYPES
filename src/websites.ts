@@ -18,6 +18,7 @@ export type WebsiteFieldType =
   | 'images'
   | 'url'
   | 'reference'
+  | 'funnelStep'
   | 'list'
   | 'object';
 
@@ -80,6 +81,8 @@ export interface BlockDefinition {
   configSchema: ComponentFieldDefinition[];
   defaultConfig: Record<string, unknown>;
   maxInstances?: number;
+  /** Região de layout na página de imóvel: topo full-width / coluna principal / sidebar sticky / rodapé full-width. Ausente = 'main'. */
+  region?: 'top' | 'main' | 'sidebar' | 'bottom';
   version: string;
 }
 
@@ -124,6 +127,10 @@ export interface TemplatePageDefinition {
   defaultBlocks: BlockInstance[];
   requiredBlocks?: string[];
   removable?: boolean;
+  /** Página de rota dinâmica por item (ex: detalhe do imóvel). */
+  isDynamic?: boolean;
+  /** Padrão de rota com placeholder, ex: '/imoveis/:slug'. Só para isDynamic. */
+  routePattern?: string;
 }
 
 export interface TemplateModel {
