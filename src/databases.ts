@@ -221,6 +221,13 @@ export interface DatabasePropertyData {
   /** Full address */
   address: PropertyAddress;
 
+  /**
+   * Exibir o endereço preciso (rua/número/CEP/coordenadas/mapa) nas superfícies
+   * públicas (site + agente). Ausente/false = Privado (só bairro/cidade/estado).
+   * No sync é definido só na inserção; depois só o toggle manual altera.
+   */
+  showAddress?: boolean;
+
   /** Property features */
   features: {
     bedrooms?: number;

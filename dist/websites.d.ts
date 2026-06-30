@@ -141,6 +141,15 @@ export interface WebsitePublicData {
     pages: WebsitePage[];
     /** true quando servido via host de preview ({websiteId}.{app.renderUrl}) */
     isPreview?: boolean;
+    /**
+     * Endpoint + token para os formulários públicos criarem leads.
+     * `url` = app.apiUrl (base da public-api do tenant); `key` = token cru da
+     * API key 'Websites' (auto-provisionada). Omitido quando app.apiUrl não setado.
+     */
+    leadsApi?: {
+        url: string;
+        key: string;
+    };
 }
 export interface CreateWebsiteRequest {
     name: string;
