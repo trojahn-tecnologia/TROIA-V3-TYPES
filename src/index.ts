@@ -100,6 +100,8 @@ export * from './agent-prompt-tags';
 export * from './escalation-rules';
 export * from './custom-actions';
 export * from './custom-action-logs';
+// Agent Webhook Logs — execution log for AI Agent webhook receiver (GET /api/agent-webhook-logs)
+export * from './agent-webhook-logs';
 export * from './agent-golden-cases';
 
 // Lead Routing Rules (automatic lead assignment by conditions)

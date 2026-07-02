@@ -81,14 +81,29 @@ function removeOldTgz(dir: string, keep: string): string[] {
 }
 
 async function main(): Promise<void> {
-  const rl = readline.createInterface({ input: stdin, output: stdout });
+  const rl = readline.createInterface({ input: stdin, output: stdout, terminal: stdin.isTTY });
+
+  // Iterador de linhas compartilhado: funciona igual em TTY e em pipe
+  // (`printf 'n\n2\n' | npm run release` = uso não-interativo). Com rl.question
+  // puro, o EOF do pipe encerra o processo antes da 2ª pergunta.
+  const lineIterator = rl[Symbol.asyncIterator]();
+  const ask = async (prompt: string): Promise<string> => {
+    stdout.write(prompt);
+    const { value, done } = await lineIterator.next();
+    if (done) {
+      stdout.write('\n');
+      return '';
+    }
+    if (!stdin.isTTY) stdout.write(`${String(value)}\n`); // eco em modo pipe (legibilidade)
+    return String(value);
+  };
 
   console.log('══════════════════════════════════════════════');
   console.log('  @troia-v3/types — release + distribuição');
   console.log('══════════════════════════════════════════════');
 
   // ── 1. Bump + build + pack (opcional) ──────────────────────────────
-  const bumpAnswer = (await rl.question('\nGerar nova versão patch (bump + build + pack)? [S/n] ')).trim().toLowerCase();
+  const bumpAnswer = (await ask('\nGerar nova versão patch (bump + build + pack)? [S/n] ')).trim().toLowerCase();
   const doBump = bumpAnswer === '' || bumpAnswer === 's' || bumpAnswer === 'sim' || bumpAnswer === 'y';
 
   if (doBump) {
@@ -132,7 +147,7 @@ async function main(): Promise<void> {
   });
 
   // ── 3. Seleção ─────────────────────────────────────────────────────
-  const selectionRaw = (await rl.question(
+  const selectionRaw = (await ask(
     "\nQuais atualizar? (números separados por vírgula, 'a' = todos, Enter = cancelar) "
   )).trim().toLowerCase();
   rl.close();

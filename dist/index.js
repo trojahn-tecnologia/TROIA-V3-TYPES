@@ -97,6 +97,8 @@ __exportStar(require("./agent-prompt-tags"), exports);
 __exportStar(require("./escalation-rules"), exports);
 __exportStar(require("./custom-actions"), exports);
 __exportStar(require("./custom-action-logs"), exports);
+// Agent Webhook Logs — execution log for AI Agent webhook receiver (GET /api/agent-webhook-logs)
+__exportStar(require("./agent-webhook-logs"), exports);
 __exportStar(require("./agent-golden-cases"), exports);
 // Lead Routing Rules (automatic lead assignment by conditions)
 __exportStar(require("./leads-routing-rules"), exports);

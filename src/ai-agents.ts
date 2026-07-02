@@ -283,6 +283,24 @@ export interface AIAgentWebhook {
   updatedAt: string;
 }
 
+export interface CreateAIAgentWebhookRequest {
+  name: string;
+  description?: string;
+  method: 'POST' | 'PUT' | 'PATCH';
+  prompt: string;
+}
+
+export interface UpdateAIAgentWebhookRequest {
+  name?: string;
+  description?: string;
+  method?: 'POST' | 'PUT' | 'PATCH';
+  prompt?: string;
+}
+
+export interface UpdateAIAgentWebhookStatusRequest {
+  status: 'active' | 'inactive';
+}
+
 export interface AIAgentResponse extends Omit<AIAgent, '_id'> {
   id: string;
   totalInteractions?: number;

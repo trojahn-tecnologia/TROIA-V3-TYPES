@@ -57,6 +57,7 @@ export * from './agent-prompt-tags';
 export * from './escalation-rules';
 export * from './custom-actions';
 export * from './custom-action-logs';
+export * from './agent-webhook-logs';
 export * from './agent-golden-cases';
 export * from './leads-routing-rules';
 export * from './workflows';
