@@ -246,6 +246,20 @@ export interface ConversationQuery extends PaginationQuery {
 export interface ConversationListResponse extends ListResponse<ConversationResponse> {}
 
 // ============================================================================
+// Histórico agrupado por (contato, canal)
+// Servido por GET /conversations/history — uma linha por par (contactId,
+// channelId) com conversas fechadas, representada pela conversa mais recente
+// do par (enriquecida com contact/provider) + contagem total do grupo.
+// ============================================================================
+
+/** Linha do histórico agrupado: a conversa fechada mais recente do par (contato, canal) + contagem */
+export interface ConversationHistoryGroupResponse extends ConversationResponse {
+  conversationCount: number;
+}
+
+export interface ConversationHistoryGroupListResponse extends ListResponse<ConversationHistoryGroupResponse> {}
+
+// ============================================================================
 // Conversation media (galeria de mídia paginada)
 // Servida por GET /conversations/:id/media — substitui o antigo `Conversation.files`
 // que era agregado inteiro num único documento (estourava o limite de 16MB do

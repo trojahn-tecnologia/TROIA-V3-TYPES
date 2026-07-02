@@ -168,6 +168,12 @@ export interface ConversationQuery extends PaginationQuery {
 }
 export interface ConversationListResponse extends ListResponse<ConversationResponse> {
 }
+/** Linha do histórico agrupado: a conversa fechada mais recente do par (contato, canal) + contagem */
+export interface ConversationHistoryGroupResponse extends ConversationResponse {
+    conversationCount: number;
+}
+export interface ConversationHistoryGroupListResponse extends ListResponse<ConversationHistoryGroupResponse> {
+}
 export type ConversationMediaType = 'image' | 'video' | 'audio' | 'document';
 export interface ConversationMediaItem {
     messageId: string;
