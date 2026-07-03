@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { ActiveStatus, PaginationQuery } from './common';
+import { ToolFilterCondition } from './custom-actions';
 /**
  * Categoria funcional do agente — descreve O QUE ele FAZ.
  *
@@ -198,12 +199,30 @@ export interface AIAgentCapabilityConfig {
  * AI Agent Webhook Configuration
  * Allows external systems to send data that will be processed by AI and injected into conversations
  */
+export interface AIAgentWebhookAIProcessing {
+    enabled: boolean;
+    /** Instruções para a IA transformar o JSON recebido em texto (min 10 chars quando enabled) */
+    prompt: string;
+}
 export interface AIAgentWebhook {
     id: string;
     name: string;
     description?: string;
     method: 'POST' | 'PUT' | 'PATCH';
-    prompt: string;
+    /**
+     * @deprecated Legado (webhooks criados antes de 2026-07-02, IA sempre ativa).
+     * Leitura deve fazer fallback: prompt preenchido => aiProcessing { enabled: true, prompt }.
+     * Escritas novas usam `aiProcessing`.
+     */
+    prompt?: string;
+    /** Processamento com IA do JSON recebido. Desativado => JSON cru injetado na conversa. */
+    aiProcessing?: AIAgentWebhookAIProcessing;
+    /**
+     * Filtros (lógica E) avaliados na recepção. `field` aceita caminhos de entidade
+     * (contact.*, conversation.*) ou caminho no JSON recebido ($.a.b). Reprovou =>
+     * 200 + log filtered, sem injeção/execução.
+     */
+    filters?: ToolFilterCondition[];
     status: 'active' | 'inactive';
     createdAt: string;
     updatedAt: string;
@@ -212,13 +231,15 @@ export interface CreateAIAgentWebhookRequest {
     name: string;
     description?: string;
     method: 'POST' | 'PUT' | 'PATCH';
-    prompt: string;
+    aiProcessing?: AIAgentWebhookAIProcessing;
+    filters?: ToolFilterCondition[];
 }
 export interface UpdateAIAgentWebhookRequest {
     name?: string;
     description?: string;
     method?: 'POST' | 'PUT' | 'PATCH';
-    prompt?: string;
+    aiProcessing?: AIAgentWebhookAIProcessing;
+    filters?: ToolFilterCondition[];
 }
 export interface UpdateAIAgentWebhookStatusRequest {
     status: 'active' | 'inactive';

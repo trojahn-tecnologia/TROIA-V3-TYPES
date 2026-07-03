@@ -26,6 +26,8 @@ export interface AgentWebhookLog {
         error?: string;
     };
     success: boolean;
+    /** true quando a requisição foi descartada pelos filtros do webhook (200, sem injeção/execução) */
+    filtered?: boolean;
     error?: string;
     executionTime: number;
     appId: ObjectId | string;
