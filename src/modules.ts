@@ -30,7 +30,6 @@ export type ValidModuleId =
   // Business modules
   | 'crm'
   | 'chat'
-  | 'leads'
   | 'customers'
   | 'activities'
   | 'conversations'
