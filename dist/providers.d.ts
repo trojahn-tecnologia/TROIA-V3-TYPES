@@ -22,6 +22,16 @@ export interface WhatsAppConfig {
     accountMode?: 'STANDALONE' | 'COEXISTENCE';
     /** ISO timestamp da última sincronização de accountMode com Meta. */
     accountModeUpdatedAt?: string;
+    /** POST /{wabaId}/subscribed_apps executado com sucesso (recepção de webhooks habilitada). */
+    webhookSubscribed?: boolean;
+    /** ISO timestamp da última assinatura de webhook bem-sucedida. */
+    webhookSubscribedAt?: string;
+    /** POST /{phoneNumberId}/register executado com sucesso (número apto a enviar via Cloud API). Coexistência pula (número já registrado pelo Business App). */
+    phoneRegistered?: boolean;
+    /** ISO timestamp do registro do número. */
+    phoneRegisteredAt?: string;
+    /** Última falha do setup automático (webhook subscribe ou register). Limpo quando o passo sucede. */
+    setupError?: string;
 }
 export interface FacebookMessengerConfig {
     pageId: string;

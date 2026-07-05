@@ -197,6 +197,12 @@ export type ChannelResponse = Omit<Channel, '_id' | 'createdAt' | 'updatedAt' | 
     mode?: 'standalone' | 'coexistence';
     /** WhatsApp Business — accountMode confirmado pela Meta. */
     accountMode?: 'STANDALONE' | 'COEXISTENCE';
+    /** WhatsApp Business — webhook assinado na WABA (setup automático pós Embedded Signup). */
+    webhookSubscribed?: boolean;
+    /** WhatsApp Business — número registrado na Cloud API (apto a enviar). */
+    phoneRegistered?: boolean;
+    /** WhatsApp Business — última falha do setup automático (webhook/register). */
+    setupError?: string;
   };
   /**
    * Métricas agregadas do canal — populadas no list/getById.
