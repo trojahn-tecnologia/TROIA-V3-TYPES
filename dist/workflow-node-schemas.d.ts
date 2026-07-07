@@ -25,6 +25,8 @@ export interface AvailableContext {
     ticket: boolean;
     /** AI Processor output disponível no contexto ({{ai.message}}, etc.) */
     ai?: boolean;
+    /** Calendar event context (date-field trigger with entityType 'event') */
+    event?: boolean;
 }
 /**
  * Schema de output de um node

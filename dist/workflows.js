@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -21,6 +21,7 @@ exports.WORKFLOW_NODE_TYPES = [
     'trigger_date_field',
     'trigger_inactivity',
     'trigger_instagram_comment',
+    'trigger_instagram_mention',
     // Actions
     'action_send_message',
     'action_send_email',
@@ -62,3 +63,36 @@ exports.WORKFLOW_STATUSES = ['active', 'inactive', 'draft', 'archived'];
  * Execution Statuses — runtime constant + derived type.
  */
 exports.WORKFLOW_EXECUTION_STATUSES = ['pending', 'running', 'completed', 'failed', 'cancelled', 'suspended'];
+// ============================================================
+// NODE CONFIGURATION INTERFACES
+// ============================================================
+/**
+ * Catálogo canônico de operadores de condição/filtro do motor de workflows.
+ * FONTE ÚNICA — o ConditionEvaluator do backend, o buildMongoFilterConditions
+ * (dispatchers + preview) e o FILTER_OPERATORS da UI derivam deste catálogo.
+ *
+ * 'greater_or_equal' e 'less_or_equal' são ALIASES aceitos em runtime
+ * (normalizados para 'greater_than_or_equal'/'less_than_or_equal') porque
+ * configs históricos criados pela UI usam essa grafia.
+ */
+exports.WORKFLOW_CONDITION_OPERATORS = [
+    'equals',
+    'not_equals',
+    'contains',
+    'not_contains',
+    'starts_with',
+    'ends_with',
+    'greater_than',
+    'less_than',
+    'greater_than_or_equal',
+    'less_than_or_equal',
+    'greater_or_equal', // alias legado (UI) de greater_than_or_equal
+    'less_or_equal', // alias legado (UI) de less_than_or_equal
+    'is_empty',
+    'is_not_empty',
+    'is_null',
+    'is_not_null',
+    'in',
+    'not_in',
+    'matches_regex',
+];

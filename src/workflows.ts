@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
 
+import type { DatabaseType } from './databases';
+
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -21,6 +23,7 @@ export const WORKFLOW_NODE_TYPES = [
   'trigger_date_field',
   'trigger_inactivity',
   'trigger_instagram_comment',
+  'trigger_instagram_mention',
   // Actions
   'action_send_message',
   'action_send_email',
@@ -80,14 +83,47 @@ export type NodeRunEntryStatus = 'pending' | 'running' | 'completed' | 'failed' 
 // ============================================================
 
 /**
+ * Catálogo canônico de operadores de condição/filtro do motor de workflows.
+ * FONTE ÚNICA — o ConditionEvaluator do backend, o buildMongoFilterConditions
+ * (dispatchers + preview) e o FILTER_OPERATORS da UI derivam deste catálogo.
+ *
+ * 'greater_or_equal' e 'less_or_equal' são ALIASES aceitos em runtime
+ * (normalizados para 'greater_than_or_equal'/'less_than_or_equal') porque
+ * configs históricos criados pela UI usam essa grafia.
+ */
+export const WORKFLOW_CONDITION_OPERATORS = [
+  'equals',
+  'not_equals',
+  'contains',
+  'not_contains',
+  'starts_with',
+  'ends_with',
+  'greater_than',
+  'less_than',
+  'greater_than_or_equal',
+  'less_than_or_equal',
+  'greater_or_equal',   // alias legado (UI) de greater_than_or_equal
+  'less_or_equal',      // alias legado (UI) de less_than_or_equal
+  'is_empty',
+  'is_not_empty',
+  'is_null',
+  'is_not_null',
+  'in',
+  'not_in',
+  'matches_regex',
+] as const;
+
+export type WorkflowConditionOperator = typeof WORKFLOW_CONDITION_OPERATORS[number];
+
+/**
  * Filter Condition - Standard format for workflow filters
  * Used by triggers and conditions to filter entities
  */
 export interface FilterCondition {
-  /** Field path to evaluate (e.g., "status", "lead.step", "{{contact.tags}}") */
+  /** Field path to evaluate (e.g., "status", "lead.stepId", "{{contact.tags}}") */
   field: string;
-  /** Comparison operator */
-  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'in' | 'not_in' | 'is_empty' | 'is_not_empty';
+  /** Comparison operator (catálogo canônico WORKFLOW_CONDITION_OPERATORS) */
+  operator: WorkflowConditionOperator;
   /** Value to compare against */
   value: string | number | boolean | null | string[] | number[];
 }
@@ -98,7 +134,6 @@ export interface FilterCondition {
 export interface WebhookTriggerConfig {
   webhookId?: string;
   secret?: string;
-  validatePayload?: boolean;
 }
 
 /**
@@ -114,6 +149,12 @@ export interface ScheduleTriggerConfig {
  */
 export interface EventTriggerConfig {
   eventType: WorkflowEventType;
+  /**
+   * Para eventos *.updated: dispara apenas se algum destes campos estiver
+   * na lista de campos alterados publicada pelo evento (`changes`).
+   * Vazio/ausente = dispara em qualquer alteração.
+   */
+  watchFields?: string[];
   filters?: FilterCondition[];
 }
 
@@ -171,7 +212,8 @@ export interface DateFieldTriggerConfig<T extends DateFieldEntityType> {
   offsetValue: number;
   /** Unit for the offset */
   offsetUnit: 'minutes' | 'hours' | 'days';
-  offsetDirection: 'before' | 'after';
+  /** 'exact' = disparar exatamente na data (offset é ignorado/zerado pelo motor) */
+  offsetDirection: 'before' | 'after' | 'exact';
   filters?: FilterCondition[];
 }
 
@@ -192,11 +234,41 @@ export type AnyDateFieldTriggerConfig =
 export interface InactivityTriggerConfig {
   entityType: 'conversation' | 'contact' | 'lead' | 'ticket';
   inactivityPeriod: number; // The numeric value (interpreted based on periodUnit)
-  periodUnit?: 'seconds' | 'minutes' | 'hours' | 'days'; // default: 'seconds' for backward compatibility
-  inactivityField: string; // e.g., 'lastMessageAt', 'updatedAt'
+  periodUnit?: 'seconds' | 'minutes' | 'hours' | 'days'; // default: 'hours' (unificado com o dispatcher em 2026-07-06 — o antigo comentário 'seconds' nunca refletiu o runtime)
+  inactivityField?: string; // default por entidade: conversation→lastMessageAt, contact→lastInteractionAt, lead→lastActivityAt, ticket→lastResponseAt (InactivityTriggerDispatcher)
   filters?: FilterCondition[];
   maxTriggersPerEntity?: number; // default: 1
   resetOnActivity?: boolean; // default: true
+}
+
+/**
+ * Instagram Comment Trigger Configuration
+ *
+ * - keyword: case-insensitive "contains" match against the comment text.
+ *   Empty/absent = any comment triggers.
+ * - postId: Instagram media ID (Graph API media id, e.g. "17887498072083520").
+ *   Equality match. Empty/absent = all posts/reels of the connected account.
+ */
+export interface InstagramCommentTriggerConfig {
+  keyword?: string;
+  postId?: string;
+}
+
+/**
+ * Instagram Mention Trigger Configuration
+ *
+ * Fires when the connected professional account is @-mentioned on Instagram —
+ * either in a media caption (Meta webhook field 'mentions' with `value.media_id`)
+ * or in a comment (`value.comment_id` + `value.media_id`).
+ *
+ * - keyword: case-insensitive "contains" match against the mention text (the
+ *   caption/comment where the account was tagged). Empty/absent = any mention
+ *   triggers. When the text cannot be resolved from the webhook (minimal
+ *   payload without Advanced Access), an empty keyword still fires; a non-empty
+ *   keyword will not match an unresolved (empty) text.
+ */
+export interface InstagramMentionTriggerConfig {
+  keyword?: string;
 }
 
 /**
@@ -206,7 +278,17 @@ export interface SendMessageActionConfig {
   // Destino
   targetType?: 'current' | 'new_conversation';
   channelId?: string;
-  contactSource?: 'context' | 'specific';
+  /**
+   * Origem do destinatário quando `targetType='new_conversation'`:
+   *  - `context`: usa o contato do contexto do workflow (`inputData.contact.id`)
+   *  - `specific`: usa `contactId` fixo configurado
+   *  - `trigger_author`: responde o autor do evento (comentário/menção no
+   *    Instagram) resolvendo o IGSID de `triggerData.from.id`. O contato é
+   *    criado sob demanda quando o comentarista/mentionador ainda não existe
+   *    na base. Nesse modo, o canal cai para `triggerData.channelId` quando
+   *    `channelId` não é configurado.
+   */
+  contactSource?: 'context' | 'specific' | 'trigger_author';
   contactId?: string;
 
   // Conteúdo
@@ -222,13 +304,15 @@ export interface SendMessageActionConfig {
 
 /**
  * Send Email Action Configuration
+ *
+ * Note: `templateId`/`templateVariables` were removed (2026-07-06) — they were
+ * never reachable from the UI and `SendEmailStepFactory` ignored `templateId`.
+ * Emails are sent as free-form body via SystemEmailService.
  */
 export interface SendEmailActionConfig {
   to: string;
   subject: string;
   body: string;
-  templateId?: string;
-  templateVariables?: Record<string, string>;
 }
 
 /**
@@ -245,24 +329,90 @@ export interface HttpRequestActionConfig {
 
 /**
  * Query Database Action Configuration
+ *
+ * Queries the RAG databases (databases-documents) — same contract used by the
+ * AI agents' search tools. Rewritten 2026-07-06: the old shape
+ * `{ collection, operation, query, outputVariable }` targeted a dead Mongo API.
  */
 export interface QueryDatabaseActionConfig {
-  collection: string;
-  operation: 'find' | 'findOne' | 'count' | 'aggregate';
-  query: Record<string, unknown>;
-  outputVariable?: string;
+  /** Type of database to search (properties, vehicles, products, services, documents) */
+  databaseType: DatabaseType;
+  /** Names of the databases to search within (empty = validation error at design time) */
+  databaseNames: string[];
+  /** Free-text semantic search — supports {{variable}} templates */
+  searchText?: string;
+  /** Structured filters applied post-vector (aligned with Database{Type}Data schema) */
+  structuredFilters?: Record<string, unknown>;
+  /** Max results (default defined by the step factory) */
+  limit?: number;
 }
 
 /**
  * Create Lead Action Configuration
  */
 export interface CreateLeadActionConfig {
+  /**
+   * Source type for the contact ID.
+   * - 'context': extract from workflow context (contact, conversation, event)
+   * - 'specific': use the `contactId` configured in the node
+   * @default 'context'
+   */
+  contactSource?: 'context' | 'specific';
   contactId?: string;
   funnelId?: string;
   step?: string;
   description?: string;
   value?: number;
-  assignToUserId?: string;
+  /** Assignment mode — 'auto' uses the funnel's distribution, 'user'/'team' are direct */
+  assignTo?: 'auto' | 'user' | 'team';
+  /** Target user when assignTo === 'user' */
+  userId?: string;
+  /** Target team when assignTo === 'team' */
+  teamId?: string;
+}
+
+/**
+ * Update Lead Action Configuration
+ */
+export interface UpdateLeadActionConfig {
+  /**
+   * Source type for the lead ID.
+   * - 'context': extract from workflow context (lead)
+   * - 'specific': use the `leadId` configured in the node
+   * @default 'context'
+   */
+  leadSource?: 'context' | 'specific';
+  /** Target lead when leadSource === 'specific' */
+  leadId?: string;
+  /** Whitelisted lead fields to update — values support {{variable}} templates */
+  fields: Record<string, unknown>;
+}
+
+/**
+ * Send Template Action Configuration
+ */
+export interface SendTemplateActionConfig {
+  /** Channel used to send the template (defines provider + template source) */
+  channelId: string;
+  /** ID of the approved template to send */
+  templateId: string;
+  /** Template variables — values support {{variable}} templates */
+  templateVariables?: Record<string, string>;
+  /** Optional explicit contact — defaults to the contact from workflow context */
+  contactId?: string;
+}
+
+/**
+ * Create Ticket Action Configuration
+ */
+export interface CreateTicketActionConfig {
+  title: string;
+  description?: string;
+  /** Target pipeline — when omitted, the service resolves the default pipeline */
+  pipelineId?: string;
+  stageId?: string;
+  contactId?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 /**
@@ -281,8 +431,16 @@ export interface UpdateContactActionConfig {
 export interface AssignActionConfig {
   resourceType: 'ticket' | 'conversation' | 'lead';
   resourceId?: string;
+  /**
+   * Assignment mode written by the UI (AssignConfig.tsx).
+   * - 'auto': automatic distribution (context strategy)
+   * - 'user': direct assignment to `userId`
+   * - 'team': rotation within `teamId`
+   */
+  assigneeType?: 'auto' | 'user' | 'team';
   userId?: string;
   teamId?: string;
+  /** Legacy strategy vocabulary — still accepted via API/AI-modifier */
   strategy?: 'round_robin' | 'least_busy' | 'random' | 'specific_user';
 }
 
@@ -290,7 +448,10 @@ export interface AssignActionConfig {
  * Set Variable Action Configuration
  */
 export interface SetVariableActionConfig {
-  variable: string;
+  /** Nome canônico gravado pela UI (SetVariableConfig.tsx) e pelo AI-modifier. */
+  variableName?: string;
+  /** Nome legado — aceito pelo step factory como fallback. */
+  variable?: string;
   value: string | number | boolean | null;
   expression?: string;
 }
@@ -327,13 +488,6 @@ export interface CreateConversationActionConfig {
    * Can be a context reference like {{event.channelId}}.
    */
   channelId?: string;
-
-  /**
-   * Optional variable name to store the created conversation.
-   * If provided, the conversation will be stored in context.variables[outputVariable].
-   * The conversation is always added to context.conversation regardless of this setting.
-   */
-  outputVariable?: string;
 }
 
 /**
@@ -341,7 +495,7 @@ export interface CreateConversationActionConfig {
  */
 export interface IfControlConfig {
   condition: string;
-  operator?: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'is_empty' | 'is_not_empty';
+  operator?: WorkflowConditionOperator;
   value?: string | number | boolean | null;
 }
 
@@ -354,6 +508,7 @@ export interface SwitchControlConfig {
     value: string | number | boolean | null;
     label?: string;
   }>;
+  /** default: true — a UI e o motor tratam undefined como habilitado (defaultCase !== false) */
   defaultCase?: boolean;
 }
 
@@ -372,6 +527,31 @@ export interface LoopControlConfig {
   items?: string; // Variable name containing array
   maxIterations?: number;
   condition?: string;
+}
+
+/**
+ * Wait For Control Configuration (control_wait_for)
+ * Espera timeout OU evento de cancelamento — duas saídas: 'timeout' | 'event'.
+ */
+export interface WaitForControlConfig {
+  timeout: { duration: number; unit: 'minutes' | 'hours' | 'days' };
+  cancelEvent?: {
+    eventType: string;      // ex: 'message.received'
+    entityType?: string;    // informativo — o significado do matchValue é fixo por eventType
+    matchField?: string;    // informativo (não usado pelo motor)
+    matchValue?: string;    // template, ex: '{{conversation.id}}'
+  };
+  /** Smart Delay: se preenchido, SUBSTITUI o timeout (espera até este horário HH:mm). */
+  waitUntilTime?: string;
+  waitUntilWeekday?: boolean;
+}
+
+/**
+ * Split Control Configuration (control_split — teste A/B)
+ * sourceHandle das edges: 'path-0'..'path-N' (índice do path).
+ */
+export interface SplitControlConfig {
+  paths: Array<{ label: string; weight: number }>;
 }
 
 /**
@@ -419,8 +599,11 @@ export interface AIAgentInlineConfig {
   maxTokens?: number;
   /** Maximum iterations of the tool-calling loop (default: 5) */
   maxIterations?: number;
-  /** Memory mode: 'thread' persists history per conversation, 'ephemeral' is stateless */
-  memoryMode: 'thread' | 'ephemeral';
+  /**
+   * Memory mode: 'thread' persists history per conversation, 'ephemeral' is stateless.
+   * @default 'ephemeral'
+   */
+  memoryMode?: 'thread' | 'ephemeral';
   /** Input template (supports {{variable}} substitution from workflow context) */
   input: string;
   /**
@@ -510,11 +693,16 @@ export type NodeConfig =
   | EventTriggerConfig
   | AnyDateFieldTriggerConfig
   | InactivityTriggerConfig
+  | InstagramCommentTriggerConfig
+  | InstagramMentionTriggerConfig
   | SendMessageActionConfig
   | SendEmailActionConfig
   | HttpRequestActionConfig
   | QueryDatabaseActionConfig
   | CreateLeadActionConfig
+  | UpdateLeadActionConfig
+  | SendTemplateActionConfig
+  | CreateTicketActionConfig
   | UpdateContactActionConfig
   | AssignActionConfig
   | SetVariableActionConfig
@@ -522,11 +710,17 @@ export type NodeConfig =
   | SwitchControlConfig
   | DelayControlConfig
   | LoopControlConfig
+  | WaitForControlConfig
+  | SplitControlConfig
   | AIAgentNodeConfig
   | AIAgentInlineConfig
   | CreateDatabaseDocumentActionConfig
   | SkillInputConfig
   | SkillOutputConfig
+  // LegacyNodeConfig fallback — nós sem interface canônica ainda dependem disto
+  // (action_send_media, action_add_tag, action_remove_tag, action_internal_notification,
+  // action_find_leads, trigger_instagram_comment, trigger_instagram_mention e
+  // configs legadas gravadas no DB).
   | Record<string, unknown>;
 
 // ============================================================
@@ -856,35 +1050,32 @@ export interface WorkflowTriggerCountResponse extends Omit<WorkflowTriggerCount,
 
 /**
  * Workflow Event Types
+ *
+ * Members under "Planned / no publisher yet" are offered by the trigger UI but
+ * have no publish call site in the backend today — workflows subscribed to them
+ * never fire. Kept in the union to avoid breaking existing consumers/configs;
+ * adding a publisher promotes the member to its category group above.
  */
 export type WorkflowEventType =
   // Messages
   | 'message.received'
   | 'message.sent'
-  | 'message.delivered'
-  | 'message.read'
   // Conversations
   | 'conversation.created'
   | 'conversation.updated'
   | 'conversation.closed'
-  | 'conversation.reopened'
   | 'conversation.assigned'
-  | 'conversation.inactive'
   // Contacts
   | 'contact.created'
   | 'contact.updated'
-  | 'contact.deleted'
   | 'contact.tag_added'
   | 'contact.tag_removed'
-  | 'contact.birthday'
-  | 'contact.inactive'
   // Leads
   | 'lead.created'
   | 'lead.updated'
   | 'lead.stage_changed'
   | 'lead.won'
   | 'lead.lost'
-  | 'lead.inactive'
   // Tickets
   | 'ticket.created'
   | 'ticket.updated'
@@ -901,12 +1092,20 @@ export type WorkflowEventType =
   | 'database.document.updated'
   // Forms
   | 'form.submitted'
-  // Instagram
-  | 'instagram.comment.received'
-  // Webhooks
-  | 'webhook.received'
   // Custom
-  | 'custom.event';
+  | 'custom.event'
+  // --- Planned / no publisher yet ---
+  | 'message.delivered'
+  | 'message.read'
+  | 'conversation.reopened'
+  | 'conversation.inactive'
+  | 'contact.deleted'
+  | 'contact.birthday'
+  | 'contact.inactive'
+  | 'lead.inactive'
+  | 'webhook.received'
+  | 'instagram.comment.received'
+  | 'instagram.mention.received';
 
 /**
  * Workflow Event
@@ -1045,42 +1244,6 @@ export interface WorkflowExecutionContext {
     channelId?: string;
     attendees?: Array<{ contactId?: string; email?: string; name?: string }>;
   };
-}
-
-/**
- * Entity context for workflow execution.
- * Contains ONLY entity references — no workflow metadata.
- * Built by WorkflowContextBuilder.buildContextFromDoc().
- *
- * This type enforces separation between entity data and workflow execution fields
- * (workflowId, executionId, triggerType, etc.), preventing accidental mixing.
- */
-export interface WorkflowEntityContext {
-  conversation?: WorkflowExecutionContext['conversation'];
-  contact?: WorkflowExecutionContext['contact'];
-  lead?: WorkflowExecutionContext['lead'];
-  ticket?: WorkflowExecutionContext['ticket'];
-  event?: WorkflowExecutionContext['event'];
-}
-
-/**
- * Standard parameters for triggering a workflow execution.
- * ALL trigger services MUST use this interface — no exceptions.
- *
- * entityContext is REQUIRED — context must always be pre-built by
- * WorkflowContextBuilder before calling WorkflowTriggerRunner.run().
- */
-export interface TriggerWorkflowParams {
-  /** Raw MongoDB workflow document */
-  workflow: Record<string, unknown>;
-  /** Trigger node from workflow definition */
-  triggerNode: Record<string, unknown>;
-  /** ID of the entity being triggered */
-  entityId: string;
-  /** Pre-built entity context (REQUIRED — never optional) */
-  entityContext: WorkflowEntityContext;
-  /** Trigger-specific data (varies by trigger type) */
-  triggerData: Record<string, unknown>;
 }
 
 // ============================================================
