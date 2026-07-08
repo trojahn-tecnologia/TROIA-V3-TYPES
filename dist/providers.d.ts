@@ -144,6 +144,7 @@ export interface ProviderCredentials {
     accessToken?: string;
     refreshToken?: string;
     expiresAt?: Date;
+    pageAccessToken?: string;
     apiKey?: string;
     apiSecret?: string;
     username?: string;

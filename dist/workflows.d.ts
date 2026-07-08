@@ -310,6 +310,13 @@ export interface CreateTicketActionConfig {
  * Update Contact Action Configuration
  */
 export interface UpdateContactActionConfig {
+    /**
+     * Source type for the contact to update.
+     * - 'context' (default): use the contact from workflow context (contact / trigger author)
+     * - 'specific': use the `contactId` configured in the node (required in this mode)
+     * @default 'context'
+     */
+    contactSource?: 'context' | 'specific';
     contactId?: string;
     addTags?: string[];
     removeTags?: string[];

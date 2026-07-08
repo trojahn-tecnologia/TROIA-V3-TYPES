@@ -27,6 +27,19 @@ export interface AvailableContext {
     ai?: boolean;
     /** Calendar event context (date-field trigger with entityType 'event') */
     event?: boolean;
+    /**
+     * O contexto vem de um evento do Instagram (comentário/menção) cujo AUTOR pode
+     * ser respondido por IGSID (triggerData.from.id). Habilita a opção "Autor do
+     * comentário/menção" no envio de mensagem — que NÃO é o mesmo que o contato do
+     * contexto (esse resolve/cria o contato pelo IGSID).
+     */
+    instagramAuthor?: boolean;
+    /**
+     * Legenda humana da opção "contato do contexto" adaptada à origem do contexto
+     * (ex: "Contato do lead ganho", "Contato da conversa"). Quando ausente, usa
+     * "Contato do contexto".
+     */
+    contextContactLabel?: string;
 }
 /**
  * Schema de output de um node

@@ -204,6 +204,12 @@ export interface ProviderCredentials {
   refreshToken?: string;
   expiresAt?: Date;
 
+  // Meta/Instagram Page Access Token (Instagram Messaging API POST /{pageId}/messages
+  // requires a Page token; the user token above causes Meta error #190). Derived from
+  // the user accessToken + pageId at channel create/reconnect. Preferred over accessToken
+  // when sending Instagram messages.
+  pageAccessToken?: string;
+
   // API Key authentication
   apiKey?: string;
   apiSecret?: string;
