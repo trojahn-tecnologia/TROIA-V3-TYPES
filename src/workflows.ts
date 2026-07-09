@@ -1332,3 +1332,70 @@ export interface WorkflowValidationResult {
     severity: 'error' | 'warning';
   }>;
 }
+
+// ============================================================================
+// EXPORT / IMPORT (portabilidade)
+// ============================================================================
+
+export type WorkflowRefType =
+  | 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage'
+  | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database';
+
+export interface WorkflowExportRef {
+  token: string;              // "$ref:1" — único no arquivo
+  type: WorkflowRefType;
+  name: string | null;        // nome do recurso no export (pista pro wizard)
+  sourceId: string;           // ObjectId original — usado pra auto-resolver (backup)
+  required: boolean;
+  dependsOn?: string;         // token do pai (funnelStep→funnel, pipelineStage→pipeline)
+}
+
+export interface WorkflowExportFolder {
+  tempId: string;
+  name: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  parentTempId?: string;
+}
+
+export interface WorkflowExportEntry {
+  name: string;
+  description?: string;
+  usageType?: 'automation' | 'skill';
+  folderTempId?: string;      // só no bundle
+  definition: WorkflowDefinition;
+}
+
+export interface WorkflowExportFile {
+  formatVersion: 1;
+  kind: 'workflow' | 'bundle';
+  exportedAt: string;
+  folders?: WorkflowExportFolder[];
+  workflows: WorkflowExportEntry[];
+  references: WorkflowExportRef[];
+}
+
+export interface WorkflowImportPreviewRef extends WorkflowExportRef {
+  resolved: boolean;          // sourceId existe na company/tipo atual
+}
+
+export interface WorkflowImportPreview {
+  kind: 'workflow' | 'bundle';
+  folderCount: number;
+  workflowCount: number;
+  references: WorkflowImportPreviewRef[];
+  warnings: string[];
+}
+
+export interface WorkflowImportRequest {
+  file: WorkflowExportFile;
+  mappings: Record<string, string>;   // token → novo ObjectId (inclui auto-resolvidos)
+  targetFolderId?: string | null;      // onde colocar (kind:'workflow')
+}
+
+export interface WorkflowImportResult {
+  createdWorkflowIds: string[];
+  createdFolderIds: string[];
+  warnings: string[];
+}

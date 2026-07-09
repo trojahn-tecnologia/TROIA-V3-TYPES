@@ -74,6 +74,7 @@ export * from './transfer';
 export * from './assignment-context';
 export * from './channel-rate-limits';
 export * from './goals';
+export * from './channel-dashboard';
 export * from './dashboards-commercial';
 export * from './dashboards-marketing';
 export * from './agent-evaluators';

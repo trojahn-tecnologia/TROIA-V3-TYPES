@@ -147,6 +147,9 @@ export * from './channel-rate-limits';
 // Goals module (Phase 3 — commercial dashboard targets for users/teams/company)
 export * from './goals';
 
+// Channel Dashboard module (F0 — 5 collections: media, comments, metrics, activities, sync-state)
+export * from './channel-dashboard';
+
 // Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
 export * from './dashboards-commercial';
 

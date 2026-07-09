@@ -17,6 +17,8 @@ export interface Company extends FullTenantDocument {
   documentType?: CompanyDocumentType;
   status: ActiveStatus;
   defaultCountryCode?: string;
+  /** IANA timezone (ex.: 'America/Sao_Paulo'). Default de exibição: America/Sao_Paulo. */
+  timezone?: string;
   address: Address;
   defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;
@@ -57,6 +59,7 @@ export interface UpdateCompanyRequest {
   documentType?: CompanyDocumentType;
   status?: ActiveStatus;
   defaultCountryCode?: string;
+  timezone?: string;
   address?: Partial<Address>;
   defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;
@@ -92,6 +95,7 @@ export interface CompanyResponse {
   appId: string;
   status: ActiveStatus;
   defaultCountryCode?: string;
+  timezone?: string;
   address: Address;
   defaultAssignmentConfig?: DistributionConfig;
   themeOverrides?: TenantThemeOverrides;

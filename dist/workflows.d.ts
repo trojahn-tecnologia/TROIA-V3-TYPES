@@ -1044,3 +1044,55 @@ export interface WorkflowValidationResult {
         severity: 'error' | 'warning';
     }>;
 }
+export type WorkflowRefType = 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage' | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database';
+export interface WorkflowExportRef {
+    token: string;
+    type: WorkflowRefType;
+    name: string | null;
+    sourceId: string;
+    required: boolean;
+    dependsOn?: string;
+}
+export interface WorkflowExportFolder {
+    tempId: string;
+    name: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+    parentTempId?: string;
+}
+export interface WorkflowExportEntry {
+    name: string;
+    description?: string;
+    usageType?: 'automation' | 'skill';
+    folderTempId?: string;
+    definition: WorkflowDefinition;
+}
+export interface WorkflowExportFile {
+    formatVersion: 1;
+    kind: 'workflow' | 'bundle';
+    exportedAt: string;
+    folders?: WorkflowExportFolder[];
+    workflows: WorkflowExportEntry[];
+    references: WorkflowExportRef[];
+}
+export interface WorkflowImportPreviewRef extends WorkflowExportRef {
+    resolved: boolean;
+}
+export interface WorkflowImportPreview {
+    kind: 'workflow' | 'bundle';
+    folderCount: number;
+    workflowCount: number;
+    references: WorkflowImportPreviewRef[];
+    warnings: string[];
+}
+export interface WorkflowImportRequest {
+    file: WorkflowExportFile;
+    mappings: Record<string, string>;
+    targetFolderId?: string | null;
+}
+export interface WorkflowImportResult {
+    createdWorkflowIds: string[];
+    createdFolderIds: string[];
+    warnings: string[];
+}

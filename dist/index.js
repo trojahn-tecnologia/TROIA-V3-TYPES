@@ -129,6 +129,8 @@ __exportStar(require("./assignment-context"), exports);
 __exportStar(require("./channel-rate-limits"), exports);
 // Goals module (Phase 3 — commercial dashboard targets for users/teams/company)
 __exportStar(require("./goals"), exports);
+// Channel Dashboard module (F0 — 5 collections: media, comments, metrics, activities, sync-state)
+__exportStar(require("./channel-dashboard"), exports);
 // Commercial Dashboard module (Phase 4 — request/response types for /api/dashboards/commercial)
 __exportStar(require("./dashboards-commercial"), exports);
 // Marketing Dashboard module — request/response types for /api/dashboards/marketing
