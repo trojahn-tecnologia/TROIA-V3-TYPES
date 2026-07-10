@@ -5,6 +5,7 @@
  */
 import type { SoundKey } from './notifications';
 import type { ChannelDisconnectInfo } from './channels';
+import type { ChannelSyncStatus, ChannelActivityType } from './channel-dashboard';
 export declare const SOCKET_EVENTS: {
     readonly CONVERSATION_MESSAGE: "conversation:message";
     readonly CONVERSATION_UPDATED: "conversation:updated";
@@ -24,6 +25,12 @@ export declare const SOCKET_EVENTS: {
     readonly CHANNEL_CONNECTED: "channel:connected";
     readonly CHANNEL_DISCONNECTED: "channel:disconnected";
     readonly CHANNEL_ACCOUNT_UPDATED: "channel:account-updated";
+    readonly CHANNEL_SYNC_STARTED: "channel:sync-started";
+    readonly CHANNEL_SYNC_COMPLETED: "channel:sync-completed";
+    readonly CHANNEL_SYNC_ERROR: "channel:sync-error";
+    readonly CHANNEL_MEDIA_PUBLISHED: "channel:media-published";
+    readonly CHANNEL_COMMENT_RECEIVED: "channel:comment-received";
+    readonly CHANNEL_ACTIVITY_RECEIVED: "channel:activity-received";
     readonly USER_TYPING: "user:typing";
     readonly USER_ONLINE: "user:online";
     readonly USER_OFFLINE: "user:offline";
@@ -255,6 +262,52 @@ export interface ChannelConnectedEvent {
     instanceKey: string;
     channelId: string;
     connectedAt: string;
+}
+/**
+ * Channel Sync Status Event
+ * Emitido pelo motor de sync do Dashboard de Canal ao iniciar/concluir/falhar
+ * uma sincronização de perfil/métricas — frontend atualiza o estado em tempo real.
+ */
+export interface ChannelSyncStatusEvent {
+    channelId: string;
+    syncStatus: ChannelSyncStatus;
+    trigger?: string;
+    error?: string;
+}
+/**
+ * Channel Media Published Event
+ * Emitido quando uma publicação agendada/rascunho é publicada com sucesso no provider
+ * (Dashboard de Canal — F3) — frontend atualiza a fila e o feed.
+ */
+export interface ChannelMediaPublishedEvent {
+    channelId: string;
+    mediaId: string;
+    providerMediaId?: string;
+    permalink?: string;
+    mediaType: string;
+}
+/**
+ * Channel Comment Received Event
+ * Emitido quando um comentário novo (webhook Instagram) é persistido — frontend
+ * atualiza a moderação em tempo real (Dashboard de Canal — F4).
+ */
+export interface ChannelCommentReceivedEvent {
+    channelId: string;
+    mediaId: string;
+    commentId: string;
+    text: string;
+    authorUsername: string;
+}
+/**
+ * Channel Activity Received Event
+ * Emitido quando uma atividade nova é materializada na timeline do canal
+ * (comment / mention / follower_delta) — frontend (F5b) faz nudge de realtime.
+ */
+export interface ChannelActivityReceivedEvent {
+    channelId: string;
+    activityId: string;
+    activityType: ChannelActivityType;
+    occurredAt: string;
 }
 /**
  * Channel Account Updated Event
@@ -647,6 +700,12 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
     [SOCKET_EVENTS.CHANNEL_DISCONNECTED]: ChannelDisconnectedEvent;
     [SOCKET_EVENTS.CHANNEL_ACCOUNT_UPDATED]: ChannelAccountUpdatedEvent;
+    [SOCKET_EVENTS.CHANNEL_SYNC_STARTED]: ChannelSyncStatusEvent;
+    [SOCKET_EVENTS.CHANNEL_SYNC_COMPLETED]: ChannelSyncStatusEvent;
+    [SOCKET_EVENTS.CHANNEL_SYNC_ERROR]: ChannelSyncStatusEvent;
+    [SOCKET_EVENTS.CHANNEL_MEDIA_PUBLISHED]: ChannelMediaPublishedEvent;
+    [SOCKET_EVENTS.CHANNEL_COMMENT_RECEIVED]: ChannelCommentReceivedEvent;
+    [SOCKET_EVENTS.CHANNEL_ACTIVITY_RECEIVED]: ChannelActivityReceivedEvent;
     [SOCKET_EVENTS.USER_TYPING]: UserTypingEvent;
     [SOCKET_EVENTS.ASSIGNMENT_CREATED]: AssignmentCreatedEvent;
     [SOCKET_EVENTS.ASSIGNMENT_UPDATED]: AssignmentUpdatedEvent;

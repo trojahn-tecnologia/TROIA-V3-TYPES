@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ChannelAccountInfo } from './channels';
 import { FullTenantDocument, PaginationQuery, ListResponse } from './common';
 export type ChannelMediaType = 'feed' | 'carousel' | 'reels' | 'story';
 export type ChannelMediaStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed';
@@ -188,6 +189,31 @@ export interface CreateChannelActivityRequest {
     data: Record<string, unknown>;
     refId?: string;
 }
+/** Resposta paginada da timeline — cursor/keyset (NÃO estende ListResponse page-based). */
+export interface ChannelActivityListResponse {
+    items: ChannelActivityResponse[];
+    nextCursor: string | null;
+}
+/** Shape tipado de `data` para atividade de comentário (F5a). Persistido como Record. */
+export interface ChannelActivityCommentData {
+    mediaId: string;
+    text: string;
+    authorUsername: string;
+}
+/** Shape tipado de `data` para atividade de menção (F5a). Persistido como Record. */
+export interface ChannelActivityMentionData {
+    mediaId: string;
+    text: string;
+    authorId: string;
+    authorUsername?: string;
+    commentId?: string;
+}
+/** Shape tipado de `data` para variação de seguidores (F5a). Persistido como Record. */
+export interface ChannelActivityFollowerDeltaData {
+    date: string;
+    delta: number;
+    followersCount: number;
+}
 export type ChannelSyncStatus = 'idle' | 'syncing' | 'error';
 export type ChannelSyncResourceKey = 'profile' | 'media' | 'comments' | 'metrics' | 'activities';
 export interface ChannelSyncResourceState {
@@ -216,4 +242,47 @@ export interface ChannelSyncStateResponse {
     resources: Partial<Record<ChannelSyncResourceKey, ChannelSyncResourceStateResponse>>;
     createdAt: string;
     updatedAt: string;
+}
+export type ChannelSyncTriggerType = 'connect' | 'reconnect' | 'manual' | 'scheduled';
+export interface ChannelSyncJob {
+    channelId: string;
+    appId: string;
+    companyId: string;
+    trigger: ChannelSyncTriggerType;
+    resources?: ChannelSyncResourceKey[];
+}
+export interface ChannelSyncResult {
+    channelId: string;
+    success: boolean;
+    resourcesSynced: ChannelSyncResourceKey[];
+    errors?: string[];
+}
+export interface ChannelAccountInsights {
+    reach?: number;
+    impressions?: number;
+    engagement?: number;
+    profileViews?: number;
+    followersCount?: number;
+    followsCount?: number;
+    mediaCount?: number;
+}
+export interface ChannelDashboardOverview {
+    channel: {
+        id: string;
+        name: string;
+        identifier: string;
+        providerId?: string;
+        accountInfo?: ChannelAccountInfo;
+        status: string;
+    };
+    capabilities: string[];
+    syncState: ChannelSyncStateResponse | null;
+    latestMetrics: ChannelMetricsResponse | null;
+}
+export interface ChannelMediaPublishResult {
+    mediaId: string;
+    providerMediaId?: string;
+    permalink?: string;
+    success: boolean;
+    error?: string;
 }

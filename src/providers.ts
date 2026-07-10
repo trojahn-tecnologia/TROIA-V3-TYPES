@@ -508,6 +508,7 @@ export enum ProviderCapability {
 
   // Analytics capabilities
   GET_INSIGHTS = 'get_insights',
+  GET_AUDIENCE = 'get_audience',
   TRACK_OPEN = 'track_open',
 
   // Bot capabilities

@@ -296,6 +296,7 @@ export declare enum ProviderCapability {
     REST_API = "rest_api",
     GRAPHQL = "graphql",
     GET_INSIGHTS = "get_insights",
+    GET_AUDIENCE = "get_audience",
     TRACK_OPEN = "track_open",
     CREATE_BOT = "create_bot",
     MANAGE_PAGE = "manage_page",

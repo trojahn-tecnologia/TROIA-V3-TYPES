@@ -1112,7 +1112,8 @@ export type WorkflowEventType =
   | 'lead.inactive'
   | 'webhook.received'
   | 'instagram.comment.received'
-  | 'instagram.mention.received';
+  | 'instagram.mention.received'
+  | 'facebook.comment.received';
 
 /**
  * Workflow Event

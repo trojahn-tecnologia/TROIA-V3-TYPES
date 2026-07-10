@@ -183,6 +183,7 @@ var ProviderCapability;
     ProviderCapability["GRAPHQL"] = "graphql";
     // Analytics capabilities
     ProviderCapability["GET_INSIGHTS"] = "get_insights";
+    ProviderCapability["GET_AUDIENCE"] = "get_audience";
     ProviderCapability["TRACK_OPEN"] = "track_open";
     // Bot capabilities
     ProviderCapability["CREATE_BOT"] = "create_bot";

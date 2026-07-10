@@ -36,6 +36,12 @@ exports.SOCKET_EVENTS = {
     CHANNEL_CONNECTED: 'channel:connected',
     CHANNEL_DISCONNECTED: 'channel:disconnected',
     CHANNEL_ACCOUNT_UPDATED: 'channel:account-updated', // ✅ Info da conta conectada atualizada (foto, push name, etc.)
+    CHANNEL_SYNC_STARTED: 'channel:sync-started',
+    CHANNEL_SYNC_COMPLETED: 'channel:sync-completed',
+    CHANNEL_SYNC_ERROR: 'channel:sync-error',
+    CHANNEL_MEDIA_PUBLISHED: 'channel:media-published',
+    CHANNEL_COMMENT_RECEIVED: 'channel:comment-received',
+    CHANNEL_ACTIVITY_RECEIVED: 'channel:activity-received',
     // User Events
     USER_TYPING: 'user:typing',
     USER_ONLINE: 'user:online',
