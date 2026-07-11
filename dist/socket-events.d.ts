@@ -68,6 +68,11 @@ export declare const SOCKET_EVENTS: {
     readonly TEAM_UNREAD_COUNT: "team:unread-count";
     readonly TEAM_HEARTBEAT: "team:heartbeat";
     readonly CREDIT_PAYMENT_CONFIRMED: "credit:payment:confirmed";
+    readonly HISTORY_IMPORT_QR: "history-import:qr";
+    readonly HISTORY_IMPORT_STATUS: "history-import:status";
+    readonly HISTORY_IMPORT_PROGRESS: "history-import:progress";
+    readonly HISTORY_IMPORT_COMPLETED: "history-import:completed";
+    readonly HISTORY_IMPORT_FAILED: "history-import:failed";
 };
 export type SocketEventName = typeof SOCKET_EVENTS[keyof typeof SOCKET_EVENTS];
 /**

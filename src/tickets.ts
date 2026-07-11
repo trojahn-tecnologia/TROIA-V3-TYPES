@@ -27,6 +27,9 @@ export interface Ticket {
   // Lead relationship (if ticket came from lead)
   leadId?: string;
 
+  // Project relationship (Gantt de tickets do helpdesk)
+  projectId?: string; // projeto (módulo projects) — escrito apenas internamente pelo backend
+
   // Assignment system integration
   assigneeId?: string;
   teamId?: string;

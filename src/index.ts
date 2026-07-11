@@ -166,3 +166,9 @@ export * from './widget';
 
 // Conversation semantic search (MCP tool request/response)
 export * from './conversation-search';
+
+// History Imports module (Importação de Histórico WhatsApp)
+export * from './history-imports';
+
+// Projects module (Gestão de projetos — Gantt de tickets do helpdesk)
+export * from './projects';

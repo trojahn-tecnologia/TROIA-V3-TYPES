@@ -16,6 +16,7 @@ export interface Ticket {
     customerId?: string;
     contactId?: string;
     leadId?: string;
+    projectId?: string;
     assigneeId?: string;
     teamId?: string;
     assignmentType?: string;

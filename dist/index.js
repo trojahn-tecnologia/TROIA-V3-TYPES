@@ -143,3 +143,7 @@ __exportStar(require("./agent-evaluators"), exports);
 __exportStar(require("./widget"), exports);
 // Conversation semantic search (MCP tool request/response)
 __exportStar(require("./conversation-search"), exports);
+// History Imports module (Importação de Histórico WhatsApp)
+__exportStar(require("./history-imports"), exports);
+// Projects module (Gestão de projetos — Gantt de tickets do helpdesk)
+__exportStar(require("./projects"), exports);

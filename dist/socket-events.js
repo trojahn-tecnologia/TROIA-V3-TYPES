@@ -91,6 +91,12 @@ exports.SOCKET_EVENTS = {
     TEAM_HEARTBEAT: 'team:heartbeat', // Client heartbeat to keep presence alive
     // Credit Payment Events
     CREDIT_PAYMENT_CONFIRMED: 'credit:payment:confirmed', // PIX payment confirmed via webhook
+    // History Import Events (Importação de Histórico WhatsApp)
+    HISTORY_IMPORT_QR: 'history-import:qr',
+    HISTORY_IMPORT_STATUS: 'history-import:status',
+    HISTORY_IMPORT_PROGRESS: 'history-import:progress',
+    HISTORY_IMPORT_COMPLETED: 'history-import:completed',
+    HISTORY_IMPORT_FAILED: 'history-import:failed',
 };
 // ============================================================================
 // ROOM PATTERNS

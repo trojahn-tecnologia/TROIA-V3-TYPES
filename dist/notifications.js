@@ -34,6 +34,11 @@ var NotificationType;
     NotificationType["TICKET_COMMENT_ADDED"] = "ticket_comment_added";
     NotificationType["CONVERSATION_ASSIGNED"] = "conversation_assigned";
     NotificationType["CONVERSATION_MESSAGE_RECEIVED"] = "conversation_message_received";
+    // Projects
+    NotificationType["PROJECT_TASK_UNBLOCKED"] = "project_task_unblocked";
+    NotificationType["PROJECT_TASK_COMPLETED"] = "project_task_completed";
+    NotificationType["PROJECT_COMPLETED"] = "project_completed";
+    NotificationType["PROJECT_TASK_OVERDUE"] = "project_task_overdue";
     // Lead events
     NotificationType["LEAD_ASSIGNED"] = "lead_assigned";
     NotificationType["LEAD_STATUS_CHANGED"] = "lead_status_changed";

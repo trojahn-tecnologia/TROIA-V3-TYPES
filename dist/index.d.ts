@@ -80,3 +80,5 @@ export * from './dashboards-marketing';
 export * from './agent-evaluators';
 export * from './widget';
 export * from './conversation-search';
+export * from './history-imports';
+export * from './projects';

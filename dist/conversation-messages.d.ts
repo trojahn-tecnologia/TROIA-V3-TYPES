@@ -118,6 +118,7 @@ export interface ConversationMessage {
     appId: string;
     companyId: string;
     conversationId: string;
+    channelId?: string;
     content: MessageContent[];
     plainText?: string;
     html?: string;

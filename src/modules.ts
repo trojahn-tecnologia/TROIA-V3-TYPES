@@ -42,6 +42,7 @@ export type ValidModuleId =
   | 'funnels'
   | 'funnel-steps'
   | 'goals'
+  | 'projects'
 
   // Feature modules
   | 'products'

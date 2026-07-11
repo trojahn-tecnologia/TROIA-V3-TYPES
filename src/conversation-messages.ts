@@ -156,6 +156,7 @@ export interface ConversationMessage {
   appId: string;
   companyId: string;
   conversationId: string;
+  channelId?: string; // denormalizado da conversation (D10 — dedup por canal)
 
   // Message content
   content: MessageContent[];

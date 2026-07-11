@@ -37,6 +37,12 @@ export enum NotificationType {
   CONVERSATION_ASSIGNED = 'conversation_assigned',
   CONVERSATION_MESSAGE_RECEIVED = 'conversation_message_received',
 
+  // Projects
+  PROJECT_TASK_UNBLOCKED = 'project_task_unblocked',
+  PROJECT_TASK_COMPLETED = 'project_task_completed',
+  PROJECT_COMPLETED = 'project_completed',
+  PROJECT_TASK_OVERDUE = 'project_task_overdue',
+
   // Lead events
   LEAD_ASSIGNED = 'lead_assigned',
   LEAD_STATUS_CHANGED = 'lead_status_changed',

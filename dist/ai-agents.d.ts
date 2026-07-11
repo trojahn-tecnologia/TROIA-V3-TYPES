@@ -192,6 +192,14 @@ export interface AIAgentCapabilityConfig {
         allowedTransferUserIds?: string[];
         allowedTeamIds?: string[];
         transferMessage?: string;
+        /**
+         * Prefixos de URL permitidos para send_media_message além do allowlist
+         * de contexto. Match por startsWith. Formato validado no backend:
+         * http(s):// + host + barra após o host (ex: "https://cdn.exemplo.com/r/").
+         * A barra após o host é obrigatória — sem ela, "https://cdn.x.com"
+         * casaria com "https://cdn.x.com.evil.net/..." (bypass de sufixo).
+         */
+        allowedMediaUrlPrefixes?: string[];
         [key: string]: unknown;
     };
 }

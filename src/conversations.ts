@@ -24,7 +24,7 @@ export interface Conversation {
 
   // External provider integration
   providerConversationId?: string; // External conversation ID
-  source: string;                  // Universal source identifier
+  source: string;                  // Universal source identifier — inclui 'import' (D5: conversa "Histórico importado" fechada, criada por ConversationsService.createImportedConversation)
 
   // Participants
   customerId?: string;
