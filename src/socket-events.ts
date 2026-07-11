@@ -36,6 +36,7 @@ export const SOCKET_EVENTS = {
   MESSAGE_DELETED: 'message:deleted',
   MESSAGE_REACTION: 'message:reaction',             // ✅ Reaction added/removed on a message
   MESSAGE_EDITED: 'message:edited',                 // ✅ Message content edited (inbound via webhook / outbound via UI)
+  MESSAGE_TRANSCRIBED: 'message:transcribed',       // ✅ Audio/video transcription (STT) saved on message plainText
 
   // Channel Events
   CHANNEL_QR: 'channel:qr',
@@ -303,6 +304,18 @@ export interface MessageEditedEvent {
   newPlainText: string;
   editedAt: string;
   source: 'webhook' | 'ui';     // webhook = cliente editou no WhatsApp; ui = usuário TROIA editou
+}
+
+/**
+ * Message Transcribed Event
+ * Emitido quando a transcrição STT de um áudio/vídeo é gerada sob demanda e
+ * salva no plainText da mensagem. Frontend deve atualizar apenas o plainText
+ * (NÃO marca a mensagem como editada).
+ */
+export interface MessageTranscribedEvent {
+  conversationId: string;
+  messageId: string;            // MongoDB _id da mensagem transcrita
+  plainText: string;            // Texto transcrito
 }
 
 /**
@@ -813,6 +826,7 @@ export interface SocketEventMap {
   [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
   [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;       // ✅ Reaction add/remove
   [SOCKET_EVENTS.MESSAGE_EDITED]: MessageEditedEvent;           // ✅ Message content edited
+  [SOCKET_EVENTS.MESSAGE_TRANSCRIBED]: MessageTranscribedEvent; // ✅ STT transcription saved on plainText
   [SOCKET_EVENTS.MESSAGE_DELETED]: MessageDeletedEvent;         // ✅ Message soft-deleted (ui/webhook)
 
   // Channel Events

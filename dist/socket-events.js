@@ -31,6 +31,7 @@ exports.SOCKET_EVENTS = {
     MESSAGE_DELETED: 'message:deleted',
     MESSAGE_REACTION: 'message:reaction', // ✅ Reaction added/removed on a message
     MESSAGE_EDITED: 'message:edited', // ✅ Message content edited (inbound via webhook / outbound via UI)
+    MESSAGE_TRANSCRIBED: 'message:transcribed', // ✅ Audio/video transcription (STT) saved on message plainText
     // Channel Events
     CHANNEL_QR: 'channel:qr',
     CHANNEL_CONNECTED: 'channel:connected',

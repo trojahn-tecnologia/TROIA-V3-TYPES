@@ -21,6 +21,7 @@ export declare const SOCKET_EVENTS: {
     readonly MESSAGE_DELETED: "message:deleted";
     readonly MESSAGE_REACTION: "message:reaction";
     readonly MESSAGE_EDITED: "message:edited";
+    readonly MESSAGE_TRANSCRIBED: "message:transcribed";
     readonly CHANNEL_QR: "channel:qr";
     readonly CHANNEL_CONNECTED: "channel:connected";
     readonly CHANNEL_DISCONNECTED: "channel:disconnected";
@@ -232,6 +233,17 @@ export interface MessageEditedEvent {
     newPlainText: string;
     editedAt: string;
     source: 'webhook' | 'ui';
+}
+/**
+ * Message Transcribed Event
+ * Emitido quando a transcrição STT de um áudio/vídeo é gerada sob demanda e
+ * salva no plainText da mensagem. Frontend deve atualizar apenas o plainText
+ * (NÃO marca a mensagem como editada).
+ */
+export interface MessageTranscribedEvent {
+    conversationId: string;
+    messageId: string;
+    plainText: string;
 }
 /**
  * Message Deleted Event
@@ -695,6 +707,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.MESSAGE_READ]: MessageReadEvent;
     [SOCKET_EVENTS.MESSAGE_REACTION]: MessageReactionEvent;
     [SOCKET_EVENTS.MESSAGE_EDITED]: MessageEditedEvent;
+    [SOCKET_EVENTS.MESSAGE_TRANSCRIBED]: MessageTranscribedEvent;
     [SOCKET_EVENTS.MESSAGE_DELETED]: MessageDeletedEvent;
     [SOCKET_EVENTS.CHANNEL_QR]: ChannelQREvent;
     [SOCKET_EVENTS.CHANNEL_CONNECTED]: ChannelConnectedEvent;
