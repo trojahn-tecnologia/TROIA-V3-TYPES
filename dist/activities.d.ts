@@ -21,6 +21,8 @@ export interface Activity {
     title: string;
     description?: string;
     summary?: string;
+    contentFormat?: 'html' | 'text';
+    attachments?: ActivityAttachment[];
     beforeData?: Record<string, unknown>;
     afterData?: Record<string, unknown>;
     metadata?: Record<string, unknown>;
@@ -32,6 +34,12 @@ export interface Activity {
     occurredAt: string;
     createdAt: string;
     updatedAt: string;
+}
+export interface ActivityAttachment {
+    url: string;
+    filename: string;
+    size?: number;
+    mimeType?: string;
 }
 export type ActivityType = 'creation' | 'modification' | 'deletion' | 'assignment' | 'status_change' | 'communication' | 'interaction' | 'system' | 'integration' | 'workflow';
 export type ActivityCategory = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'assignment' | 'payment' | 'integration' | 'system' | 'workflow' | 'report';

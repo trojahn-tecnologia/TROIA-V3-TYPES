@@ -147,3 +147,7 @@ __exportStar(require("./conversation-search"), exports);
 __exportStar(require("./history-imports"), exports);
 // Projects module (Gestão de projetos — Gantt de tickets do helpdesk)
 __exportStar(require("./projects"), exports);
+// Ticket Emails module (Plano B — e-mails de ticket "de e-mail", threading RFC)
+__exportStar(require("./ticket-emails"), exports);
+// Email Retentions module (Plano B — retenção de e-mails antes de virarem ticket)
+__exportStar(require("./email-retentions"), exports);

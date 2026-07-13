@@ -82,3 +82,5 @@ export * from './widget';
 export * from './conversation-search';
 export * from './history-imports';
 export * from './projects';
+export * from './ticket-emails';
+export * from './email-retentions';

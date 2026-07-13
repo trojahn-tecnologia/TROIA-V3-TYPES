@@ -172,3 +172,9 @@ export * from './history-imports';
 
 // Projects module (Gestão de projetos — Gantt de tickets do helpdesk)
 export * from './projects';
+
+// Ticket Emails module (Plano B — e-mails de ticket "de e-mail", threading RFC)
+export * from './ticket-emails';
+
+// Email Retentions module (Plano B — retenção de e-mails antes de virarem ticket)
+export * from './email-retentions';

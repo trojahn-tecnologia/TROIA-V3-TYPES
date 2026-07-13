@@ -8,6 +8,15 @@ export interface EmailChannelConfig {
     displayName: string;
     signature?: string;
     autoCreateTicket?: boolean;
+    /**
+     * Modo de criação de ticket a partir de e-mail inbound (Plano B).
+     * - 'off': comportamento legado — inbound cria/segue conversation no chat.
+     * - 'review': e-mail fica em retenção (`EmailRetention`, status 'pending')
+     *   até aprovação manual antes de virar ticket.
+     * - 'auto': ticket é criado automaticamente a partir do e-mail.
+     * Legado `autoCreateTicket: true` sem este campo ⇒ tratado como 'auto'.
+     */
+    ticketCreationMode?: 'off' | 'review' | 'auto';
     ticketCategory?: string;
     ticketPriority?: string;
     ticketTeamId?: string;

@@ -43,7 +43,7 @@ export interface ProjectInternalNotifyConfig {
 
 export interface Project extends AppAwareDocument {
   name: string;
-  client?: string;                  // nome livre do cliente (exibição)
+  clientId?: string;                // ref customers
   description?: string;
   color: string;                    // #RRGGBB
   status: ProjectStatus;            // 'completed' é automático (todas as tarefas concluídas)
@@ -101,7 +101,7 @@ export interface CreateProjectTaskInput {
 
 export interface CreateProjectRequest {
   name: string;
-  client?: string;
+  clientId?: string;
   description?: string;
   color?: string;
   pipelineId: string;
@@ -116,7 +116,7 @@ export interface CreateProjectRequest {
 
 export interface UpdateProjectRequest {
   name?: string;
-  client?: string;
+  clientId?: string;
   description?: string;
   color?: string;
   pipelineId?: string;
@@ -218,6 +218,7 @@ export interface ProjectListItem extends ProjectResponse {
   startDate?: string;               // min(tasks.startDate) ISO
   endDate?: string;                 // max(tasks.endDate) ISO
   nextMilestone?: { title: string; date: string } | null;
+  clientName?: string;              // enrichment (nome do customer vinculado via clientId)
 }
 export interface ProjectListResponse extends ListResponse<ProjectListItem> {}
 export interface ProjectQueryOptions extends GenericQueryOptions<ProjectQuery> {}

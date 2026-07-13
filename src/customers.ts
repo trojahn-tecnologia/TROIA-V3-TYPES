@@ -52,6 +52,8 @@ export interface CreateCustomerRequest {
   type: 'PF' | 'PJ';
   picture?: string;
   tags?: string[];
+  email?: string;
+  phone?: string;
   domains?: string[];
   segment: string;
   contacts?: string[];
@@ -68,6 +70,8 @@ export interface UpdateCustomerRequest {
   type?: 'PF' | 'PJ';
   picture?: string;
   tags?: string[];
+  email?: string;
+  phone?: string;
   domains?: string[];
   segment?: string;
   contacts?: string[];
@@ -76,6 +80,14 @@ export interface UpdateCustomerRequest {
   address?: CustomerAddress;
   website?: string;
   status?: 'active' | 'inactive';
+}
+
+/** Item de dropdown cross-module para vínculo com cliente (contato, ticket, projeto). */
+export interface CustomerDropdownItem {
+  id: string;
+  name: string;
+  type: 'PF' | 'PJ';
+  document?: string;
 }
 
 export type CustomerResponse = Customer;

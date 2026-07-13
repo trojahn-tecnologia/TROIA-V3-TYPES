@@ -1,5 +1,6 @@
 // Ticket Types - Sistema de atendimento com SLA
 import { TicketStatusCategory } from './ticket-pipelines';
+import { ActivityAttachment } from './activities';
 
 export interface Ticket {
   id: string;
@@ -47,6 +48,13 @@ export interface Ticket {
   conversationId?: string; // Associated conversation
   channelId?: string;      // Channel where ticket originated
   source?: string;         // Universal source (email, whatsapp, etc.)
+
+  // E-mail→Ticket (Plano B) — canal de e-mail de origem. Presença = ticket
+  // "de e-mail" (reply do ticket envia e-mail via ticket-emails em vez de
+  // mensagem de conversation). Campo interno — escrito apenas pelo backend
+  // no fluxo de criação a partir de e-mail; NÃO aceito em
+  // CreateTicketRequest/UpdateTicketRequest.
+  emailChannelId?: string;
 
   // Dates and timeline
   firstResponseAt?: string;
@@ -168,6 +176,48 @@ export interface TicketSLA {
   breached: boolean;
   actualResponseTime?: number;
   actualResolutionTime?: number;
+}
+
+// Timeline unificada do ticket (Plano A — redesign da tela de tickets)
+// 'email' = fonte ticket-emails (populada a partir do Plano B; Spec A entrega só 'activity')
+export type TicketTimelineKind = 'activity' | 'email';
+
+export interface TicketTimelineItem {
+  kind: TicketTimelineKind;
+  id: string;
+  createdAt: string; // ISO
+
+  // kind: 'activity'
+  activityType?: string; // comment_added | internal_note_added | assignment_changed | ...
+  content?: string;
+  contentFormat?: 'html' | 'text';
+  isInternal?: boolean;
+  attachments?: ActivityAttachment[];
+  actor?: { id?: string; name: string; type: 'user' | 'contact' | 'system' };
+  metadata?: Record<string, unknown>;
+
+  // kind: 'email' (Plano B — Spec A entrega só 'activity')
+  direction?: 'inbound' | 'outbound';
+  emailHtml?: string; // HTML do email (inbound) — FE renderiza em iframe sandbox
+  emailMeta?: {
+    from?: string;
+    to?: string[];
+    cc?: string[];
+    subject?: string;
+    deliveryStatus?: string;
+  };
+}
+
+export interface TicketTimelineResponse {
+  items: TicketTimelineItem[];
+  nextCursor?: string;
+  hasMore: boolean;
+}
+
+// Reply de ticket com editor rico (Plano A)
+export interface ReplyTicketRequest {
+  content: string;
+  attachments?: ActivityAttachment[];
 }
 
 // Export query — subset de TicketQuery sem paginação

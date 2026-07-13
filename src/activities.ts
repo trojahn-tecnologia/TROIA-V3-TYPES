@@ -32,6 +32,10 @@ export interface Activity {
   description?: string;
   summary?: string; // Short description for lists
 
+  // Rich content (Plano A — editor rico da timeline de tickets)
+  contentFormat?: 'html' | 'text'; // ausente = legado texto puro (comportamento atual preservado)
+  attachments?: ActivityAttachment[];
+
   // Activity data and changes
   beforeData?: Record<string, unknown>; // State before change
   afterData?: Record<string, unknown>;  // State after change
@@ -52,6 +56,14 @@ export interface Activity {
   occurredAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// Anexo de activity (comentário/nota com editor rico — Plano A)
+export interface ActivityAttachment {
+  url: string;
+  filename: string;
+  size?: number;
+  mimeType?: string;
 }
 
 export type ActivityType =

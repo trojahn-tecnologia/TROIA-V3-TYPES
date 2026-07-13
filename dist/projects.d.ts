@@ -30,7 +30,7 @@ export interface ProjectInternalNotifyConfig {
 }
 export interface Project extends AppAwareDocument {
     name: string;
-    client?: string;
+    clientId?: string;
     description?: string;
     color: string;
     status: ProjectStatus;
@@ -82,7 +82,7 @@ export interface CreateProjectTaskInput {
 }
 export interface CreateProjectRequest {
     name: string;
-    client?: string;
+    clientId?: string;
     description?: string;
     color?: string;
     pipelineId: string;
@@ -101,7 +101,7 @@ export interface CreateProjectRequest {
 }
 export interface UpdateProjectRequest {
     name?: string;
-    client?: string;
+    clientId?: string;
     description?: string;
     color?: string;
     pipelineId?: string;
@@ -197,6 +197,7 @@ export interface ProjectListItem extends ProjectResponse {
         title: string;
         date: string;
     } | null;
+    clientName?: string;
 }
 export interface ProjectListResponse extends ListResponse<ProjectListItem> {
 }

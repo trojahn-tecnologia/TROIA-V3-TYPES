@@ -34,6 +34,7 @@ export interface Contact {
     teamId?: string;
     lastInteractionAt?: string;
     mutedBy?: string[];
+    emailTicketAuthorization?: 'approved' | 'blocked';
     createdAt: string;
     updatedAt: string;
 }

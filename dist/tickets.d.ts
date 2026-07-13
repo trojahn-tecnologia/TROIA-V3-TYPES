@@ -1,4 +1,5 @@
 import { TicketStatusCategory } from './ticket-pipelines';
+import { ActivityAttachment } from './activities';
 export interface Ticket {
     id: string;
     appId: string;
@@ -29,6 +30,7 @@ export interface Ticket {
     conversationId?: string;
     channelId?: string;
     source?: string;
+    emailChannelId?: string;
     firstResponseAt?: string;
     lastResponseAt?: string;
     resolvedAt?: string;
@@ -135,6 +137,41 @@ export interface TicketSLA {
     breached: boolean;
     actualResponseTime?: number;
     actualResolutionTime?: number;
+}
+export type TicketTimelineKind = 'activity' | 'email';
+export interface TicketTimelineItem {
+    kind: TicketTimelineKind;
+    id: string;
+    createdAt: string;
+    activityType?: string;
+    content?: string;
+    contentFormat?: 'html' | 'text';
+    isInternal?: boolean;
+    attachments?: ActivityAttachment[];
+    actor?: {
+        id?: string;
+        name: string;
+        type: 'user' | 'contact' | 'system';
+    };
+    metadata?: Record<string, unknown>;
+    direction?: 'inbound' | 'outbound';
+    emailHtml?: string;
+    emailMeta?: {
+        from?: string;
+        to?: string[];
+        cc?: string[];
+        subject?: string;
+        deliveryStatus?: string;
+    };
+}
+export interface TicketTimelineResponse {
+    items: TicketTimelineItem[];
+    nextCursor?: string;
+    hasMore: boolean;
+}
+export interface ReplyTicketRequest {
+    content: string;
+    attachments?: ActivityAttachment[];
 }
 export interface TicketExportQuery {
     pipelineId?: string;

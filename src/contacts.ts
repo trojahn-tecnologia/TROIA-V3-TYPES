@@ -68,6 +68,11 @@ export interface Contact {
   // quando conv é individual).
   mutedBy?: string[];
 
+  // E-mail→Ticket (Plano B, D5) — autorização do contato para que e-mails
+  // dele virem tickets automaticamente/em retenção. Ausente = pendente
+  // (primeiro e-mail sempre passa por retenção manual até decisão).
+  emailTicketAuthorization?: 'approved' | 'blocked';
+
   createdAt: string;
   updatedAt: string;
 }
