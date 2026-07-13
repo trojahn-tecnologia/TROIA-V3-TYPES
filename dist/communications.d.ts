@@ -5,6 +5,7 @@
 import { MediaData } from './gateway';
 import { Contact } from './contacts';
 import { Group } from './groups';
+import type { WhatsAppTemplateComponent } from './templates';
 export interface EmailData {
     to: string | string[];
     from?: string;
@@ -83,8 +84,9 @@ export interface TemplateMessageData {
     components?: Array<{
         type: 'header' | 'body' | 'footer' | 'button';
         parameters?: Array<{
-            type: 'text' | 'image' | 'video' | 'document' | 'location';
+            type: 'text' | 'payload' | 'image' | 'video' | 'document' | 'location';
             text?: string;
+            payload?: string;
             image?: {
                 link: string;
             };
@@ -103,8 +105,9 @@ export interface TemplateMessageData {
             };
         }>;
         sub_type?: 'url' | 'quick_reply';
-        index?: number;
+        index?: number | string;
     }>;
+    providerComponents?: WhatsAppTemplateComponent[];
     renderedContent?: string;
     messageId?: string;
     headerMedia?: {

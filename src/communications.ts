@@ -5,6 +5,7 @@
 import { MediaData } from './gateway';
 import { Contact } from './contacts';
 import { Group } from './groups';
+import type { WhatsAppTemplateComponent } from './templates';
 
 export interface EmailData {
   to: string | string[];
@@ -107,20 +108,26 @@ export interface TemplateMessageData {
   // Variables already resolved (position -> value)
   variables: Record<string, string>;  // { "1": "João", "2": "Empresa XYZ" }
 
-  // Template components (WhatsApp Business API format)
+  // Template components (WhatsApp Business API SEND format — built by WhatsAppProvider)
   components?: Array<{
     type: 'header' | 'body' | 'footer' | 'button';
     parameters?: Array<{
-      type: 'text' | 'image' | 'video' | 'document' | 'location';
+      type: 'text' | 'payload' | 'image' | 'video' | 'document' | 'location';
       text?: string;
+      payload?: string;
       image?: { link: string };
       video?: { link: string };
       document?: { link: string; filename?: string };
       location?: { latitude: number; longitude: number; name?: string; address?: string };
     }>;
     sub_type?: 'url' | 'quick_reply';
-    index?: number;
+    index?: number | string;
   }>;
+
+  // RAW creation-format components from providerConfig (Meta Management API format).
+  // Callers pass these untouched; WhatsAppProvider converts to SEND format internally.
+  // When present, takes precedence over `components`.
+  providerComponents?: WhatsAppTemplateComponent[];
 
   // For Gateway: pre-rendered content (variables already replaced)
   renderedContent?: string;
