@@ -529,8 +529,9 @@ export enum ProviderCapability {
   // Internal subagents (services da plataforma TROIA que usam LLM, agrupados por afinidade funcional).
   // Cada tenant marca essas capabilities na integration que quer usar para cada grupo.
   AI_INTERNAL_JUDGE = 'ai_internal_judge',           // LlmJudgeService (10 evaluators), judge-llm tool, quality-test, ab-test
-  AI_INTERNAL_PROCESSING = 'ai_internal_processing', // narration-cleaner, summarizer, lead-processor, wizard draft, workflow modifier
+  AI_INTERNAL_PROCESSING = 'ai_internal_processing', // narration-cleaner, summarizer, wizard draft, workflow modifier; fallback do lead import
   AI_INTERNAL_ANALYTICS = 'ai_internal_analytics',   // gap classifier/resolution, insights, topic-tagger, prompt coach/migration/rewriter, training
+  AI_INTERNAL_IMPORTING = 'ai_internal_importing',   // lead import (mapeamento de colunas CSV + extração por lotes); ausente → fallback AI_INTERNAL_PROCESSING
   TEXT_TO_SPEECH = 'text_to_speech',          // Convert text to audio (TTS)
   SPEECH_TO_TEXT = 'speech_to_text',          // Convert audio to text (STT/Whisper)
 

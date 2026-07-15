@@ -202,6 +202,7 @@ var ProviderCapability;
     ProviderCapability["AI_INTERNAL_JUDGE"] = "ai_internal_judge";
     ProviderCapability["AI_INTERNAL_PROCESSING"] = "ai_internal_processing";
     ProviderCapability["AI_INTERNAL_ANALYTICS"] = "ai_internal_analytics";
+    ProviderCapability["AI_INTERNAL_IMPORTING"] = "ai_internal_importing";
     ProviderCapability["TEXT_TO_SPEECH"] = "text_to_speech";
     ProviderCapability["SPEECH_TO_TEXT"] = "speech_to_text";
     // Template Management
