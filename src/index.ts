@@ -126,6 +126,9 @@ export * from './forms';
 // Internal Team Chat (user-to-user chat, Redis-backed, 72h TTL)
 export * from './internal-chat';
 
+// Kanban system (generic + lead-specific contracts)
+export * from './kanban';
+
 // MongoDB Document Models (ObjectId/Date types for repositories)
 export * from './models';
 

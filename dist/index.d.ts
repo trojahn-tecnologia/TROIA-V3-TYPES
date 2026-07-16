@@ -67,6 +67,7 @@ export * from './websites';
 export * from './voices';
 export * from './forms';
 export * from './internal-chat';
+export * from './kanban';
 export * from './models';
 export * from './theme';
 export * from './credits';

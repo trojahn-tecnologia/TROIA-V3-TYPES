@@ -115,6 +115,8 @@ __exportStar(require("./voices"), exports);
 __exportStar(require("./forms"), exports);
 // Internal Team Chat (user-to-user chat, Redis-backed, 72h TTL)
 __exportStar(require("./internal-chat"), exports);
+// Kanban system (generic + lead-specific contracts)
+__exportStar(require("./kanban"), exports);
 // MongoDB Document Models (ObjectId/Date types for repositories)
 __exportStar(require("./models"), exports);
 // Theme overrides (tenant customization)

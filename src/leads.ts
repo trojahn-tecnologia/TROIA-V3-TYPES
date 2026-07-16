@@ -400,3 +400,52 @@ export interface AddLeadInterestsRequest {
 
 // Import types
 import { PaginationQuery, ListResponse } from './common';
+
+// ============================================================================
+// KANBAN EM ESCALA (SP1 — 2026-07-16)
+// Projeção enxuta do card + queries dos endpoints /leads/kanban.
+// Campos = exatamente o que LeadCard.tsx renderiza (ver spec §4).
+// ============================================================================
+
+export interface LeadKanbanCardContact {
+  id: string;
+  name?: string;
+  picture?: string;
+  tags?: string[];
+  identifiers?: {
+    email?: string[];
+    phone?: string[];
+    whatsapp?: string[];
+  };
+}
+
+export interface LeadKanbanCard {
+  id: string;
+  stepId: string;
+  funnelId: string;
+  description?: string;
+  budget?: number;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  businessStatus?: 'pending' | 'won' | 'lost';
+  qualifyStatus?: 'pending' | 'qualified' | 'disqualified';
+  /** Sintético — calculado no backend a partir de activities. */
+  activityStatus: 'no_activities' | 'overdue' | 'up_to_date';
+  lastInteractionAt?: string;
+  createdAt: string;
+  contact?: LeadKanbanCardContact;
+  assignee?: { id: string; name: string };
+}
+
+export interface LeadKanbanQuery {
+  funnelId: string;
+  search?: string;
+  /** Tamanho da janela por coluna (default 50, máx 100 — validado no backend). */
+  windowSize?: number;
+  /** Mesmos filtros da listagem, exceto funnelId (top-level) e stepId (por rota). */
+  filters?: LeadQuery['filters'];
+}
+
+export interface LeadKanbanColumnQuery extends LeadKanbanQuery {
+  stepId: string;
+  cursor?: string;
+}
