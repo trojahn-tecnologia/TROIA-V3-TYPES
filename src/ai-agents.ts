@@ -137,6 +137,50 @@ export interface ToolPrecondition {
   conditions: PreconditionRule[];
 }
 
+/**
+ * Configuração de escalação/transferência do agente (ponto 6 do blueprint
+ * de qualidade, 2026-07-15). O LLM decide QUANDO escalar; esta config
+ * decide PARA ONDE (padrão Intercom Fin).
+ */
+export interface AIAgentEscalationConfig {
+  /** 'team'/'user' = destino resolvido pela config; 'model_choice' = legado (modelo escolhe) */
+  defaultTarget: 'team' | 'user' | 'model_choice';
+  /** Obrigatório quando defaultTarget = 'team' */
+  teamId?: string;
+  /** Obrigatório quando defaultTarget = 'user' */
+  userId?: string;
+}
+
+/**
+ * Regra binária da rubrica do MessageGuard (Onda 1 do blueprint, 2026-07-15).
+ * Extraída automaticamente do systemPrompt no save (método candidate-based,
+ * RLCF): cada regra é atômica e verificável por um judge pequeno.
+ */
+export interface AIAgentGuardRubricRule {
+  /** R1..R15 */
+  id: string;
+  /** Enunciado binário verificável (pt-BR) */
+  rule: string;
+  /** hard = verificável objetivamente; principle = julgável por LLM */
+  type: 'hard' | 'principle';
+  /** high = política (bloqueia no enforcement); low = estilo (fail-open) */
+  severity: 'low' | 'high';
+}
+
+/**
+ * Rubrica compilada do agente — 1 artefato, 3 usos: MessageGuard (runtime),
+ * reforço no prompt e evaluator per-tenant. Gerada de forma assíncrona no
+ * save do agente; `promptHash` detecta staleness vs o systemPrompt atual.
+ */
+export interface AIAgentGuardRubric {
+  rules: AIAgentGuardRubricRule[];
+  /** sha256 do systemPrompt que originou a rubrica */
+  promptHash: string;
+  generatedAt: string;
+  /** Modelo que gerou (debug/auditoria) */
+  model?: string;
+}
+
 export interface AIAgent {
   _id?: ObjectId;
   id?: string;
@@ -175,6 +219,21 @@ export interface AIAgent {
   };
   enabledCapabilities: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
   webhooks?: AIAgentWebhook[];                     // Webhook configurations for external data injection
+  /**
+   * Configuração de escalação/transferência (2026-07-15, ponto 6 do blueprint
+   * de qualidade). Padrão Intercom Fin: o LLM decide QUANDO escalar; a
+   * configuração do dono decide PARA ONDE.
+   *
+   * - `defaultTarget: 'team'` + `teamId`: toda transferência vai para a
+   *   equipe configurada — o runtime expõe apenas `transfer_to_team` com o
+   *   destino travado (o modelo não escolhe email/equipe).
+   * - `defaultTarget: 'user'` + `userId`: idem para um atendente específico.
+   * - `defaultTarget: 'model_choice'` (ou config ausente): comportamento
+   *   legado — o modelo escolhe entre as tools/destinos disponíveis.
+   */
+  escalationConfig?: AIAgentEscalationConfig;
+  /** Rubrica do MessageGuard — gerada pelo sistema no save (não settável via API) */
+  guardRubric?: AIAgentGuardRubric;
   responseStyle?: string;                   // Agent response style (professional, casual, etc.)
   tone?: string;                            // Agent tone (helpful, formal, friendly, etc.)
   language?: string;                        // Preferred language for responses
@@ -363,6 +422,7 @@ export interface CreateAIAgentRequest {
     voiceId?: string;
   };
   enabledCapabilities?: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
+  escalationConfig?: AIAgentEscalationConfig;
   webhooks?: Omit<AIAgentWebhook, 'createdAt' | 'updatedAt'>[];
 }
 
@@ -389,6 +449,7 @@ export interface UpdateAIAgentRequest {
     voiceId?: string;
   };
   enabledCapabilities?: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
+  escalationConfig?: AIAgentEscalationConfig;
   webhooks?: Omit<AIAgentWebhook, 'createdAt' | 'updatedAt'>[];
   /**
    * ID do `agent-quality-snapshots` doc que originou este update (Sprint UI-4).
