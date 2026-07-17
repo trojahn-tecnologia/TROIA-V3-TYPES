@@ -449,6 +449,13 @@ export enum ProviderCapability {
   // Notification capabilities
   SEND_SMS = 'send_sms',
   SEND_PUSH = 'send_push',
+  /**
+   * Marca a integração como remetente de códigos 2FA/verificação do SISTEMA
+   * (app-level, não company). Não-exclusiva: várias integrações podem carregá-la
+   * e a cascata do SystemWhatsAppService ordena por preferência de provider
+   * (whatsapp-business > gateway-whatsapp).
+   */
+  SEND_2FA = 'send_2fa',
 
   // Social media capabilities
   CREATE_POST = 'create_post',

@@ -1,5 +1,7 @@
 // Lead Types - Sales system with universal source
 
+import type { KanbanSortMode } from './kanban';
+
 // ============================================================================
 // CANONICAL ENUMS — single source of truth para Lead.source / Lead.medium / Lead.channel
 // ============================================================================
@@ -188,6 +190,9 @@ export interface Lead {
   lastStepAt?: string;
   lastActivityAt?: string;
 
+  /** Rank fractional do modo de ordenação manual do kanban (SP2). Ausente = nunca ordenado manualmente. */
+  kanbanRank?: string;
+
   // Origin (free-text classification)
   origin?: string;
 
@@ -288,6 +293,7 @@ export interface UpdateLeadRequest {
   lastInteractionAt?: string;
   lastFollowUpAt?: string;
   lastStepAt?: string;
+  kanbanRank?: string;
   origin?: string;
   campaignName?: string;
   adsetName?: string;
@@ -432,6 +438,8 @@ export interface LeadKanbanCard {
   activityStatus: 'no_activities' | 'overdue' | 'up_to_date';
   lastInteractionAt?: string;
   createdAt: string;
+  /** Rank do modo manual — o client precisa dele pra calcular a posição entre vizinhos. */
+  kanbanRank?: string;
   contact?: LeadKanbanCardContact;
   assignee?: { id: string; name: string };
 }
@@ -441,6 +449,8 @@ export interface LeadKanbanQuery {
   search?: string;
   /** Tamanho da janela por coluna (default 50, máx 100 — validado no backend). */
   windowSize?: number;
+  /** Modo de ordenação (default 'created'). Import de './kanban'. */
+  sortMode?: KanbanSortMode;
   /** Mesmos filtros da listagem, exceto funnelId (top-level) e stepId (por rota). */
   filters?: LeadQuery['filters'];
 }

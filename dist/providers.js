@@ -135,6 +135,13 @@ var ProviderCapability;
     // Notification capabilities
     ProviderCapability["SEND_SMS"] = "send_sms";
     ProviderCapability["SEND_PUSH"] = "send_push";
+    /**
+     * Marca a integração como remetente de códigos 2FA/verificação do SISTEMA
+     * (app-level, não company). Não-exclusiva: várias integrações podem carregá-la
+     * e a cascata do SystemWhatsAppService ordena por preferência de provider
+     * (whatsapp-business > gateway-whatsapp).
+     */
+    ProviderCapability["SEND_2FA"] = "send_2fa";
     // Social media capabilities
     ProviderCapability["CREATE_POST"] = "create_post";
     ProviderCapability["CREATE_STORY"] = "create_story";

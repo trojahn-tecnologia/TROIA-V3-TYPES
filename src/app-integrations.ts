@@ -76,4 +76,12 @@ export interface ProviderDefinitionResponse {
   categories: string[];
   status: 'active' | 'inactive';
   configSchema: Record<string, unknown>;
+  /**
+   * Config schema for Direct API mode (config by ID, no OAuth signup flow).
+   * Optional — only providers that support a non-Embedded-Signup app-level
+   * config expose it (e.g. whatsapp-business, registering a WABA directly
+   * as the official 2FA sender). Absent when the provider only supports
+   * Embedded Signup / has no Direct API alternative.
+   */
+  directConfigSchema?: Record<string, unknown>;
 }

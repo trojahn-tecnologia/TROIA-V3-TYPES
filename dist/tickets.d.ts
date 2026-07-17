@@ -1,5 +1,6 @@
 import { TicketStatusCategory } from './ticket-pipelines';
 import { ActivityAttachment } from './activities';
+import type { KanbanSortMode } from './kanban';
 export interface Ticket {
     id: string;
     appId: string;
@@ -49,6 +50,12 @@ export interface Ticket {
     customerSatisfaction?: number;
     createdAt: string;
     updatedAt: string;
+    /** Timestamp de entrada na etapa atual — usado pelo sortMode 'stepEntered' do kanban (SP3). */
+    stageEnteredAt?: string;
+    /** Timestamp da última atividade registrada no ticket — usado pelo sortMode 'inactivity' do kanban (SP3). */
+    lastActivityAt?: string;
+    /** Rank fractional do modo de ordenação manual do kanban (SP3). Ausente = nunca ordenado manualmente. */
+    kanbanRank?: string;
 }
 export interface CreateTicketRequest {
     title: string;
@@ -88,6 +95,8 @@ export interface UpdateTicketRequest {
     internalNotes?: string;
     resolutionSummary?: string;
     customerSatisfaction?: number;
+    /** Rank fractional do modo de ordenação manual do kanban (SP3) — setado via drag no board. */
+    kanbanRank?: string;
 }
 export type TicketResponse = Ticket;
 export interface TicketQuery extends PaginationQuery {
@@ -196,3 +205,43 @@ export interface TicketExportQuery {
     search?: string;
 }
 import { PaginationQuery, ListResponse } from './common';
+/** Projeção enxuta do ticket para o card do kanban (SP3) — só o que o TicketCard renderiza. */
+export interface TicketKanbanCard {
+    id: string;
+    stageId: string;
+    pipelineId: string;
+    ticketNumber: string;
+    title: string;
+    description?: string;
+    priority: string;
+    statusCategory: string;
+    category?: string;
+    tags: string[];
+    slaBreached?: boolean;
+    slaDueAt?: string;
+    projectId?: string;
+    kanbanRank?: string;
+    createdAt: string;
+    updatedAt: string;
+    contact?: {
+        id: string;
+        name: string;
+        picture?: string;
+    };
+    assignee?: {
+        id: string;
+        name: string;
+        picture?: string;
+    };
+}
+/** Query do board de tickets (GET /tickets/kanban). */
+export interface TicketKanbanQuery {
+    pipelineId: string;
+    search?: string;
+    /** Tamanho da janela por coluna (default 50, máx 100 — validado no backend). */
+    windowSize?: number;
+    /** Modo de ordenação (default 'created'). Import de './kanban'. */
+    sortMode?: KanbanSortMode;
+    /** TicketQuery.filters não tem tipo nomeado (inline) — sem base pra Omit. */
+    filters?: Record<string, unknown>;
+}

@@ -1,3 +1,4 @@
+import type { KanbanSortMode } from './kanban';
 /** Plataforma/origem de marketing do lead (espelha campos UTM). */
 export declare const LEAD_SOURCES: readonly ["meta", "google", "tiktok", "linkedin", "microsoft", "organic", "referral", "email", "offline", "partner", "outbound", "direct"];
 export type LeadSource = typeof LEAD_SOURCES[number];
@@ -68,6 +69,8 @@ export interface Lead {
     lastFollowUpAt?: string;
     lastStepAt?: string;
     lastActivityAt?: string;
+    /** Rank fractional do modo de ordenação manual do kanban (SP2). Ausente = nunca ordenado manualmente. */
+    kanbanRank?: string;
     origin?: string;
     campaignName?: string;
     adsetName?: string;
@@ -146,6 +149,7 @@ export interface UpdateLeadRequest {
     lastInteractionAt?: string;
     lastFollowUpAt?: string;
     lastStepAt?: string;
+    kanbanRank?: string;
     origin?: string;
     campaignName?: string;
     adsetName?: string;
@@ -270,6 +274,8 @@ export interface LeadKanbanCard {
     activityStatus: 'no_activities' | 'overdue' | 'up_to_date';
     lastInteractionAt?: string;
     createdAt: string;
+    /** Rank do modo manual — o client precisa dele pra calcular a posição entre vizinhos. */
+    kanbanRank?: string;
     contact?: LeadKanbanCardContact;
     assignee?: {
         id: string;
@@ -281,6 +287,8 @@ export interface LeadKanbanQuery {
     search?: string;
     /** Tamanho da janela por coluna (default 50, máx 100 — validado no backend). */
     windowSize?: number;
+    /** Modo de ordenação (default 'created'). Import de './kanban'. */
+    sortMode?: KanbanSortMode;
     /** Mesmos filtros da listagem, exceto funnelId (top-level) e stepId (por rota). */
     filters?: LeadQuery['filters'];
 }

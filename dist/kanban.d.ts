@@ -29,7 +29,29 @@ export interface KanbanBoardAggregates {
         low: number;
     };
 }
-export interface KanbanBoardResponse<T> {
+/** TAggregates com default = retrocompatível com o board de leads (SP1/SP2). */
+export interface KanbanBoardResponse<T, TAggregates = KanbanBoardAggregates> {
     columns: KanbanColumnPage<T>[];
-    aggregates: KanbanBoardAggregates;
+    aggregates: TAggregates;
+}
+/** Modos de ordenação do kanban. Cada módulo suporta um subconjunto (whitelist no backend). */
+export type KanbanSortMode = 'created' | 'stepEntered' | 'priority' | 'idle' | 'inactivity' | 'manual';
+export declare const LEAD_KANBAN_SORT_MODES: KanbanSortMode[];
+/** Aggregates do board de tickets — sem valor monetário (tickets não têm budget). */
+export interface TicketKanbanBoardAggregates {
+    total: number;
+    /** Contagem por statusCategory de TODOS os tickets matched do pipeline (não só janelas). */
+    statusCategoryCounts: Record<string, number>;
+    priorityCounts: Record<string, number>;
+}
+/** Modos de ordenação suportados pelo kanban de tickets (SP3). Sem 'idle' — tickets têm uma única fonte de interação. */
+export declare const TICKET_KANBAN_SORT_MODES: readonly ["created", "stepEntered", "priority", "inactivity", "manual"];
+/** Modos do kanban de atendimentos (SP4). Sem manual (lanes derivadas) e sem idle (fonte única lastMessageAt). */
+export declare const CONVERSATION_KANBAN_SORT_MODES: readonly ["created", "priority", "inactivity"];
+/** Lanes fixas do kanban de atendimentos — predicados server-side (SP4 D1). */
+export type ConversationKanbanLaneId = 'ai' | 'queue' | 'inService' | 'transferred' | 'closed';
+export declare const CONVERSATION_KANBAN_LANE_IDS: readonly ["ai", "queue", "inService", "transferred", "closed"];
+/** Aggregates do board de atendimentos — counts por lane já vêm nos `count` das colunas (D4). */
+export interface ConversationKanbanBoardAggregates {
+    total: number;
 }

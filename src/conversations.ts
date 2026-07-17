@@ -349,5 +349,55 @@ export interface BulkConversationOperationRequest {
   };
 }
 
+// ============================================================================
+// KANBAN DE ATENDIMENTOS (SP4 — 2026-07-16)
+// Projeção enxuta do card + query do endpoint /conversations/kanban.
+// ============================================================================
+
+/** Projeção enxuta da conversa para o card do kanban (SP4) — só o que o ConversationCardImproved renderiza. */
+export interface ConversationKanbanCard {
+  id: string;
+  status: 'waiting' | 'active' | 'closed';
+  subject?: string;
+  source?: string;
+  agentId?: string;
+  agentStatus?: 'active' | 'inactive' | 'paused';
+  assigneeId?: string;
+  closeReason?: 'resolved' | 'spam' | 'duplicate' | 'no_response' | 'transferred' | 'expired' | 'other';
+  lastMessage?: string;
+  lastMessageAt?: string;
+  /** Computado server-side a partir de `unreadTracking[userId]` (campo é por-usuário). */
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
+  contact?: { id: string; name: string; picture?: string; phone?: string };
+  assignee?: { id: string; name: string };
+  /** Derivado da hidratação channel→integration (mesma que `enrichConversations` já faz). */
+  providerType?: string;
+}
+
+/** Query do board de atendimentos (GET /conversations/kanban). */
+export interface ConversationKanbanQuery {
+  search?: string;
+  /** Tamanho da janela por coluna (default 50, máx 100 — validado no backend). */
+  windowSize?: number;
+  /** Modo de ordenação (default 'created'). Whitelist em CONVERSATION_KANBAN_SORT_MODES. Import de './kanban'. */
+  sortMode?: KanbanSortMode;
+  /** Subset de ConversationQuery.filters — status NÃO existe aqui (é a raia). */
+  filters?: {
+    channelId?: string;
+    assigneeId?: string;
+    teamId?: string;
+    providerId?: string;
+  };
+}
+
+/** Página de UMA coluna (lane) do kanban de atendimentos — extende o board com laneId + cursor. */
+export interface ConversationKanbanColumnQuery extends ConversationKanbanQuery {
+  laneId: ConversationKanbanLaneId;
+  cursor?: string;
+}
+
 // Import types
 import { PaginationQuery, ListResponse } from './common';
+import type { KanbanSortMode, ConversationKanbanLaneId } from './kanban';
