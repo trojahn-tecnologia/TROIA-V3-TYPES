@@ -302,6 +302,7 @@ export enum ProviderId {
 
   // Messaging Providers
   WHATSAPP_BUSINESS = 'whatsapp-business',
+  WHATSAPP_BUSINESS_2FA = 'whatsapp-business-2fa',
   FACEBOOK_MESSENGER = 'facebook-messenger',
   TELEGRAM_BOT = 'telegram-bot',
   SMS_TWILIO = 'sms-twilio',
@@ -369,6 +370,7 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
 
   // Messaging
   [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
+  [ProviderId.WHATSAPP_BUSINESS_2FA]: 'messaging',
   [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
   [ProviderId.TELEGRAM_BOT]: 'messaging',
   [ProviderId.SMS_TWILIO]: 'messaging',

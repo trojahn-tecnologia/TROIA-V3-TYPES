@@ -207,6 +207,7 @@ export declare enum ProviderId {
     EMAIL_RESEND = "email-resend",
     GMAIL_API = "gmail-api",
     WHATSAPP_BUSINESS = "whatsapp-business",
+    WHATSAPP_BUSINESS_2FA = "whatsapp-business-2fa",
     FACEBOOK_MESSENGER = "facebook-messenger",
     TELEGRAM_BOT = "telegram-bot",
     SMS_TWILIO = "sms-twilio",

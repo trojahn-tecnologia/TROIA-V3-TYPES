@@ -47,6 +47,10 @@ export enum NotificationType {
   LEAD_ASSIGNED = 'lead_assigned',
   LEAD_STATUS_CHANGED = 'lead_status_changed',
   LEAD_ACTIVITY_ASSIGNED = 'lead_activity_assigned',
+  // Lead inactivity alerts (2026-07-17)
+  LEAD_ALERT_WARNING = 'lead_alert_warning',
+  LEAD_ALERT_CRITICAL = 'lead_alert_critical',
+  LEAD_WEEKLY_DIGEST = 'lead_weekly_digest',
 
   // Escalation events
   ESCALATION_TRIGGERED = 'escalation_triggered',

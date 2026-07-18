@@ -14,6 +14,7 @@ var ProviderId;
     ProviderId["GMAIL_API"] = "gmail-api";
     // Messaging Providers
     ProviderId["WHATSAPP_BUSINESS"] = "whatsapp-business";
+    ProviderId["WHATSAPP_BUSINESS_2FA"] = "whatsapp-business-2fa";
     ProviderId["FACEBOOK_MESSENGER"] = "facebook-messenger";
     ProviderId["TELEGRAM_BOT"] = "telegram-bot";
     ProviderId["SMS_TWILIO"] = "sms-twilio";
@@ -65,6 +66,7 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.GMAIL_API]: 'email',
     // Messaging
     [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
+    [ProviderId.WHATSAPP_BUSINESS_2FA]: 'messaging',
     [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
     [ProviderId.TELEGRAM_BOT]: 'messaging',
     [ProviderId.SMS_TWILIO]: 'messaging',

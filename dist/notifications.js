@@ -43,6 +43,10 @@ var NotificationType;
     NotificationType["LEAD_ASSIGNED"] = "lead_assigned";
     NotificationType["LEAD_STATUS_CHANGED"] = "lead_status_changed";
     NotificationType["LEAD_ACTIVITY_ASSIGNED"] = "lead_activity_assigned";
+    // Lead inactivity alerts (2026-07-17)
+    NotificationType["LEAD_ALERT_WARNING"] = "lead_alert_warning";
+    NotificationType["LEAD_ALERT_CRITICAL"] = "lead_alert_critical";
+    NotificationType["LEAD_WEEKLY_DIGEST"] = "lead_weekly_digest";
     // Escalation events
     NotificationType["ESCALATION_TRIGGERED"] = "escalation_triggered";
     NotificationType["ESCALATION_REASSIGNED"] = "escalation_reassigned";

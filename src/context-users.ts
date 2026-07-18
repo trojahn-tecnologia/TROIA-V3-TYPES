@@ -15,8 +15,12 @@
  *
  * - `attendant`: recebe distribuição automática e atendimento
  * - `viewer`: apenas visualiza o contexto, não recebe itens
+ * - `manager`: gestor do contexto — vê os itens (como viewer, ativa o contexto
+ *   e enxerga por scope), NÃO entra no pool de distribuição (pool é só
+ *   `attendant`), e é o alvo das notificações de gestão (ex.: alerta crítico de
+ *   inatividade de lead + resumo semanal). 2026-07-17.
  */
-export type ContextUserRole = 'attendant' | 'viewer';
+export type ContextUserRole = 'attendant' | 'viewer' | 'manager';
 
 /**
  * Escopo de visualização dos itens (leads/conversas/tickets) do contexto.

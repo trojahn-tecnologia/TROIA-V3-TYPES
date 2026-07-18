@@ -1,6 +1,7 @@
 // Lead Types - Sales system with universal source
 
 import type { KanbanSortMode } from './kanban';
+import type { AlertLevel, AlertReason } from './alerts';
 
 // ============================================================================
 // CANONICAL ENUMS — single source of truth para Lead.source / Lead.medium / Lead.channel
@@ -181,6 +182,31 @@ export interface Lead {
   // overdue: Has pending activities past their occurredAt date (orange/warning)
   // up_to_date: All activities completed or pending with future dates (green/success)
   activityStatus?: 'no_activities' | 'overdue' | 'up_to_date';
+
+  // ── Alertas de inatividade ────────────────────────────────────────────────
+  /** Snooze do usuário (ISO). Enquanto no futuro, o alerta fica 'snoozed'. */
+  alertSnoozedUntil?: string;
+  /** Denormalizado: nº de activities não-deletadas do lead. Base de no_activities. */
+  activityCount?: number;
+  /** Denormalizado (ISO): menor occurredAt entre activities pending. < now = atrasada; >= now = futura agendada. */
+  earliestPendingActivityAt?: string;
+  /** Computado (read-only): cor final do card sobrepondo as regras de atividade. */
+  alertLevel?: AlertLevel;
+  /** Computado (read-only): motivo governante da cor, p/ tooltip. */
+  alertReason?: AlertReason;
+  /** Computado (read-only): dias desde a última atividade. */
+  daysSinceActivity?: number;
+  /** Computado (read-only): dias na etapa atual. */
+  daysInStep?: number;
+  /**
+   * Último nível de alerta computado no scan (idempotência de transição —
+   * detecta mudança de cor entre scans, warning/critical/ok/snoozed).
+   * `notifiedAt` é OPCIONAL (opção B, 2026-07-17): só é gravado quando uma
+   * notificação foi DE FATO enviada (decision.type setado + destinatário
+   * elegível) — transições ok/snoozed atualizam `level` mas preservam o
+   * `notifiedAt` anterior.
+   */
+  alertNotifyState?: { level: AlertLevel; notifiedAt?: string };
 
   // Control dates
   customerId?: string;        // Renamed from convertedToCustomerId
@@ -374,6 +400,8 @@ export interface LeadQuery extends PaginationQuery {
     tags?: string | string[];
     type?: string | string[];
     contactIdIn?: string[];
+    /** Filtro por cor de alerta de inatividade (kanban) — computado server-side antes da janela. */
+    alertLevel?: AlertLevel;
   };
 }
 
@@ -436,6 +464,16 @@ export interface LeadKanbanCard {
   qualifyStatus?: 'pending' | 'qualified' | 'disqualified';
   /** Sintético — calculado no backend a partir de activities. */
   activityStatus: 'no_activities' | 'overdue' | 'up_to_date';
+  /** Cor final do card (alertas de inatividade) — sobrepõe activityStatus. Computado server-side. */
+  alertLevel: AlertLevel;
+  /** Motivo governante da cor, p/ tooltip. */
+  alertReason?: AlertReason;
+  /** Dias desde a última atividade (contador do card). */
+  daysSinceActivity?: number;
+  /** Dias na etapa atual (contador do card). */
+  daysInStep?: number;
+  /** Snooze ativo (ISO), se houver — o card mostra sino cortado. */
+  alertSnoozedUntil?: string;
   lastInteractionAt?: string;
   createdAt: string;
   /** Rank do modo manual — o client precisa dele pra calcular a posição entre vizinhos. */

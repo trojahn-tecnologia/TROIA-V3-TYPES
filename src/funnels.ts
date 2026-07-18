@@ -1,5 +1,6 @@
 import { PaginationQuery, ListResponse, AppAwareDocument, ActiveStatus } from './common';
 import type { DistributionConfig } from './distribution';
+import type { AlertConfig } from './alerts';
 
 /**
  * Funnel - Sales funnel structure
@@ -33,6 +34,8 @@ export interface Funnel extends AppAwareDocument {
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil (ex: Venda, Suporte, Consultoria) */
   types?: string[];
+  /** Config default dos alertas de inatividade deste funil (override por etapa em FunnelStep). */
+  alertConfig?: AlertConfig;
 }
 
 export interface CreateFunnelRequest {
@@ -45,6 +48,8 @@ export interface CreateFunnelRequest {
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil */
   types?: string[];
+  /** Config default dos alertas de inatividade deste funil. */
+  alertConfig?: AlertConfig;
 }
 
 export interface UpdateFunnelRequest {
@@ -58,6 +63,8 @@ export interface UpdateFunnelRequest {
   allowDuplicateContacts?: boolean;
   /** Tipos de lead disponíveis neste funil */
   types?: string[];
+  /** Config default dos alertas de inatividade deste funil. */
+  alertConfig?: AlertConfig;
 }
 
 export type FunnelResponse = Omit<Funnel, '_id'> & {
@@ -95,6 +102,8 @@ export interface FunnelStep extends AppAwareDocument {
   color: string;              // Hex color (e.g., "#10b981")
   order: number;              // Display order within funnel (customizable)
   status: ActiveStatus;
+  /** Override opcional dos alertas de inatividade nesta etapa (por relógio; herda do funil). */
+  alertConfig?: AlertConfig;
 }
 
 export interface CreateFunnelStepRequest {
@@ -103,6 +112,8 @@ export interface CreateFunnelStepRequest {
   description?: string;
   color: string;
   order?: number;
+  /** Override opcional dos alertas de inatividade nesta etapa. */
+  alertConfig?: AlertConfig;
 }
 
 export interface UpdateFunnelStepRequest {
@@ -111,6 +122,8 @@ export interface UpdateFunnelStepRequest {
   color?: string;
   order?: number;
   status?: ActiveStatus;
+  /** Override opcional dos alertas de inatividade nesta etapa. */
+  alertConfig?: AlertConfig;
 }
 
 export type FunnelStepResponse = Omit<FunnelStep, '_id'> & { id: string };

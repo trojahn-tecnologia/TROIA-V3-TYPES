@@ -34,6 +34,7 @@ export * from './contacts';
 export * from './customers';
 export * from './leads';
 export * from './funnels';
+export * from './alerts';
 export * from './ticket-pipelines';
 export * from './tickets';
 export * from './ticket-followers';

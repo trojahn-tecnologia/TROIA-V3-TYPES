@@ -60,6 +60,9 @@ export * from './customers';
 export * from './leads';
 export * from './funnels';
 
+// Inactivity alerts (config por funil/etapa + resultado computado no card)
+export * from './alerts';
+
 // Ticket Pipelines & Stages
 export * from './ticket-pipelines';
 

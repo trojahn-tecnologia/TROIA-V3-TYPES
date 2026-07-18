@@ -65,6 +65,8 @@ __exportStar(require("./contacts"), exports);
 __exportStar(require("./customers"), exports);
 __exportStar(require("./leads"), exports);
 __exportStar(require("./funnels"), exports);
+// Inactivity alerts (config por funil/etapa + resultado computado no card)
+__exportStar(require("./alerts"), exports);
 // Ticket Pipelines & Stages
 __exportStar(require("./ticket-pipelines"), exports);
 // Phase 2: Advanced customer service modules
