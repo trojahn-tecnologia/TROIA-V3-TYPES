@@ -362,6 +362,7 @@ export type UserStatus = ActiveStatus;
 export interface UserQuery extends PaginationQuery {
     status?: ActiveStatus;
     levelId?: string;
+    teamId?: string;
     email?: string;
     firstName?: string;
     lastName?: string;
@@ -379,6 +380,11 @@ export interface UserResponse {
     status: ActiveStatus;
     levelId?: string;
     level?: LevelResponse | null;
+    levelName?: string | null;
+    teams?: Array<{
+        id: string;
+        name: string;
+    }>;
     preferences: UserPreferences;
     permissions: UserPermissions;
     emailVerified?: boolean;

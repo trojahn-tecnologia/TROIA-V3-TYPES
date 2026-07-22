@@ -412,6 +412,7 @@ export type UserStatus = ActiveStatus;
 export interface UserQuery extends PaginationQuery {
   status?: ActiveStatus;
   levelId?: string; // Filtrar por nível
+  teamId?: string; // Filtrar por equipe (resolvido via team-users)
   email?: string;
   firstName?: string;
   lastName?: string;
@@ -431,6 +432,8 @@ export interface UserResponse {
   status: ActiveStatus;
   levelId?: string;
   level?: LevelResponse | null;   // populated in /users/me and /users/login
+  levelName?: string | null;      // populated in list responses — nome do nível (coluna Nível)
+  teams?: Array<{ id: string; name: string }>; // populated in list responses — equipes (coluna Equipes)
   preferences: UserPreferences;
   permissions: UserPermissions;
   emailVerified?: boolean;
