@@ -157,6 +157,8 @@ export interface ConversationQuery extends PaginationQuery {
         teamId?: string;
         category?: string;
         tags?: string[];
+        stepId?: string[];
+        contactCustomerId?: string[];
         conversationTags?: string[];
         excludeConversationTags?: string[];
         hasUnreadMessages?: boolean;

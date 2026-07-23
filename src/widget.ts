@@ -1,3 +1,5 @@
+import type { PwaIcons } from './app';
+
 /**
  * Hosted Page Layout Type
  */
@@ -14,6 +16,8 @@ export interface HostedPageConfig {
   subtitle?: string;
   logoUrl?: string;
   backgroundColor?: string;
+  /** Ícones PWA gerados a partir de logoUrl + backgroundColor (backend). */
+  pwaIcons?: PwaIcons;
 }
 
 /**
@@ -26,6 +30,23 @@ export interface WidgetFeatures {
   allowAudio?: boolean;
   allowDocuments?: boolean;
   allowVideo?: boolean;
+  /** Exibe o botão "Instalar App" (PWA). Instalação real só na hosted page. */
+  allowPwaInstall?: boolean;
+  /** Habilita coleta de token de push e alerta por notificação. */
+  allowPushNotifications?: boolean;
+}
+
+/**
+ * Company injetada via window.troiaWidgetConfig.
+ * Quando presente, cria/associa um Customer ao contato do visitante.
+ * Campos alinhados à nomenclatura de `Customer`.
+ */
+export interface WidgetCompanyConfig {
+  name: string;
+  type?: 'PF' | 'PJ';
+  document?: string;
+  email?: string;
+  phone?: string;
 }
 
 /**
@@ -42,6 +63,10 @@ export interface WidgetConfig {
   visitorName?: string;
   visitorEmail?: string;
   visitorPhone?: string;
+  /** Tags aplicadas ao contato do visitante no registro (união idempotente). */
+  visitorTags?: string[];
+  /** Company injetada: cria/associa um Customer ao contato. */
+  company?: WidgetCompanyConfig;
 
   // Behavior
   hidden?: boolean;

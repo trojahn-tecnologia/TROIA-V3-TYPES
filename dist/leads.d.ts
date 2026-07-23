@@ -217,6 +217,8 @@ export interface LeadResponse extends Lead {
     step?: {
         id: string;
         name: string;
+        /** Cor da etapa (funnel-steps.color) — usada na pill de etapa da listagem. */
+        color?: string;
     };
     funnel?: {
         id: string;
@@ -299,6 +301,12 @@ export interface LeadKanbanCard {
     priority?: 'low' | 'medium' | 'high' | 'urgent';
     businessStatus?: 'pending' | 'won' | 'lost';
     qualifyStatus?: 'pending' | 'qualified' | 'disqualified';
+    /** Temperatura do lead — flame do card (.tk-t do DS). */
+    temperature?: 'cold' | 'warm' | 'hot';
+    /** Sub-canal semântico de captura — ícone do .tk-sub do card. */
+    channel?: LeadChannel;
+    /** Plataforma de origem — chip do card (.tk-chip). */
+    source?: LeadSource;
     /** Sintético — calculado no backend a partir de activities. */
     activityStatus: 'no_activities' | 'overdue' | 'up_to_date';
     /** Cor final do card (alertas de inatividade) — sobrepõe activityStatus. Computado server-side. */

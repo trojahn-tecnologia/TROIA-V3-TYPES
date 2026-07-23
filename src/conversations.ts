@@ -233,6 +233,8 @@ export interface ConversationQuery extends PaginationQuery {
     teamId?: string;
     category?: string;
     tags?: string[];
+    stepId?: string[];             // ✅ Filtro chat: conversa cujo contato tem lead numa dessas etapas de funil (FunnelStep._id). Resolvido via leads no repository.
+    contactCustomerId?: string[];  // ✅ Filtro chat: conversa cujo contato está vinculado a um desses clientes (Contact.customerId). NÃO confundir com `customerId` (conversation.customerId).
     conversationTags?: string[];
     excludeConversationTags?: string[];
     hasUnreadMessages?: boolean;

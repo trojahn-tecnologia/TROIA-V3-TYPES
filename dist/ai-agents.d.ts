@@ -311,6 +311,8 @@ export interface UpdateAIAgentWebhookStatusRequest {
 export interface AIAgentResponse extends Omit<AIAgent, '_id'> {
     id: string;
     totalInteractions?: number;
+    /** Qualidade do agente em % inteiro — média dos `agent-scores` (30d), só na listagem */
+    qualityScore?: number;
 }
 export interface CreateAIAgentRequest {
     name: string;
