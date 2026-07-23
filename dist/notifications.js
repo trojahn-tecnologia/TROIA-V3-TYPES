@@ -101,6 +101,10 @@ var NotificationCategory;
  */
 exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS = {
     [NotificationType.CONVERSATION_MESSAGE_RECEIVED]: ['push', 'sound'],
+    // Conversa Atribuída: SEM 'email' — não é oferecido na UI de preferências
+    // nem despachado por email (quem já tinha ativado deixa de receber, pois o
+    // dispatch filtra pelos canais suportados). Lead/Ticket atribuído mantêm email.
+    [NotificationType.CONVERSATION_ASSIGNED]: ['inApp', 'push', 'whatsapp'],
 };
 /**
  * Retorna os canais suportados pra um tipo. Default: 4 canais clássicos

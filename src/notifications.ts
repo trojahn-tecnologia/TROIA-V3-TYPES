@@ -131,6 +131,10 @@ export type SoundKey = 'message' | 'queue' | 'lead' | 'ticket' | 'alert';
  */
 export const NOTIFICATION_TYPE_SUPPORTED_CHANNELS: Partial<Record<NotificationType, NotificationChannel[]>> = {
   [NotificationType.CONVERSATION_MESSAGE_RECEIVED]: ['push', 'sound'],
+  // Conversa Atribuída: SEM 'email' — não é oferecido na UI de preferências
+  // nem despachado por email (quem já tinha ativado deixa de receber, pois o
+  // dispatch filtra pelos canais suportados). Lead/Ticket atribuído mantêm email.
+  [NotificationType.CONVERSATION_ASSIGNED]: ['inApp', 'push', 'whatsapp'],
 };
 
 /**
