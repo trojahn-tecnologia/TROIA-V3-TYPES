@@ -68,6 +68,10 @@ export enum NotificationType {
   TEAM_MEMBER_REMOVED = 'team_member_removed',
   SHIFT_REMINDER = 'shift_reminder',
 
+  // Calendar / agenda (2026-07-24)
+  EVENT_REMINDER = 'event_reminder',            // Lembrete de evento (X min antes) — event.reminders
+  AGENDA_DAILY_SUMMARY = 'agenda_daily_summary', // Resumo diário da agenda às 08:00
+
   // Custom notifications
   CUSTOM_NOTIFICATION = 'custom_notification',
 }
@@ -95,6 +99,7 @@ export enum NotificationCategory {
   LEADS = 'leads',
   PAYMENT = 'payment',
   TEAM = 'team',
+  CALENDAR = 'calendar',
   CUSTOM = 'custom',
 }
 
@@ -135,6 +140,10 @@ export const NOTIFICATION_TYPE_SUPPORTED_CHANNELS: Partial<Record<NotificationTy
   // nem despachado por email (quem já tinha ativado deixa de receber, pois o
   // dispatch filtra pelos canais suportados). Lead/Ticket atribuído mantêm email.
   [NotificationType.CONVERSATION_ASSIGNED]: ['inApp', 'push', 'whatsapp'],
+  // Agenda: lembrete de evento respeita o método configurado no evento
+  // (popup/notification → inApp/push; email → email). Resumo diário só in-app/push.
+  [NotificationType.EVENT_REMINDER]: ['inApp', 'push', 'email'],
+  [NotificationType.AGENDA_DAILY_SUMMARY]: ['inApp', 'push'],
 };
 
 /**

@@ -60,6 +60,9 @@ var NotificationType;
     NotificationType["TEAM_MEMBER_ADDED"] = "team_member_added";
     NotificationType["TEAM_MEMBER_REMOVED"] = "team_member_removed";
     NotificationType["SHIFT_REMINDER"] = "shift_reminder";
+    // Calendar / agenda (2026-07-24)
+    NotificationType["EVENT_REMINDER"] = "event_reminder";
+    NotificationType["AGENDA_DAILY_SUMMARY"] = "agenda_daily_summary";
     // Custom notifications
     NotificationType["CUSTOM_NOTIFICATION"] = "custom_notification";
 })(NotificationType || (exports.NotificationType = NotificationType = {}));
@@ -87,6 +90,7 @@ var NotificationCategory;
     NotificationCategory["LEADS"] = "leads";
     NotificationCategory["PAYMENT"] = "payment";
     NotificationCategory["TEAM"] = "team";
+    NotificationCategory["CALENDAR"] = "calendar";
     NotificationCategory["CUSTOM"] = "custom";
 })(NotificationCategory || (exports.NotificationCategory = NotificationCategory = {}));
 /**
@@ -105,6 +109,10 @@ exports.NOTIFICATION_TYPE_SUPPORTED_CHANNELS = {
     // nem despachado por email (quem já tinha ativado deixa de receber, pois o
     // dispatch filtra pelos canais suportados). Lead/Ticket atribuído mantêm email.
     [NotificationType.CONVERSATION_ASSIGNED]: ['inApp', 'push', 'whatsapp'],
+    // Agenda: lembrete de evento respeita o método configurado no evento
+    // (popup/notification → inApp/push; email → email). Resumo diário só in-app/push.
+    [NotificationType.EVENT_REMINDER]: ['inApp', 'push', 'email'],
+    [NotificationType.AGENDA_DAILY_SUMMARY]: ['inApp', 'push'],
 };
 /**
  * Retorna os canais suportados pra um tipo. Default: 4 canais clássicos

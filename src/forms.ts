@@ -73,6 +73,11 @@ export interface FormField {
   options?: FormFieldOption[];
   validation?: FormFieldValidation;
   conditionalLogic?: FormConditionalLogic;
+  /**
+   * Mapeamento para um campo da entidade destino (#263) — ex: `name`, `email`,
+   * `phone`. Usado pela auto-criação a partir do `destination` do form.
+   */
+  mapsTo?: string;
 }
 
 // ============================================================
@@ -129,6 +134,18 @@ export enum FormStatus {
 /**
  * Form - Documento principal do formulario
  */
+/**
+ * Destino do formulário (#261) — para onde as respostas apontam. Capturado no
+ * drawer "Novo formulário". A auto-criação da entidade na submissão é
+ * consumida por workflows via o evento `form.submitted` (que carrega o
+ * `destination`).
+ */
+export interface FormDestination {
+  targetType: 'lead' | 'contact' | 'ticket';
+  funnelId?: string; // quando targetType='lead'
+  pipelineId?: string; // quando targetType='ticket'
+}
+
 export interface Form extends TenantAwareDocument {
   name: string;
   description?: string;
@@ -137,6 +154,7 @@ export interface Form extends TenantAwareDocument {
   fields: FormField[];
   settings: FormSettings;
   styling: FormStyling;
+  destination?: FormDestination;
   thankYouMessage?: string;
   thankYouRedirectUrl?: string;
   maxResponses?: number;
@@ -172,6 +190,7 @@ export interface CreateFormRequest {
   fields: FormField[];
   settings?: Partial<FormSettings>;
   styling?: Partial<FormStyling>;
+  destination?: FormDestination;
   thankYouMessage?: string;
   thankYouRedirectUrl?: string;
   maxResponses?: number;
@@ -189,6 +208,7 @@ export interface UpdateFormRequest {
   fields?: FormField[];
   settings?: Partial<FormSettings>;
   styling?: Partial<FormStyling>;
+  destination?: FormDestination;
   thankYouMessage?: string;
   thankYouRedirectUrl?: string;
   maxResponses?: number | null;

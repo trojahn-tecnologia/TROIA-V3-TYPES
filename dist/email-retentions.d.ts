@@ -1,6 +1,6 @@
 import { AppAwareDocument, PaginationQuery, ListResponse } from './common';
 import { TicketEmailAttachment } from './ticket-emails';
-export type EmailRetentionStatus = 'pending' | 'approved' | 'blocked';
+export type EmailRetentionStatus = 'pending' | 'approved' | 'blocked' | 'discarded';
 export interface EmailRetentionPayload {
     to: string[];
     cc?: string[];

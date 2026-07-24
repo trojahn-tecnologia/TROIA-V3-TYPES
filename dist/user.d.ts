@@ -107,6 +107,33 @@ export interface UserCalendarPreferences {
     meetingBuffer: MeetingBufferConfig;
     defaultMeetingDuration: number;
     dailyMeetingLimit?: DailyMeetingLimitConfig;
+    notifications?: CalendarNotificationPreferences;
+}
+/**
+ * Preferências de notificação da Agenda (aba "Geral" das Configurações).
+ *
+ * - `reminderDefault`: lembrete PADRÃO aplicado a eventos que NÃO têm lembrete
+ *   próprio (`event.reminders.useDefault`). O disparo real por evento vem de
+ *   `event.reminders.overrides` (configurado na criação/edição do evento);
+ *   este toggle é apenas o fallback quando o evento não escolheu nenhum.
+ * - `emailInvite`: ao criar um evento COM participantes, enviar convite por
+ *   e-mail a cada participante.
+ * - `dailySummary`: receber a agenda do dia às 08:00 (fuso do usuário).
+ *
+ * Campo opcional: preferências legadas (sem este bloco) assumem os defaults do
+ * front (lembrete 15min ligado, convite ligado, resumo desligado).
+ */
+export interface CalendarNotificationPreferences {
+    reminderDefault: {
+        enabled: boolean;
+        minutes: number;
+    };
+    emailInvite: {
+        enabled: boolean;
+    };
+    dailySummary: {
+        enabled: boolean;
+    };
 }
 /**
  * Working Hours Configuration

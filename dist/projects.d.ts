@@ -41,7 +41,19 @@ export interface Project extends AppAwareDocument {
     contactIds: string[];
     notifyConfig: ProjectNotifyConfig;
     internalNotifyConfig: ProjectInternalNotifyConfig;
+    attachments?: ProjectAttachment[];
     createdBy?: string;
+}
+/** Arquivo anexado ao projeto (aba "Arquivos" do workspace). */
+export interface ProjectAttachment {
+    id: string;
+    name: string;
+    url: string;
+    mimeType?: string;
+    size?: number;
+    uploadedById?: string;
+    uploadedByName?: string;
+    uploadedAt: string;
 }
 export interface ProjectResponse extends Omit<Project, '_id' | 'appId'> {
     id: string;
@@ -111,6 +123,7 @@ export interface UpdateProjectRequest {
     contactIds?: string[];
     notifyConfig?: ProjectNotifyConfig;
     internalNotifyConfig?: ProjectInternalNotifyConfig;
+    attachments?: ProjectAttachment[];
     status?: ProjectStatus;
 }
 export interface CreateProjectTaskRequest {
@@ -185,6 +198,7 @@ export interface ProjectQuery extends PaginationQuery {
     status?: ProjectStatus;
     pipelineId?: string;
     leaderId?: string;
+    clientId?: string;
 }
 export interface ProjectListItem extends ProjectResponse {
     progress: ProjectProgress;

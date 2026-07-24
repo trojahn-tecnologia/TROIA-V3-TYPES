@@ -42,6 +42,8 @@ export declare enum NotificationType {
     TEAM_MEMBER_ADDED = "team_member_added",
     TEAM_MEMBER_REMOVED = "team_member_removed",
     SHIFT_REMINDER = "shift_reminder",
+    EVENT_REMINDER = "event_reminder",// Lembrete de evento (X min antes) — event.reminders
+    AGENDA_DAILY_SUMMARY = "agenda_daily_summary",// Resumo diário da agenda às 08:00
     CUSTOM_NOTIFICATION = "custom_notification"
 }
 /**
@@ -66,6 +68,7 @@ export declare enum NotificationCategory {
     LEADS = "leads",
     PAYMENT = "payment",
     TEAM = "team",
+    CALENDAR = "calendar",
     CUSTOM = "custom"
 }
 /**

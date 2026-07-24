@@ -11,7 +11,9 @@ import { TicketEmailAttachment } from './ticket-emails';
 // até aprovação/bloqueio manual (tela de Retenção), e só então vira ticket.
 // ============================================================================
 
-export type EmailRetentionStatus = 'pending' | 'approved' | 'blocked';
+// 'discarded' (2026-07-24): "Descartar" — limpa a entry sem criar ticket e sem
+// tocar o contato (remetente segue indeciso → próximos e-mails ainda retidos).
+export type EmailRetentionStatus = 'pending' | 'approved' | 'blocked' | 'discarded';
 
 export interface EmailRetentionPayload {
   to: string[];

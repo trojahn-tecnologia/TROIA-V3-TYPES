@@ -54,7 +54,20 @@ export interface Project extends AppAwareDocument {
   contactIds: string[];
   notifyConfig: ProjectNotifyConfig;
   internalNotifyConfig: ProjectInternalNotifyConfig;
+  attachments?: ProjectAttachment[]; // arquivos do projeto (aba "Arquivos")
   createdBy?: string;
+}
+
+/** Arquivo anexado ao projeto (aba "Arquivos" do workspace). */
+export interface ProjectAttachment {
+  id: string;               // uuid local (key React + remoção)
+  name: string;             // nome original do arquivo
+  url: string;              // URL pública no S3
+  mimeType?: string;
+  size?: number;            // bytes
+  uploadedById?: string;
+  uploadedByName?: string;
+  uploadedAt: string;       // ISO 8601
 }
 
 export interface ProjectResponse extends Omit<Project, '_id' | 'appId'> {
@@ -126,6 +139,7 @@ export interface UpdateProjectRequest {
   contactIds?: string[];
   notifyConfig?: ProjectNotifyConfig;
   internalNotifyConfig?: ProjectInternalNotifyConfig;
+  attachments?: ProjectAttachment[];
   status?: ProjectStatus;           // arquivar/reativar manual
 }
 
@@ -209,6 +223,7 @@ export interface ProjectQuery extends PaginationQuery {
   status?: ProjectStatus;
   pipelineId?: string;
   leaderId?: string;
+  clientId?: string;               // ref customers — filtra projetos pelo cliente vinculado
 }
 export interface ProjectListItem extends ProjectResponse {
   progress: ProjectProgress;
