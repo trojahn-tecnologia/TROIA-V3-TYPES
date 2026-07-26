@@ -14,7 +14,7 @@ var ProviderId;
     ProviderId["GMAIL_API"] = "gmail-api";
     // Messaging Providers
     ProviderId["WHATSAPP_BUSINESS"] = "whatsapp-business";
-    ProviderId["WHATSAPP_BUSINESS_2FA"] = "whatsapp-business-2fa";
+    ProviderId["WHATSAPP_BUSINESS_NOTIFICATIONS"] = "whatsapp-business-notifications";
     ProviderId["FACEBOOK_MESSENGER"] = "facebook-messenger";
     ProviderId["TELEGRAM_BOT"] = "telegram-bot";
     ProviderId["SMS_TWILIO"] = "sms-twilio";
@@ -66,7 +66,7 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.GMAIL_API]: 'email',
     // Messaging
     [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
-    [ProviderId.WHATSAPP_BUSINESS_2FA]: 'messaging',
+    [ProviderId.WHATSAPP_BUSINESS_NOTIFICATIONS]: 'messaging',
     [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
     [ProviderId.TELEGRAM_BOT]: 'messaging',
     [ProviderId.SMS_TWILIO]: 'messaging',
@@ -144,6 +144,13 @@ var ProviderCapability;
      * (whatsapp-business > gateway-whatsapp).
      */
     ProviderCapability["SEND_2FA"] = "send_2fa";
+    /**
+     * Marca a integração como remetente de notificações de sistema (template
+     * UTILITY genérico) via WhatsApp Oficial (Sistema). Independente de
+     * SEND_2FA — viabilidade é resolvida por-capability (template próprio,
+     * `config.templates.notification`).
+     */
+    ProviderCapability["SEND_NOTIFICATION"] = "send_notification";
     // Social media capabilities
     ProviderCapability["CREATE_POST"] = "create_post";
     ProviderCapability["CREATE_STORY"] = "create_story";

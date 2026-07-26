@@ -41,6 +41,10 @@ exports.WORKFLOW_NODE_TYPES = [
     'action_internal_notification',
     'action_find_leads',
     'action_create_database_document',
+    'action_mirror_media',
+    'action_voice_clone',
+    'action_voice_tts',
+    'action_voice_clone_delete',
     // Controls
     'control_if',
     'control_switch',
@@ -48,6 +52,7 @@ exports.WORKFLOW_NODE_TYPES = [
     'control_wait_for',
     'control_loop',
     'control_split',
+    'control_retry_scope',
     // AI
     'ai_agent',
     'ai_agent_inline',

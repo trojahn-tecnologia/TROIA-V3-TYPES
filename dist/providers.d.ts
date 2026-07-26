@@ -207,7 +207,7 @@ export declare enum ProviderId {
     EMAIL_RESEND = "email-resend",
     GMAIL_API = "gmail-api",
     WHATSAPP_BUSINESS = "whatsapp-business",
-    WHATSAPP_BUSINESS_2FA = "whatsapp-business-2fa",
+    WHATSAPP_BUSINESS_NOTIFICATIONS = "whatsapp-business-notifications",
     FACEBOOK_MESSENGER = "facebook-messenger",
     TELEGRAM_BOT = "telegram-bot",
     SMS_TWILIO = "sms-twilio",
@@ -267,6 +267,13 @@ export declare enum ProviderCapability {
      * (whatsapp-business > gateway-whatsapp).
      */
     SEND_2FA = "send_2fa",
+    /**
+     * Marca a integração como remetente de notificações de sistema (template
+     * UTILITY genérico) via WhatsApp Oficial (Sistema). Independente de
+     * SEND_2FA — viabilidade é resolvida por-capability (template próprio,
+     * `config.templates.notification`).
+     */
+    SEND_NOTIFICATION = "send_notification",
     CREATE_POST = "create_post",
     CREATE_STORY = "create_story",
     CREATE_CAMPAIGN = "create_campaign",

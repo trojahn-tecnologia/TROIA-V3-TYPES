@@ -43,6 +43,10 @@ export const WORKFLOW_NODE_TYPES = [
   'action_internal_notification',
   'action_find_leads',
   'action_create_database_document',
+  'action_mirror_media',
+  'action_voice_clone',
+  'action_voice_tts',
+  'action_voice_clone_delete',
   // Controls
   'control_if',
   'control_switch',
@@ -50,6 +54,7 @@ export const WORKFLOW_NODE_TYPES = [
   'control_wait_for',
   'control_loop',
   'control_split',
+  'control_retry_scope',
   // AI
   'ai_agent',
   'ai_agent_inline',
@@ -325,6 +330,106 @@ export interface HttpRequestActionConfig {
   body?: string | Record<string, unknown>;
   timeout?: number;
   retryAttempts?: number;
+  /**
+   * Aguardar callback externo (2026-07): após disparar a requisição, o run
+   * SUSPENDE e só retoma quando o provedor externo fizer POST no endpoint
+   * público `/api/workflows/callbacks/:correlationId` (URL-capacidade — o
+   * template `{{$.__callback.url}}` fica disponível para o body/headers) ou
+   * quando `callbackTimeoutMs` expirar. Output do node vira
+   * `{ outcome: 'success'|'error'|'timeout', body: <corpo do callback> }`.
+   */
+  awaitCallback?: boolean;
+  /** Timeout da espera do callback em ms (default 20min). */
+  callbackTimeoutMs?: number;
+  /**
+   * Predicado que precisa casar no corpo do callback para RETOMAR com sucesso
+   * (ex.: Suno music `{path:'data.callbackType', equals:'complete'}`).
+   * Ausente = qualquer callback retoma. Callbacks que não casam nem com
+   * resumeWhen nem com failWhen são ignorados com 200 (estágios intermediários).
+   */
+  resumeWhen?: WorkflowCallbackPredicate;
+  /**
+   * Predicado de FALHA no corpo do callback (a Suno sinaliza erro no corpo,
+   * não no HTTP — ex.: `{path:'data.status', equals:'fail'}`). Casou → retoma
+   * pela saída de erro (`outcome:'error'`).
+   */
+  failWhen?: WorkflowCallbackPredicate;
+}
+
+/** Predicado simples caminho==valor avaliado no corpo de um callback externo. */
+export interface WorkflowCallbackPredicate {
+  /** Caminho dot-notation no corpo do callback (ex.: 'data.callbackType'). */
+  path: string;
+  /** Valor exato (comparação por String(valor) === equals). */
+  equals: string;
+}
+
+/**
+ * Retry Scope Control Configuration (2026-07)
+ *
+ * Subgrafo retentável: os nós FILHOS (React Flow `parentId`) formam um
+ * sub-workflow que é reexecutado (Mastra `.dountil`) até a iteração terminar
+ * sem falha ou `maxAttempts` esgotar. Falha de iteração = node interno lançou
+ * erro OU awaitCallback saiu com `outcome` 'error'/'timeout'.
+ */
+export interface RetryScopeControlConfig {
+  /** Máximo de tentativas do subgrafo (default 3, cap 5). */
+  maxAttempts?: number;
+  /** Delay entre tentativas em ms (default 5000, cap 60000 — inline sleep). */
+  retryDelayMs?: number;
+}
+
+/**
+ * Mirror Media Action Configuration (2026-07)
+ *
+ * Baixa uma URL externa (SSRF-guard aplicado) e re-hospeda no S3 do sistema —
+ * necessário para mídias de APIs externas com URL expirável (ex.: Suno).
+ * `trimSeconds` corta os primeiros N segundos de um MP3 (frame-walking JS,
+ * sem re-encode) — usado para gerar prévias configuráveis.
+ */
+export interface MirrorMediaActionConfig {
+  /** URL externa do arquivo (aceita templates). */
+  url: string;
+  /** Prefixo do nome do arquivo no S3 (default 'workflow-media'). */
+  filenamePrefix?: string;
+  /** Se definido, corta os primeiros N segundos do MP3 (prévia). */
+  trimSeconds?: number;
+}
+
+/**
+ * Voice Clone Action Configuration (2026-07)
+ *
+ * Clona a voz de uma URL de áudio no provider de TTS (ElevenLabs via
+ * app-integrations) e gera uma amostra falada expressiva hospedada no S3.
+ * O clone é EFÊMERO (registro + janitor no módulo voices) — deletar via
+ * action_voice_clone_delete ao final do fluxo.
+ */
+export interface VoiceCloneActionConfig {
+  /** URL pública do áudio com a voz a clonar (aceita templates). */
+  voiceUrl: string;
+  /** Texto da amostra gerada (default: texto expressivo pt-BR do sistema). */
+  sampleText?: string;
+  /** voice_settings do provider (fidelidade). */
+  voiceSettings?: {
+    stability?: number;
+    similarityBoost?: number;
+    style?: number;
+    speakerBoost?: boolean;
+  };
+}
+
+/** TTS com um clone efêmero existente → mp3 no S3. */
+export interface VoiceTtsActionConfig {
+  /** cloneId retornado pelo action_voice_clone (aceita templates). */
+  cloneId: string;
+  /** Texto a sintetizar (aceita templates — ex.: frase de verificação). */
+  text: string;
+}
+
+/** Deleta um clone efêmero (libera slot no provider). */
+export interface VoiceCloneDeleteActionConfig {
+  /** cloneId a deletar (aceita templates). */
+  cloneId: string;
 }
 
 /**
@@ -722,6 +827,11 @@ export type NodeConfig =
   | AIAgentNodeConfig
   | AIAgentInlineConfig
   | CreateDatabaseDocumentActionConfig
+  | RetryScopeControlConfig
+  | MirrorMediaActionConfig
+  | VoiceCloneActionConfig
+  | VoiceTtsActionConfig
+  | VoiceCloneDeleteActionConfig
   | SkillInputConfig
   | SkillOutputConfig
   // LegacyNodeConfig fallback — nós sem interface canônica ainda dependem disto
@@ -821,6 +931,13 @@ export interface WorkflowDefinition {
 /**
  * Workflow Folder Entity (Database Document)
  */
+/**
+ * Classificação de uso de um workflow/pasta — 'automation' (default) ou
+ * 'skill' (invocável por agentes IA). Workflows e pastas de cada tipo vivem
+ * em árvores separadas nas telas de Workflows e de Skills.
+ */
+export type WorkflowUsageType = 'automation' | 'skill';
+
 export interface WorkflowFolder {
   _id?: ObjectId;
   name: string;
@@ -828,6 +945,11 @@ export interface WorkflowFolder {
   color?: string;
   icon?: string;
   parentId?: ObjectId;
+  /**
+   * Classificação de uso da pasta — separa a árvore de pastas de Workflows
+   * (automation) da de Skills. Ausente em docs legados = 'automation'.
+   */
+  usageType?: WorkflowUsageType;
   order?: number;
   appId: ObjectId;
   companyId: ObjectId;
@@ -861,6 +983,8 @@ export interface CreateWorkflowFolderRequest {
   color?: string;
   icon?: string;
   parentId?: string;
+  /** Árvore a que a pasta pertence (Workflows × Skills). Default: 'automation' */
+  usageType?: WorkflowUsageType;
   order?: number;
 }
 
@@ -884,6 +1008,8 @@ export interface WorkflowFolderQuery {
   limit?: number;
   search?: string;
   parentId?: string | null;
+  /** Filtra pela árvore (Workflows × Skills). Ausente = todas. */
+  usageType?: WorkflowUsageType;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -1142,6 +1268,8 @@ export interface CreateWorkflowRequest {
   status?: WorkflowStatus | undefined;
   definition: WorkflowDefinition;
   folderId?: string | undefined;
+  /** Classificação de uso. Default: 'automation' */
+  usageType?: WorkflowUsageType | undefined;
   /** Environment where this workflow is being created (auto-set by backend if not provided) */
   environment?: string | undefined;
 }
@@ -1155,6 +1283,8 @@ export interface UpdateWorkflowRequest {
   status?: WorkflowStatus | undefined;
   definition?: WorkflowDefinition | undefined;
   folderId?: string | null | undefined;
+  /** Classificação de uso (Workflows × Skills) — o backend já aceita no PATCH. */
+  usageType?: WorkflowUsageType | undefined;
 }
 
 /**
@@ -1166,6 +1296,8 @@ export interface WorkflowQuery {
   search?: string | undefined;
   status?: WorkflowStatus | undefined;
   folderId?: string | null | undefined;
+  /** Filtra pela classificação de uso (tela de Workflows × tela de Skills). Ausente = todos. */
+  usageType?: WorkflowUsageType | undefined;
   /** Filter workflows by environment */
   environment?: string | undefined;
   sortBy?: string | undefined;
@@ -1357,6 +1489,8 @@ export interface WorkflowExportFolder {
   description?: string;
   color?: string;
   icon?: string;
+  /** Árvore da pasta na origem (Workflows × Skills). Ausente em arquivos antigos = 'automation'. */
+  usageType?: WorkflowUsageType;
   parentTempId?: string;
 }
 

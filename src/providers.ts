@@ -302,7 +302,7 @@ export enum ProviderId {
 
   // Messaging Providers
   WHATSAPP_BUSINESS = 'whatsapp-business',
-  WHATSAPP_BUSINESS_2FA = 'whatsapp-business-2fa',
+  WHATSAPP_BUSINESS_NOTIFICATIONS = 'whatsapp-business-notifications',
   FACEBOOK_MESSENGER = 'facebook-messenger',
   TELEGRAM_BOT = 'telegram-bot',
   SMS_TWILIO = 'sms-twilio',
@@ -370,7 +370,7 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
 
   // Messaging
   [ProviderId.WHATSAPP_BUSINESS]: 'messaging',
-  [ProviderId.WHATSAPP_BUSINESS_2FA]: 'messaging',
+  [ProviderId.WHATSAPP_BUSINESS_NOTIFICATIONS]: 'messaging',
   [ProviderId.FACEBOOK_MESSENGER]: 'messaging',
   [ProviderId.TELEGRAM_BOT]: 'messaging',
   [ProviderId.SMS_TWILIO]: 'messaging',
@@ -458,6 +458,13 @@ export enum ProviderCapability {
    * (whatsapp-business > gateway-whatsapp).
    */
   SEND_2FA = 'send_2fa',
+  /**
+   * Marca a integração como remetente de notificações de sistema (template
+   * UTILITY genérico) via WhatsApp Oficial (Sistema). Independente de
+   * SEND_2FA — viabilidade é resolvida por-capability (template próprio,
+   * `config.templates.notification`).
+   */
+  SEND_NOTIFICATION = 'send_notification',
 
   // Social media capabilities
   CREATE_POST = 'create_post',
