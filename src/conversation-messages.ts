@@ -192,6 +192,8 @@ export interface ConversationMessage {
   deliveredAt?: string;
   readAt?: string;
   failedReason?: string;
+  /** Código numérico do erro do provider (ex.: 131047 da Meta). Permite classificar a falha sem parsear string. */
+  failedCode?: number;
 
   // Message actions
   isEdited: boolean;
@@ -318,6 +320,8 @@ export interface UpdateConversationMessageRequest {
   deliveredAt?: string;
   readAt?: string;
   failedReason?: string;
+  /** Código numérico do erro do provider (ex.: 131047 da Meta). Permite classificar a falha sem parsear string. */
+  failedCode?: number;
   internalNote?: string;
 }
 

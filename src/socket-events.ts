@@ -260,6 +260,8 @@ export interface MessageStatusEvent {
   providerMessageId?: string;           // WhatsApp provider message ID
   conversationId?: string;
   status: 'sent' | 'delivered' | 'read' | 'failed';
+  failedReason?: string;                // Only for failed status — human-readable reason
+  failedCode?: number;                  // Only for failed status — código numérico estruturado do provider (ex.: 131047 da Meta)
   timestamp: Date;
 }
 

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProviderCapability = exports.isProviderCategory = exports.PROVIDER_CATEGORY = exports.ProviderId = void 0;
+exports.ProviderCapability = exports.isOfficialMetaMessagingProvider = exports.META_WINDOW_CLOSED_FAILED_CODES = exports.META_WINDOW_CLOSED_CUSTOMER_ONLY_CODE = exports.WHATSAPP_WINDOW_CODE = exports.MESSAGING_WINDOW_CLOSED_CODE = exports.MESSAGING_WINDOW_WARNING_HOURS = exports.MESSAGING_WINDOW_HOURS = exports.OFFICIAL_META_MESSAGING_PROVIDERS = exports.isProviderCategory = exports.PROVIDER_CATEGORY = exports.ProviderId = void 0;
 // ============================================================================
 // PROVIDER ENUM (Centralized)
 // ============================================================================
@@ -116,6 +116,65 @@ const isProviderCategory = (providerId, category) => {
     return exports.PROVIDER_CATEGORY[providerId] === category;
 };
 exports.isProviderCategory = isProviderCategory;
+// ============================================================================
+// META MESSAGING WINDOW
+// ============================================================================
+/**
+ * Providers da Meta que aplicam a política de janela de 24h.
+ *
+ * NÃO inclui `whatsapp-business-notifications` (canal de 2FA/notificações, não
+ * é canal de conversa) nem `gateway-whatsapp` (Baileys, não é API oficial).
+ */
+exports.OFFICIAL_META_MESSAGING_PROVIDERS = [
+    ProviderId.WHATSAPP_BUSINESS,
+    ProviderId.INSTAGRAM_MESSAGING,
+    ProviderId.FACEBOOK_MESSENGER,
+];
+/** Duração da janela de atendimento da Meta, em horas. */
+exports.MESSAGING_WINDOW_HOURS = 24;
+/** Antecedência com que o chat avisa que a janela vai fechar, em horas. */
+exports.MESSAGING_WINDOW_WARNING_HOURS = 2;
+/**
+ * Valor de `code` na response de erro quando o envio é recusado por janela fechada.
+ *
+ * TEM que ser idêntico ao nome da classe `MessagingWindowClosedError` no backend:
+ * o errorHandler devolve `code: error.name`. Renomear a classe sem atualizar esta
+ * constante quebra o frontend em silêncio.
+ */
+exports.MESSAGING_WINDOW_CLOSED_CODE = 'MessagingWindowClosedError';
+/**
+ * `ConversationMessage.failedCode` — WhatsApp Cloud API "Re-engagement message"
+ * (código real do Graph). Fonte: developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes.
+ *
+ * Movido de `TROIA-V3-BACKEND/src/shared/messaging-window/errors.ts` pra
+ * `@troia-v3/types` (review 2026-07-27, item "CORRIGIR LOGO DEPOIS" — o
+ * frontend duplicava os dois valores à mão em `useMessagingWindow.ts` com um
+ * comentário dizendo "espelha o backend"; a §5.1 da spec já tinha movido as
+ * outras constantes de janela pra types justamente pra evitar esse drift).
+ * O backend continua exportando o MESMO nome via `shared/messaging-window/errors.ts`
+ * (re-export) — nenhum call site precisou mudar.
+ */
+exports.WHATSAPP_WINDOW_CODE = 131047;
+/**
+ * `ConversationMessage.failedCode` — sentinela (NÃO é código real do Graph)
+ * usada quando a falha é "janela fechada" num canal `reopenWith: 'customer_only'`
+ * (Instagram ou Messenger) e o call site só tem o `reopenWith` em mãos, sem
+ * saber qual dos dois canais originou o erro. Deliberadamente negativa —
+ * nenhum código real do Graph é negativo. Ver `WHATSAPP_WINDOW_CODE` acima
+ * pro contexto da migração pra `@troia-v3/types`.
+ */
+exports.META_WINDOW_CLOSED_CUSTOMER_ONLY_CODE = -1;
+/**
+ * Conveniência pros dois consumidores que só precisam checar membership
+ * (`ConversationMessage.failedCode` pertence a "janela fechada"?) — backend
+ * (`shared/messaging-window/errors.ts` → `isMetaWindowError`) e frontend
+ * (`useMessagingWindow.ts` → `META_WINDOW_CODES`, `ChatMessage.tsx`).
+ */
+exports.META_WINDOW_CLOSED_FAILED_CODES = [exports.WHATSAPP_WINDOW_CODE, exports.META_WINDOW_CLOSED_CUSTOMER_ONLY_CODE];
+/** Type guard aceitando string crua (o providerId chega como string do Mongo). */
+const isOfficialMetaMessagingProvider = (providerId) => typeof providerId === 'string' &&
+    exports.OFFICIAL_META_MESSAGING_PROVIDERS.includes(providerId);
+exports.isOfficialMetaMessagingProvider = isOfficialMetaMessagingProvider;
 // ============================================================================
 // PROVIDER CAPABILITIES (Centralized)
 // ============================================================================

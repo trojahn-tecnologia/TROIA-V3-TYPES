@@ -2,6 +2,25 @@ export interface ConversationPrivacy {
     enabled: boolean;
     users: string[];
 }
+/**
+ * Estado da janela de mensageria da Meta para a conversa.
+ *
+ * Presente APENAS quando o canal é Meta oficial (whatsapp-business,
+ * instagram-messaging, facebook-messenger). Ausente = a política não se aplica.
+ *
+ * Derivado na leitura a partir de `lastMessageFromCustomer` — não é persistido.
+ */
+export interface MessagingWindow {
+    isOpen: boolean;
+    /**
+     * ISO. lastMessageFromCustomer + 24h.
+     * Ausente ⟺ o cliente nunca escreveu — nesse caso `isOpen` é sempre false,
+     * porque não existe janela a expirar.
+     */
+    expiresAt?: string;
+    /** O que reabre a conversa neste canal. Instagram/Messenger não têm template. */
+    reopenWith: 'template' | 'customer_only';
+}
 export interface Conversation {
     id: string;
     appId: string;
@@ -65,6 +84,23 @@ export interface Conversation {
     lastMessageAt?: string;
     lastMessageFromCustomer?: string;
     lastMessageFromAgent?: string;
+    /**
+     * ✅ Computed (not stored in database) — só em canais Meta oficiais.
+     *
+     * ⚠️ Populado apenas nas leituras cujo pipeline hidrata `provider` via
+     * aggregation — na prática, qualquer método do repository que passa por
+     * `enrichConversations` (privado) ou pelo pipeline próprio de `findById`.
+     * Exemplos atuais — lista ilustrativa, não fechada; cresce a cada endpoint
+     * novo que reaproveite um desses dois caminhos — inclui `GET /conversations`,
+     * `GET /conversations/:id`, `GET /conversations/history`,
+     * `GET /conversations/history/:contactId/:channelId`,
+     * `GET /conversations/kanban` e `GET /conversations/kanban/column`.
+     *
+     * Ausente nas respostas de mutação que devolvem o doc bruto do Mongo sem
+     * reidratar `provider` — ex.: `PUT /conversations/:id` (usa `findOneAndUpdate`
+     * direto). Não usar essas respostas para decidir o estado do composer.
+     */
+    messagingWindow?: MessagingWindow;
     firstResponseTime?: number;
     averageResponseTime?: number;
     tags: string[];

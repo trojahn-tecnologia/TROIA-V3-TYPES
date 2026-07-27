@@ -191,6 +191,8 @@ export interface MessageStatusEvent {
     providerMessageId?: string;
     conversationId?: string;
     status: 'sent' | 'delivered' | 'read' | 'failed';
+    failedReason?: string;
+    failedCode?: number;
     timestamp: Date;
 }
 /**
