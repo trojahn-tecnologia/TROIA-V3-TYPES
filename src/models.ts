@@ -259,7 +259,7 @@ export type TicketStageModel = Omit<TicketStage, 'pipelineId'> & {
 export type ConversationModel = ToModel<
   Conversation,
   'appId' | 'companyId' | 'channelId' | 'customerId' | 'contactId' | 'leadId' | 'ticketId' | 'assigneeId' | 'teamId' | 'assignedBy',
-  'createdAt' | 'updatedAt' | 'assignedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'lastMessageFromAgent' | 'startedAt' | 'endedAt'
+  'createdAt' | 'updatedAt' | 'assignedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'startedAt' | 'endedAt'
 >;
 
 /**

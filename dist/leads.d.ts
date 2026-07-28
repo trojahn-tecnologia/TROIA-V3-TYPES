@@ -1,4 +1,4 @@
-import type { KanbanSortMode } from './kanban';
+import type { KanbanBoardResponse, KanbanSortMode } from './kanban';
 import type { AlertLevel, AlertReason } from './alerts';
 /** Plataforma/origem de marketing do lead (espelha campos UTM). */
 export declare const LEAD_SOURCES: readonly ["meta", "google", "tiktok", "linkedin", "microsoft", "organic", "referral", "email", "offline", "partner", "outbound", "direct"];
@@ -323,11 +323,57 @@ export interface LeadKanbanCard {
     createdAt: string;
     /** Rank do modo manual — o client precisa dele pra calcular a posição entre vizinhos. */
     kanbanRank?: string;
+    /**
+     * Próxima atividade PENDENTE do lead (ISO). É o mesmo
+     * `earliestPendingActivityAt` que já alimentava o motor de alerta — pode
+     * estar no passado (follow-up atrasado) ou no futuro (agendado). O card
+     * de Detalhes rotula como "Follow-up".
+     */
+    nextFollowUpAt?: string;
     contact?: LeadKanbanCardContact;
+    /** `picture` vem de `users.avatar` (nome do campo na collection). */
     assignee?: {
         id: string;
         name: string;
+        picture?: string;
     };
+    /**
+     * Empresa do contato — caminho `lead.contactId → contact.customerId →
+     * customer.name`. NÃO é `lead.customerId`, que significa "cliente
+     * resultante da conversão" e só existe depois de `POST /leads/:id/convert`
+     * (spec §10). Ausente quando o contato não tem cliente associado.
+     */
+    customer?: {
+        id: string;
+        name: string;
+    };
+}
+/**
+ * Limiares efetivos de UMA etapa, já resolvidos pela cascata etapa → funil →
+ * sistema no backend. Relógio DESLIGADO (`enabled: false`) é omitido — o card
+ * não deve anunciar "limite Xd" de um relógio que nunca vai disparar.
+ *
+ * Vive no envelope do board e não no card porque é configuração da etapa,
+ * idêntica para todos os cards da mesma coluna.
+ */
+export interface LeadKanbanStepThresholds {
+    inactivity?: {
+        warningDays: number;
+        criticalDays: number;
+    };
+    timeInStep?: {
+        warningDays: number;
+        criticalDays: number;
+    };
+}
+/**
+ * Envelope do board de leads: o board genérico + os limiares por etapa.
+ * Estende `KanbanBoardResponse<LeadKanbanCard>`, então todo consumidor que
+ * ainda tipa pelo genérico continua compilando.
+ */
+export interface LeadKanbanBoard extends KanbanBoardResponse<LeadKanbanCard> {
+    /** Chave = `stepId`. Uma entrada por coluna do board. */
+    stepThresholds?: Record<string, LeadKanbanStepThresholds>;
 }
 export interface LeadKanbanQuery {
     funnelId: string;

@@ -135,7 +135,7 @@ export type TicketStageModel = Omit<TicketStage, 'pipelineId'> & {
     deletedAt?: Date;
 };
 /** Conversation - Conversa */
-export type ConversationModel = ToModel<Conversation, 'appId' | 'companyId' | 'channelId' | 'customerId' | 'contactId' | 'leadId' | 'ticketId' | 'assigneeId' | 'teamId' | 'assignedBy', 'createdAt' | 'updatedAt' | 'assignedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'lastMessageFromAgent' | 'startedAt' | 'endedAt'>;
+export type ConversationModel = ToModel<Conversation, 'appId' | 'companyId' | 'channelId' | 'customerId' | 'contactId' | 'leadId' | 'ticketId' | 'assigneeId' | 'teamId' | 'assignedBy', 'createdAt' | 'updatedAt' | 'assignedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'startedAt' | 'endedAt'>;
 /**
  * ConversationMessageModel - Mensagem de conversa
  *

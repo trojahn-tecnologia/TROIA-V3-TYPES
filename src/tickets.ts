@@ -280,6 +280,14 @@ export interface TicketKanbanCard {
   kanbanRank?: string;
   createdAt: string;
   updatedAt: string;
+  /**
+   * Entrada na etapa atual — gravado na criação (`preprocessCreate`) e a cada
+   * movimentação de stage (`TicketsService.update`). O mapper do card já resolve
+   * o legado sem o campo com queda para `createdAt`, o MESMO fallback do
+   * sortMode 'stepEntered' (`$ifNull: [stageEnteredAt, createdAt]`), então aqui
+   * o valor está sempre preenchido quando o ticket tem etapa.
+   */
+  stageEnteredAt?: string;
   contact?: { id: string; name: string; picture?: string };
   assignee?: { id: string; name: string; picture?: string };
 }

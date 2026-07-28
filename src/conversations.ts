@@ -25,6 +25,13 @@ export interface MessagingWindow {
   reopenWith: 'template' | 'customer_only';
 }
 
+/**
+ * Prioridade de uma conversa. ATENÇÃO: o enum de conversas usa `'normal'`,
+ * NÃO `'medium'` — difere de leads e tickets (ver `kanban-sort.ts` do módulo
+ * conversations, que já documenta a divergência no peso de ordenação).
+ */
+export type ConversationPriority = 'low' | 'normal' | 'high' | 'urgent';
+
 export interface Conversation {
   id: string;
   appId: string;
@@ -33,7 +40,7 @@ export interface Conversation {
   // Core conversation data
   subject?: string;
   status: 'waiting' | 'active' | 'closed';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: ConversationPriority;
   closeReason?: 'resolved' | 'spam' | 'duplicate' | 'no_response' | 'transferred' | 'expired' | 'other';
   closeNotes?: string;
   isReturn?: boolean;  // Flag para indicar se é um retorno/reengajamento
@@ -119,8 +126,22 @@ export interface Conversation {
   messageCount: number;
   lastMessage?: string;        // ✅ Preview of last message (100 chars max)
   lastMessageAt?: string;
+  /**
+   * Direção da ÚLTIMA fala da conversa — desnormalizada junto com
+   * `lastMessage`/`lastMessageAt` (Tarefa 14). `'inbound'` = o cliente falou por
+   * último (nós devemos resposta); `'outbound'` = nós falamos por último.
+   *
+   * Mensagem interna (`isInternal: true`) NÃO atualiza este campo, pelo mesmo
+   * motivo que não atualiza a prévia: nota interna e registro de transferência
+   * não são fala da conversa.
+   *
+   * Ausente em conversas antigas fora da janela da migration
+   * `2026-07-27-002-backfill-conversation-last-message-direction` — o card
+   * simplesmente não mostra o indicador de direção nesse caso, e o campo passa
+   * a existir na próxima mensagem real.
+   */
+  lastMessageDirection?: 'inbound' | 'outbound';
   lastMessageFromCustomer?: string;
-  lastMessageFromAgent?: string;
   /**
    * ✅ Computed (not stored in database) — só em canais Meta oficiais.
    *
@@ -393,7 +414,7 @@ export interface BulkConversationOperationRequest {
 // Projeção enxuta do card + query do endpoint /conversations/kanban.
 // ============================================================================
 
-/** Projeção enxuta da conversa para o card do kanban (SP4) — só o que o ConversationCardImproved renderiza. */
+/** Projeção enxuta da conversa para o card do kanban (SP4) — só o que os cards de Atendimento renderizam. */
 export interface ConversationKanbanCard {
   id: string;
   status: 'waiting' | 'active' | 'closed';
@@ -405,12 +426,28 @@ export interface ConversationKanbanCard {
   closeReason?: 'resolved' | 'spam' | 'duplicate' | 'no_response' | 'transferred' | 'expired' | 'other';
   lastMessage?: string;
   lastMessageAt?: string;
+  /** Quem falou por último. Alimenta os cards Normal (01) e Compacto (06). */
+  lastMessageDirection?: 'inbound' | 'outbound';
+  /** Persistida na conversa (default 'normal'); o board JÁ ordena por ela (sortMode 'priority'). */
+  priority?: ConversationPriority;
+  /** Tags da CONVERSA. Omitido quando vazio. */
+  tags?: string[];
+  /** Tags do CONTATO (hidratadas via `enrichConversations`). Omitido quando vazio. */
+  contactTags?: string[];
+  /** Nome do canal (não do provider). O ícone/cor de marca continua vindo de `providerType`. */
+  channelName?: string;
+  /**
+   * Início do ATENDIMENTO (status → 'active'). Ausente enquanto a conversa está
+   * em fila — NÃO cai para `createdAt` (diferente do `ConversationResponse.startedAt`,
+   * que é obrigatório no tipo e por isso coalesce). Tempo em fila = startedAt − createdAt.
+   */
+  startedAt?: string;
   /** Computado server-side a partir de `unreadTracking[userId]` (campo é por-usuário). */
   unreadCount?: number;
   createdAt: string;
   updatedAt: string;
   contact?: { id: string; name: string; picture?: string; phone?: string };
-  assignee?: { id: string; name: string };
+  assignee?: { id: string; name: string; picture?: string };
   /** Derivado da hidratação channel→integration (mesma que `enrichConversations` já faz). */
   providerType?: string;
 }

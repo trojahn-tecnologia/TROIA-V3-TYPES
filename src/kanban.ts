@@ -75,3 +75,28 @@ export const CONVERSATION_KANBAN_LANE_IDS = ['ai', 'queue', 'inService', 'transf
 export interface ConversationKanbanBoardAggregates {
   total: number;
 }
+
+// ============================================================================
+// DENSIDADE DE CARD (2026-07-27)
+// ============================================================================
+
+/**
+ * Tamanho do card no board. NÃO é o mesmo card com padding diferente: cada
+ * valor corresponde a um desenho distinto, com hierarquia própria — ver
+ * `DOCS/superpowers/specs/2026-07-27-kanban-card-density-design.md` § 1.
+ *
+ * A escolha vale para o board inteiro do módulo e é persistida por navegador
+ * (localStorage), no dialeto que cada módulo já usa. Defaults por módulo:
+ * CRM `normal`, Help Desk `detailed`, Atendimento `compact`.
+ */
+export type CardDensity = 'detailed' | 'normal' | 'compact';
+
+/** Ordem canônica de exibição no seletor: do mais denso em informação ao mais enxuto. */
+export const CARD_DENSITIES: readonly CardDensity[] = ['detailed', 'normal', 'compact'] as const;
+
+/**
+ * Guard para o que vem do localStorage. Valor inválido no storage não pode
+ * quebrar a tela — o caller cai no default do próprio módulo.
+ */
+export const isCardDensity = (value: unknown): value is CardDensity =>
+  typeof value === 'string' && (CARD_DENSITIES as readonly string[]).includes(value);
