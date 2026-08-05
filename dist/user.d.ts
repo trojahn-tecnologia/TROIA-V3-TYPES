@@ -32,6 +32,8 @@ export interface UserDevice {
     deviceModel?: string;
     lastActiveAt: string;
     createdAt: string;
+    lastNotifiedAt?: string;
+    tokenInvalidatedAt?: string;
     authorizedAt?: string;
     authChannel?: 'email' | 'whatsapp';
 }

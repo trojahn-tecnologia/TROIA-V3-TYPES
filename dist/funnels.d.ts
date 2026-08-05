@@ -31,6 +31,12 @@ export interface Funnel extends AppAwareDocument {
     lastAssignedUserId?: number;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /**
+     * Escopo da checagem de duplicados quando allowDuplicateContacts === false.
+     * 'funnel' = considera apenas leads deste funil (default).
+     * 'all_funnels' = considera leads em andamento de qualquer funil do tenant.
+     */
+    duplicateCheckScope?: 'funnel' | 'all_funnels';
     /** Tipos de lead disponíveis neste funil (ex: Venda, Suporte, Consultoria) */
     types?: string[];
     /** Config default dos alertas de inatividade deste funil (override por etapa em FunnelStep). */
@@ -44,6 +50,12 @@ export interface CreateFunnelRequest {
     assignmentConfig?: DistributionConfig;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /**
+     * Escopo da checagem de duplicados quando allowDuplicateContacts === false.
+     * 'funnel' = considera apenas leads deste funil (default).
+     * 'all_funnels' = considera leads em andamento de qualquer funil do tenant.
+     */
+    duplicateCheckScope?: 'funnel' | 'all_funnels';
     /** Tipos de lead disponíveis neste funil */
     types?: string[];
     /** Config default dos alertas de inatividade deste funil. */
@@ -58,6 +70,12 @@ export interface UpdateFunnelRequest {
     assignmentConfig?: DistributionConfig;
     /** Permite criar leads duplicados (mesmo contactId) neste funil. Leads em funis diferentes não são afetados. Default: true */
     allowDuplicateContacts?: boolean;
+    /**
+     * Escopo da checagem de duplicados quando allowDuplicateContacts === false.
+     * 'funnel' = considera apenas leads deste funil (default).
+     * 'all_funnels' = considera leads em andamento de qualquer funil do tenant.
+     */
+    duplicateCheckScope?: 'funnel' | 'all_funnels';
     /** Tipos de lead disponíveis neste funil */
     types?: string[];
     /** Config default dos alertas de inatividade deste funil. */

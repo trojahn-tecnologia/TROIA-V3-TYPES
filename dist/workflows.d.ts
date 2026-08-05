@@ -176,6 +176,39 @@ export interface InstagramMentionTriggerConfig {
     keyword?: string;
 }
 /**
+ * Business hours gate para nodes de SAÍDA de workflows (2026-08).
+ *
+ * Quando `enabled: true` e o run atinge o node FORA da janela, o run SUSPENDE
+ * (snapshot + BullMQ delayed job) e retoma no próximo instante válido — só
+ * então o envio acontece. Payload de suspensão: `{ reason: 'business_hours',
+ * resumeAt }` (ver BusinessHoursSuspendPayload no backend).
+ *
+ * Shape deliberadamente compatível com a futura entidade `business-calendars`
+ * (DOCS/superpowers/specs/2026-07-27-sla-helpdesk-pesquisa.md §6.2): weekday
+ * domingo-zero como ShiftSchedule.weekdays, janela única por dia — o calendário
+ * futuro generaliza para múltiplos slots/dia. SEM feriados no MVP.
+ */
+export interface WorkflowBusinessHoursConfig {
+    /** Ativo somente quando `=== true`. `false` preserva a janela configurada sem aplicá-la. */
+    enabled: boolean;
+    /** Dias ativos, 0=Dom..6=Sáb. Vazio é inválido (rejeitado no save). */
+    weekdays: number[];
+    /** "HH:mm" — início da janela (inclusive). */
+    startTime: string;
+    /** "HH:mm" — fim da janela (exclusive). Deve ser > startTime (sem janela overnight no MVP). */
+    endTime: string;
+    /** IANA tz. Ausente = timezone da company (fallback America/Sao_Paulo). */
+    timezone?: string;
+}
+/**
+ * Node types de saída que suportam `businessHours` (UI + validação backend).
+ * `action_send_media` e `action_internal_notification` não têm interface de
+ * config canônica neste pacote (fallback `Record<string, unknown>`) mas também
+ * aceitam o campo — as interfaces locais vivem nos respectivos step factories.
+ */
+export declare const BUSINESS_HOURS_NODE_TYPES: readonly ["action_send_message", "action_send_template", "action_send_media", "action_send_email", "action_internal_notification", "ai_agent", "ai_agent_inline"];
+export type BusinessHoursNodeType = (typeof BUSINESS_HOURS_NODE_TYPES)[number];
+/**
  * Send Message Action Configuration
  */
 export interface SendMessageActionConfig {
@@ -199,6 +232,8 @@ export interface SendMessageActionConfig {
     caption?: string;
     filename?: string;
     conversationId?: string;
+    /** Janela de horário comercial — fora dela o run suspende até o próximo horário válido. */
+    businessHours?: WorkflowBusinessHoursConfig;
 }
 /**
  * Send Email Action Configuration
@@ -211,6 +246,8 @@ export interface SendEmailActionConfig {
     to: string;
     subject: string;
     body: string;
+    /** Janela de horário comercial — fora dela o run suspende até o próximo horário válido. */
+    businessHours?: WorkflowBusinessHoursConfig;
 }
 /**
  * HTTP Request Action Configuration
@@ -387,6 +424,8 @@ export interface SendTemplateActionConfig {
     templateVariables?: Record<string, string>;
     /** Optional explicit contact — defaults to the contact from workflow context */
     contactId?: string;
+    /** Janela de horário comercial — fora dela o run suspende até o próximo horário válido. */
+    businessHours?: WorkflowBusinessHoursConfig;
 }
 /**
  * Create Ticket Action Configuration
@@ -559,6 +598,8 @@ export interface AIAgentNodeConfig {
     waitForResponse?: boolean;
     /** When true, if the conversation has no messages, fetches history from the last conversation of the same contact+channel */
     includeHistory?: boolean;
+    /** Janela de horário comercial — fora dela o run suspende até o próximo horário válido (o agente roda no horário, não de madrugada). */
+    businessHours?: WorkflowBusinessHoursConfig;
 }
 /**
  * AI Agent Inline Node Configuration
@@ -598,6 +639,12 @@ export interface AIAgentInlineConfig {
     toolNodeIds?: string[];
     /** Preferred context type (defaults to 'conversation') */
     contextType?: 'conversation' | 'contact' | 'lead';
+    /**
+     * Janela de horário comercial — fora dela o run suspende até o próximo horário
+     * válido. Aplica-se ao node inteiro; nodes de ação conectados como TOOLS
+     * ignoram o próprio businessHours (suspend indisponível no loop de tool-calling).
+     */
+    businessHours?: WorkflowBusinessHoursConfig;
 }
 /**
  * Create Database Document Action Configuration

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -100,4 +100,19 @@ exports.WORKFLOW_CONDITION_OPERATORS = [
     'in',
     'not_in',
     'matches_regex',
+];
+/**
+ * Node types de saída que suportam `businessHours` (UI + validação backend).
+ * `action_send_media` e `action_internal_notification` não têm interface de
+ * config canônica neste pacote (fallback `Record<string, unknown>`) mas também
+ * aceitam o campo — as interfaces locais vivem nos respectivos step factories.
+ */
+exports.BUSINESS_HOURS_NODE_TYPES = [
+    'action_send_message',
+    'action_send_template',
+    'action_send_media',
+    'action_send_email',
+    'action_internal_notification',
+    'ai_agent',
+    'ai_agent_inline',
 ];

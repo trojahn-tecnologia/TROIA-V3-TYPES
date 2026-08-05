@@ -34,6 +34,8 @@ export interface UserDevice {
   deviceModel?: string;
   lastActiveAt: string;
   createdAt: string;
+  lastNotifiedAt?: string;       // ISO — carimbado pelo backend quando um push é enviado com sucesso para o token deste device
+  tokenInvalidatedAt?: string;   // ISO — setado quando o provider de push reporta o token como inválido/unsubscribed; devices invalidados saem do pool de envio. Rearmado ($unset) no POST /users/me/devices (re-subscribe)
   // Phase D — 2FA per-device
   authorizedAt?: string;         // ISO timestamp — preenchido após 2FA; undefined = pendente
   authChannel?: 'email' | 'whatsapp'; // canal escolhido na última geração de código
