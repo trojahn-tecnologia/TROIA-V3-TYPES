@@ -212,6 +212,13 @@ export interface DatabasePropertyData {
   /** Detailed description */
   description: string;
 
+  /**
+   * Descrição interna — visível apenas para a equipe no painel.
+   * Removida de TODAS as superfícies públicas (site público + agente de IA,
+   * incluindo RAG) via applyPropertyPublicRedaction no backend.
+   */
+  internalDescription?: string;
+
   /** Internal reference code */
   reference?: string;
 
