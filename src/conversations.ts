@@ -6,6 +6,18 @@ export interface ConversationPrivacy {
 }
 
 /**
+ * Quem enviou a última fala da conversa (desnormalizado de
+ * `ConversationMessage.senderType`). `'system'` está deliberadamente fora:
+ * mensagens system não atualizam `lastMessage*` (não são fala da conversa).
+ */
+export type ConversationLastMessageSenderType =
+  | 'contact'
+  | 'user'
+  | 'ai'
+  | 'automation'
+  | 'automation-follow';
+
+/**
  * Estado da janela de mensageria da Meta para a conversa.
  *
  * Presente APENAS quando o canal é Meta oficial (whatsapp-business,
@@ -141,6 +153,22 @@ export interface Conversation {
    * a existir na próxima mensagem real.
    */
   lastMessageDirection?: 'inbound' | 'outbound';
+  /**
+   * Quem enviou a ÚLTIMA fala da conversa — desnormalizado junto com
+   * `lastMessage`/`lastMessageAt`/`lastMessageDirection` (2026-08-04); os
+   * quatro descrevem a MESMA mensagem e nunca podem divergir.
+   *
+   * Mensagem interna (`isInternal: true`) e mensagem `senderType: 'system'`
+   * NÃO atualizam este campo (nem os irmãos): nota interna, registro de
+   * transferência e injeções de contexto para o agente (webhook/skill) não são
+   * fala da conversa — por isso `'system'` está fora do union.
+   *
+   * Consumido pelos filtros de trigger de workflow ("Quem enviou a última
+   * mensagem" — inatividade/data via query Mongo, evento via contexto).
+   * Ausente em conversas antigas fora da janela da migration de backfill
+   * `2026-08-04-001-backfill-conversation-last-message-sender-type`.
+   */
+  lastMessageSenderType?: ConversationLastMessageSenderType;
   lastMessageFromCustomer?: string;
   /**
    * ✅ Computed (not stored in database) — só em canais Meta oficiais.
