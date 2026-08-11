@@ -19,6 +19,7 @@ __exportStar(require("./common"), exports);
 // Core modules
 __exportStar(require("./app"), exports);
 __exportStar(require("./companies"), exports);
+__exportStar(require("./device"), exports);
 __exportStar(require("./user"), exports);
 __exportStar(require("./modules"), exports);
 __exportStar(require("./plans"), exports);

@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { TenantAwareDocument, FullTenantDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
+import type { DeviceClientHints, DeviceInfo } from './device';
 import type { LevelResponse } from './levels';
 export interface User extends FullTenantDocument {
     email: string;
@@ -24,7 +25,19 @@ export interface User extends FullTenantDocument {
         expiresAt?: string;
     };
 }
-export interface UserDevice {
+/**
+ * Dispositivo de um operador. Estrutura EMBUTIDA em `users.devices[]` — não
+ * virou collection porque o fluxo de 2FA por device lê/grava no mesmo documento
+ * do usuário.
+ *
+ * Herda `DeviceInfo` (vocabulário comum com `ContactDevice`) EXCETO `browser`:
+ * esse campo é histórico e recebe string livre do cliente (`'Chrome'`, `'Safari'`
+ * — ver `detectBrowser` no frontend), enquanto `DeviceInfo.browser` é enum
+ * minúsculo. Manter como string evita quebrar login/mobile já em produção; a
+ * classificação fina do parse server-side entra em `browserVersion`, `os`,
+ * `deviceKind` e `model`.
+ */
+export interface UserDevice extends Omit<DeviceInfo, 'browser'> {
     deviceId: string;
     token?: string;
     platform: 'web' | 'android' | 'ios';
@@ -321,6 +334,12 @@ export interface LoginRequest {
         platform: 'web' | 'android' | 'ios';
         browser?: string;
         deviceModel?: string;
+        /**
+         * Client Hints de alta entropia (web). O servidor já parseia o User-Agent,
+         * mas o Chrome congelou versão de SO e modelo — só os hints recuperam.
+         * Ausente em Safari/Firefox e no app mobile (que manda `deviceModel`).
+         */
+        clientHints?: DeviceClientHints;
     };
 }
 export interface LoginResponse {

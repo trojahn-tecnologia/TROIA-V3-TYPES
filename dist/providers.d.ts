@@ -214,6 +214,7 @@ export declare enum ProviderId {
     PUSH_FIREBASE = "push-firebase",
     PUSH_ONESIGNAL = "push-onesignal",
     GATEWAY_WHATSAPP = "gateway-whatsapp",
+    GEO_MAXMIND = "geo-maxmind",
     INSTAGRAM_MESSAGING = "instagram-messaging",
     LINKEDIN_MESSAGING = "linkedin-messaging",
     TIKTOK_MESSAGING = "tiktok-messaging",
@@ -242,7 +243,7 @@ export declare enum ProviderId {
     VECTOR_PINECONE = "vector-pinecone",
     META = "meta"
 }
-export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta';
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo';
 export declare const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory>;
 /** Check if a providerId belongs to a given category */
 export declare const isProviderCategory: (providerId: string | null | undefined, category: ProviderCategory) => boolean;
@@ -325,6 +326,13 @@ export declare enum ProviderCapability {
      * `config.templates.notification`).
      */
     SEND_NOTIFICATION = "send_notification",
+    /**
+     * Resolve IP → localização aproximada (país/região/cidade). Enriquece
+     * dispositivos de operadores (`users.devices[]`) e de contatos
+     * (`contact-devices`). Trocar de provedor é reconfigurar a integração no
+     * admin — nada muda no app.
+     */
+    GEO_LOOKUP = "geo_lookup",
     CREATE_POST = "create_post",
     CREATE_STORY = "create_story",
     CREATE_CAMPAIGN = "create_campaign",

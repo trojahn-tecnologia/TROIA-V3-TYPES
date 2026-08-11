@@ -156,6 +156,30 @@ export function getSupportedChannelsForType(type: NotificationType | string): No
 }
 
 /**
+ * Canais **opt-in** (2026-07-23): `enabled: true` sozinho não basta — o user
+ * precisa escolher os tipos. Nesses canais `types: undefined` significa
+ * "nenhum tipo escolhido" e o dispatch NÃO envia.
+ *
+ * Nos demais (inApp/push/sound, default-on) `types: undefined` significa
+ * "nunca configurou" e permite TODOS os tipos.
+ *
+ * ⚠️ Fonte única do contrato — consumir via `isOptInNotificationChannel` no
+ * backend (`determineChannels`) E no frontend (checkbox da tela de
+ * preferências). Duplicar a regra em cada lado já causou incidente: a UI
+ * marcava o checkbox como ligado enquanto o dispatch tratava como desligado,
+ * e usuários com WhatsApp "ativo" na tela nunca recebiam (2026-08-11).
+ */
+export const OPT_IN_NOTIFICATION_CHANNELS: readonly NotificationChannel[] = ['email', 'whatsapp'];
+
+/**
+ * `true` quando o canal exige escolha explícita de tipos (`types: undefined`
+ * = não envia). Ver `OPT_IN_NOTIFICATION_CHANNELS`.
+ */
+export function isOptInNotificationChannel(channel: NotificationChannel): boolean {
+  return OPT_IN_NOTIFICATION_CHANNELS.includes(channel);
+}
+
+/**
  * Status de entrega por canal
  */
 export interface ChannelDeliveryStatus {

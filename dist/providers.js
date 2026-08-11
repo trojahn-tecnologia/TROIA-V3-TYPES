@@ -21,6 +21,8 @@ var ProviderId;
     ProviderId["PUSH_FIREBASE"] = "push-firebase";
     ProviderId["PUSH_ONESIGNAL"] = "push-onesignal";
     ProviderId["GATEWAY_WHATSAPP"] = "gateway-whatsapp";
+    // Geo Providers (IP → localização aproximada)
+    ProviderId["GEO_MAXMIND"] = "geo-maxmind";
     // Social Media Providers
     ProviderId["INSTAGRAM_MESSAGING"] = "instagram-messaging";
     ProviderId["LINKEDIN_MESSAGING"] = "linkedin-messaging";
@@ -73,6 +75,8 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.PUSH_FIREBASE]: 'messaging',
     [ProviderId.PUSH_ONESIGNAL]: 'messaging',
     [ProviderId.GATEWAY_WHATSAPP]: 'messaging',
+    // Geo (IP → localização aproximada)
+    [ProviderId.GEO_MAXMIND]: 'geo',
     // Social
     [ProviderId.INSTAGRAM_MESSAGING]: 'social',
     [ProviderId.LINKEDIN_MESSAGING]: 'social',
@@ -210,6 +214,13 @@ var ProviderCapability;
      * `config.templates.notification`).
      */
     ProviderCapability["SEND_NOTIFICATION"] = "send_notification";
+    /**
+     * Resolve IP → localização aproximada (país/região/cidade). Enriquece
+     * dispositivos de operadores (`users.devices[]`) e de contatos
+     * (`contact-devices`). Trocar de provedor é reconfigurar a integração no
+     * admin — nada muda no app.
+     */
+    ProviderCapability["GEO_LOOKUP"] = "geo_lookup";
     // Social media capabilities
     ProviderCapability["CREATE_POST"] = "create_post";
     ProviderCapability["CREATE_STORY"] = "create_story";

@@ -603,6 +603,27 @@ export interface DatabaseProviderSyncEntry {
     lastSyncAt: string;
     syncError?: string;
 }
+/** Variante da ficha de imóvel em PDF. */
+export type PropertyPdfVariant = 'client' | 'internal';
+/**
+ * Slot de PDF exportado (ficha de imóvel) — cache por hash de conteúdo.
+ * `generatedAt` é string ISO (mesmo precedente de providerSync.lastSyncAt).
+ */
+export interface DatabaseDocumentPdfExportInfo {
+    /** URL S3. Variante client: pública; internal: objeto privado (download só via endpoint autenticado). */
+    url: string;
+    /** Key S3 para GetObject. */
+    key: string;
+    /** sha256 do payload canônico (imóvel + empresa + variante + versão do template). */
+    sourceHash: string;
+    /** ISO 8601. */
+    generatedAt: string;
+    sizeBytes?: number;
+}
+export interface DatabaseDocumentPdfExports {
+    client?: DatabaseDocumentPdfExportInfo;
+    internal?: DatabaseDocumentPdfExportInfo;
+}
 export interface DatabaseDocument<T = Record<string, unknown>> {
     _id: string;
     appId: string;
@@ -622,6 +643,13 @@ export interface DatabaseDocument<T = Record<string, unknown>> {
     };
     /** Provider sync tracking (para multi-provider support) */
     providerSync?: DatabaseProviderSyncEntry[];
+    /**
+     * PDFs exportados da ficha (só imóveis hoje). Vive no ENVELOPE de propósito:
+     * o sync de integração sobrescreve `data` inteiro a cada ciclo — qualquer
+     * cache dentro de `data` seria apagado. Escrito apenas pelo backend
+     * (não settável via API de create/update).
+     */
+    pdfExports?: DatabaseDocumentPdfExports;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;

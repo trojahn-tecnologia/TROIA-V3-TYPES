@@ -310,6 +310,9 @@ export enum ProviderId {
   PUSH_ONESIGNAL = 'push-onesignal',
   GATEWAY_WHATSAPP = 'gateway-whatsapp',
 
+  // Geo Providers (IP → localização aproximada)
+  GEO_MAXMIND = 'geo-maxmind',
+
   // Social Media Providers
   INSTAGRAM_MESSAGING = 'instagram-messaging',
   LINKEDIN_MESSAGING = 'linkedin-messaging',
@@ -358,7 +361,7 @@ export enum ProviderId {
 // PROVIDER CATEGORY MAPPING (Static, centralized)
 // ============================================================================
 
-export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta';
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo';
 
 export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   // Email
@@ -377,6 +380,9 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   [ProviderId.PUSH_FIREBASE]: 'messaging',
   [ProviderId.PUSH_ONESIGNAL]: 'messaging',
   [ProviderId.GATEWAY_WHATSAPP]: 'messaging',
+
+  // Geo (IP → localização aproximada)
+  [ProviderId.GEO_MAXMIND]: 'geo',
 
   // Social
   [ProviderId.INSTAGRAM_MESSAGING]: 'social',
@@ -537,6 +543,14 @@ export enum ProviderCapability {
    * `config.templates.notification`).
    */
   SEND_NOTIFICATION = 'send_notification',
+
+  /**
+   * Resolve IP → localização aproximada (país/região/cidade). Enriquece
+   * dispositivos de operadores (`users.devices[]`) e de contatos
+   * (`contact-devices`). Trocar de provedor é reconfigurar a integração no
+   * admin — nada muda no app.
+   */
+  GEO_LOOKUP = 'geo_lookup',
 
   // Social media capabilities
   CREATE_POST = 'create_post',

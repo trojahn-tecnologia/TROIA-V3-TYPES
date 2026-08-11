@@ -28,6 +28,19 @@ export interface App extends FullBaseDocument {
   support?: AppSupport;
   costs: CreditCostEntry[];
   pwaIcons?: PwaIcons;
+  /**
+   * Par de chaves VAPID do Web Push do widget, gerado uma única vez por app.
+   *
+   * **NUNCA regenerar**: a chave pública faz parte de toda subscription já
+   * criada no browser dos visitantes — trocá-la invalida todas em silêncio.
+   * A privada nunca sai do backend (a rota pública devolve só a pública).
+   */
+  vapidKeys?: VapidKeys;
+}
+
+export interface VapidKeys {
+  publicKey: string;
+  privateKey: string;
 }
 
 export interface AppSupportWidget {

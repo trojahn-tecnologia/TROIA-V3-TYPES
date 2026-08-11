@@ -4,6 +4,7 @@ export * from './common';
 // Core modules
 export * from './app';
 export * from './companies';
+export * from './device';
 export * from './user';
 export * from './modules';
 export * from './plans';
