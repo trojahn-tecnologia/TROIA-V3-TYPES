@@ -94,6 +94,14 @@ export type FunnelResponse = Omit<Funnel, '_id'> & {
      *   operadores das mesmas teams que o user logado.
      */
     userScope?: 'own' | 'team' | 'all' | null;
+    /**
+     * `true` se o funil tem pelo menos 1 entry ativa em `funnels-users`
+     * (qualquer usuário, não só o logado). `false` = funil órfão — D-context-gate
+     * inativo: leads não aparecem em listagens e distribuição não roda.
+     * Campo computado no read (getAll/dropdown); ausente em endpoints que não
+     * enriquecem (retrocompat).
+     */
+    hasUsers?: boolean;
 };
 export interface FunnelQuery extends PaginationQuery {
     filters?: {

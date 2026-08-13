@@ -1,3 +1,4 @@
+import type { DistributionStrategy } from './distribution';
 /**
  * AssignmentContext — Contexto canônico de qualquer atribuição/transferência
  * de lead, conversation ou ticket.
@@ -29,7 +30,11 @@ export type AssignmentSource = 'manual' | 'auto' | 'creation';
  * caminhos que não passam pelo DistributionService diretamente (ou que
  * passam mas trazem contexto adicional, como uma regra ou um agente IA).
  */
-export type AssignmentStrategy = 'manual' | 'sequential' | 'fixed_operator' | 'fixed_team' | 'shift' | 'availability' | 'last_interaction' | 'routing_rule' | 'ai_tool' | 'workflow';
+export type AssignmentStrategy = 'manual' | 'sequential' | 'fixed_operator' | 'fixed_team' | 'shift' | 'availability' | 'last_interaction' | 'routing_rule' | 'ai_tool' | 'workflow'
+/** Usuário puxou o atendimento para si (startAttendance). */
+ | 'self_assigned'
+/** Regra Lead → Conversa (syncConversationAssigneeIfEligible). */
+ | 'lead_sync';
 /**
  * Contexto canônico passado pros services de domínio (`LeadsService`,
  * `ConversationsService`, `TicketsService`) ao executar uma atribuição.
@@ -60,4 +65,10 @@ export interface AssignmentContext {
     workflowId?: string;
     /** Quando `strategy === 'last_interaction'` — pra texto "anterior: Pedro". */
     previousUserId?: string;
+    /** Estratégia que o motor efetivamente usou (result.strategyUsed). */
+    distributionStrategy?: DistributionStrategy;
+    /** Equipe resolvida pelo motor (fixed_team / transferência para equipe). */
+    distributionTeamId?: string;
+    /** Tamanho da pool elegível no momento da escolha. */
+    distributionPoolSize?: number;
 }

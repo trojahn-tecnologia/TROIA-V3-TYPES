@@ -116,6 +116,11 @@ export interface DistributionResult {
     poolSize: number;
     /** Motivo do resultado (para logging e troubleshooting). */
     reason: DistributionResultReason;
+    /**
+     * Equipe que originou a pool, quando a estratégia é `fixed_team` (config
+     * ou adhoc de transferência para equipe). Permite auditoria citar a equipe.
+     */
+    teamId?: string;
 }
 export type DistributionResultReason = 
 /** Usuário selecionado com sucesso. */

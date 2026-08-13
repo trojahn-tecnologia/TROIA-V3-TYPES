@@ -396,6 +396,12 @@ export interface LeadQuery extends PaginationQuery {
     budgetMax?: number;
     dateFrom?: string;
     dateTo?: string;
+    /** Range sobre `wonDate` (Data do ganho) — string ISO ou YYYY-MM-DD. */
+    wonDateFrom?: string;
+    wonDateTo?: string;
+    /** Range sobre `lostDate` (Data da perda) — string ISO ou YYYY-MM-DD. */
+    lostDateFrom?: string;
+    lostDateTo?: string;
     campaignName?: string | string[];
     adsetName?: string | string[];
     adName?: string | string[];
