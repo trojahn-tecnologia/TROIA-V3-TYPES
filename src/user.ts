@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { TenantAwareDocument, FullTenantDocument, ActiveStatus, PaginationQuery, GenericQueryOptions, ListResponse } from "./common";
 import type { DeviceClientHints, DeviceInfo } from './device';
 import type { LevelResponse } from './levels';
+import { getDefaultNotificationTypesForChannel } from './notifications';
 
 export interface User extends FullTenantDocument {
   email: string;
@@ -82,10 +83,20 @@ export interface UserPreferences {
 /**
  * Preferências de notificação per-user.
  *
- * Semântica de `types?: string[]` em cada canal (IMPORTANTE):
- *   - `undefined` (campo ausente) → user NUNCA configurou → TODOS os tipos permitidos (default)
- *   - `[]` (array vazio) → user configurou e desselecionou tudo → NENHUM tipo permitido
- *   - `['type1', 'type2']` → apenas os tipos listados são permitidos
+ * Semântica de `types?: string[]` em cada canal — **REGRA ÚNICA** desde
+ * 2026-08-17: só é entregue o que está MARCADO na lista daquele canal.
+ *   - `['type1', 'type2']` → apenas os tipos listados são entregues
+ *   - `[]` (array vazio) → nada é entregue nesse canal
+ *   - `undefined` (campo ausente) → nada é entregue nesse canal
+ *
+ * Não existe mais semântica dupla por canal nem atalho "sem preferências
+ * recebe tudo" — os dois foram removidos junto com o incidente dos avisos de
+ * SLA em produção. A única garantia de plataforma fora das listas é o alerta
+ * de sistema crítico no sino (ver `determineChannels` no backend).
+ *
+ * Usuário novo nasce com a lista de fábrica gravada
+ * (`buildDefaultNotificationPreferences`), então na prática `undefined` só
+ * aparece em documento legado ainda não tocado pela migração `2026-08-17-002`.
  *
  * Envios são sempre imediatos — não há mais `frequency` (era um opt-in que
  * complicava a UX pra pouco benefício).
@@ -110,6 +121,27 @@ export interface UserNotificationPreferences {
   sound: {
     enabled: boolean;
     types?: string[];
+  };
+}
+
+/**
+ * Preferências de notificação **de fábrica** (2026-08-17).
+ *
+ * Fonte única do que um usuário novo recebe. Consumida pelo backend na criação
+ * do usuário (`UsersRepository.create`) e pela migração `2026-08-17-002`, que
+ * grava a mesma lista nos canais sem lista dos usuários já existentes.
+ *
+ * `enabled` preserva exatamente os defaults históricos (sino/push/som e e-mail
+ * ligados, WhatsApp desligado); o que muda é `types`, que agora nasce EXPLÍCITO
+ * em todo canal — sino/push/som com a lista de fábrica, e-mail/WhatsApp vazios.
+ */
+export function buildDefaultNotificationPreferences(): UserNotificationPreferences {
+  return {
+    email: { enabled: true, types: getDefaultNotificationTypesForChannel('email') },
+    whatsapp: { enabled: false, types: getDefaultNotificationTypesForChannel('whatsapp') },
+    push: { enabled: true, types: getDefaultNotificationTypesForChannel('push') },
+    inApp: { enabled: true, types: getDefaultNotificationTypesForChannel('inApp') },
+    sound: { enabled: true, types: getDefaultNotificationTypesForChannel('sound') },
   };
 }
 

@@ -116,25 +116,61 @@ export declare const NOTIFICATION_TYPE_SUPPORTED_CHANNELS: Partial<Record<Notifi
  */
 export declare function getSupportedChannelsForType(type: NotificationType | string): NotificationChannel[];
 /**
- * Canais **opt-in** (2026-07-23): `enabled: true` sozinho não basta — o user
- * precisa escolher os tipos. Nesses canais `types: undefined` significa
- * "nenhum tipo escolhido" e o dispatch NÃO envia.
+ * Canais que nascem **sem nenhum tipo marcado** na lista de fábrica
+ * (`getDefaultNotificationTypesForChannel`): e-mail e WhatsApp custam dinheiro
+ * e invadem canal pessoal, então o usuário precisa marcar o que quer receber.
  *
- * Nos demais (inApp/push/sound, default-on) `types: undefined` significa
- * "nunca configurou" e permite TODOS os tipos.
- *
- * ⚠️ Fonte única do contrato — consumir via `isOptInNotificationChannel` no
- * backend (`determineChannels`) E no frontend (checkbox da tela de
- * preferências). Duplicar a regra em cada lado já causou incidente: a UI
- * marcava o checkbox como ligado enquanto o dispatch tratava como desligado,
- * e usuários com WhatsApp "ativo" na tela nunca recebiam (2026-08-11).
+ * ⚠️ Mudança de papel em 2026-08-17 (REGRA ÚNICA de despacho): esta lista NÃO
+ * decide mais nada no dispatch. Desde a regra única, `types` ausente ou vazio
+ * significa "nada" em TODOS os canais — não existe mais semântica dupla por
+ * canal (o antigo `undefinedMeansAll` morreu junto com o atalho
+ * "sem preferências → recebe tudo"). O que sobrou aqui é exclusivamente a
+ * composição da lista de FÁBRICA de um usuário novo.
  */
 export declare const OPT_IN_NOTIFICATION_CHANNELS: readonly NotificationChannel[];
 /**
- * `true` quando o canal exige escolha explícita de tipos (`types: undefined`
- * = não envia). Ver `OPT_IN_NOTIFICATION_CHANNELS`.
+ * `true` quando o canal nasce de fábrica com lista VAZIA (nada marcado).
+ * Ver `OPT_IN_NOTIFICATION_CHANNELS`.
  */
 export declare function isOptInNotificationChannel(channel: NotificationChannel): boolean;
+/**
+ * Tipos deliberadamente FORA da lista de fábrica.
+ *
+ * Os avisos de SLA entraram em produção em 17/08/2026 sem ninguém ter pedido —
+ * o atalho "usuário sem preferências recebe tudo" (removido no mesmo dia)
+ * entregou 307 notificações para 41 usuários. Decisão do dono: SLA só chega em
+ * quem ligar na tela.
+ */
+export declare const FACTORY_EXCLUDED_NOTIFICATION_TYPES: readonly NotificationType[];
+/**
+ * **Lista de fábrica** dos canais sino/push/som (2026-08-17).
+ *
+ * É a lista gravada em usuário novo (`buildDefaultNotificationPreferences`) e
+ * nos canais sem lista durante a migração `2026-08-17-002`. Contém TODOS os
+ * tipos existentes hoje EXCETO `FACTORY_EXCLUDED_NOTIFICATION_TYPES` — o que
+ * preserva exatamente o que um usuário sem preferências recebia pelo atalho
+ * antigo, menos os avisos de SLA.
+ *
+ * ⚠️ Lista EXPLÍCITA de propósito, nunca derivada de `Object.values`. Tipo novo
+ * no enum NÃO entra aqui de carona: o precedente "migração marca o tipo novo
+ * nas listas de todo mundo" (`2026-08-15-005`) foi REVOGADO pelo dono. Quem
+ * adiciona um tipo decide conscientemente se ele nasce marcado para usuários
+ * NOVOS (entra aqui) ou fica desligado até alguém marcar na tela (entra em
+ * `FACTORY_EXCLUDED_NOTIFICATION_TYPES`). Usuário EXISTENTE nunca é marcado
+ * automaticamente, em nenhum dos dois casos.
+ *
+ * O teste `tests/unit/notifications/factory-defaults.test.ts` (backend) falha
+ * quando o enum cresce sem que o tipo novo apareça em uma das duas listas —
+ * é ele que força a decisão em vez de deixá-la passar em branco.
+ */
+export declare const DEFAULT_NOTIFICATION_TYPES: readonly NotificationType[];
+/**
+ * Lista de fábrica do canal: sino/push/som recebem `DEFAULT_NOTIFICATION_TYPES`,
+ * e-mail/WhatsApp nascem vazios (nada marcado).
+ *
+ * Retorna cópia mutável — o chamador grava no documento do usuário.
+ */
+export declare function getDefaultNotificationTypesForChannel(channel: NotificationChannel): NotificationType[];
 /**
  * Status de entrega por canal
  */
