@@ -34,6 +34,15 @@ export enum NotificationType {
   TICKET_ASSIGNED = 'ticket_assigned',
   TICKET_STATUS_CHANGED = 'ticket_status_changed',
   TICKET_COMMENT_ADDED = 'ticket_comment_added',
+  // SLA (2026-08-15) — dois níveis nativos (decisão 9): aviso e violação.
+  // O nível `l2` da política mapeia para SLA_BREACH com prioridade URGENT;
+  // tudo além disso é gatilho de workflow por `slaBreachTime`.
+  //
+  // Nenhuma entrada em `NOTIFICATION_TYPE_SUPPORTED_CHANNELS`: o default de
+  // `getSupportedChannelsForType` já é `['inApp','push','email','whatsapp']`,
+  // que é exatamente o conjunto desejado — entrada no mapa só RESTRINGE.
+  SLA_WARNING = 'sla_warning',
+  SLA_BREACH = 'sla_breach',
   CONVERSATION_ASSIGNED = 'conversation_assigned',
   CONVERSATION_MESSAGE_RECEIVED = 'conversation_message_received',
 
@@ -51,6 +60,14 @@ export enum NotificationType {
   LEAD_ALERT_WARNING = 'lead_alert_warning',
   LEAD_ALERT_CRITICAL = 'lead_alert_critical',
   LEAD_WEEKLY_DIGEST = 'lead_weekly_digest',
+
+  // Checklist events (modulo Checklists+Units)
+  CHECKLIST_ASSIGNED = 'checklist_assigned',
+  CHECKLIST_DUE_SOON = 'checklist_due_soon',
+  CHECKLIST_EXPIRED = 'checklist_expired',
+  CHECKLIST_COMPLETED = 'checklist_completed',
+  CHECKLIST_APPROVED = 'checklist_approved',
+  CHECKLIST_REJECTED = 'checklist_rejected',
 
   // Escalation events
   ESCALATION_TRIGGERED = 'escalation_triggered',
@@ -97,6 +114,7 @@ export enum NotificationCategory {
   TICKETS = 'tickets',
   CONVERSATIONS = 'conversations',
   LEADS = 'leads',
+  CHECKLISTS = 'checklists',
   PAYMENT = 'payment',
   TEAM = 'team',
   CALENDAR = 'calendar',

@@ -87,3 +87,6 @@ export * from './history-imports';
 export * from './projects';
 export * from './ticket-emails';
 export * from './email-retentions';
+export * from './units';
+export * from './checklists';
+export * from './sla';

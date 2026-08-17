@@ -21,7 +21,9 @@ export declare enum FormFieldType {
     HEADING = "heading",
     PARAGRAPH = "paragraph",
     CPF = "cpf",
-    CNPJ = "cnpj"
+    CNPJ = "cnpj",
+    PHOTO = "photo",
+    CONFORMITY = "conformity"
 }
 /**
  * FormFieldOption - Opcao para campos de escolha (select, radio, checkbox)
@@ -51,6 +53,32 @@ export interface FormConditionalLogic {
     value: string;
 }
 /**
+ * FormType - Diferencia formularios genericos de checklists (modulo Checklists+Units).
+ * 'checklist' habilita ChecklistSettings no Form e os campos FormFieldType.PHOTO/CONFORMITY.
+ */
+export type FormType = 'form' | 'checklist';
+/**
+ * ChecklistSettings - Configuracoes especificas de um Form do tipo 'checklist'.
+ */
+export interface ChecklistSettings {
+    requiresApproval: boolean;
+    defaultDueHours?: number;
+    scoreEnabled: boolean;
+    captureGps: boolean;
+}
+/**
+ * CONFORMITY_VALUES - Valores aceitos pelo campo FormFieldType.CONFORMITY.
+ */
+export declare const CONFORMITY_VALUES: readonly ["conforme", "nao_conforme", "na"];
+export type ConformityValue = (typeof CONFORMITY_VALUES)[number];
+/**
+ * PhotoFieldConfig - Configuracao do campo FormFieldType.PHOTO.
+ */
+export interface PhotoFieldConfig {
+    source: 'any' | 'camera_only';
+    maxPhotos?: number;
+}
+/**
  * FormField - Campo individual do formulario
  */
 export interface FormField {
@@ -69,6 +97,8 @@ export interface FormField {
      * `phone`. Usado pela auto-criação a partir do `destination` do form.
      */
     mapsTo?: string;
+    /** Configuracao do campo quando type === FormFieldType.PHOTO. */
+    photoConfig?: PhotoFieldConfig;
 }
 /**
  * FormSettings - Configuracoes de comportamento do formulario
@@ -124,10 +154,12 @@ export interface Form extends TenantAwareDocument {
     name: string;
     description?: string;
     slug: string;
+    type: FormType;
     status: FormStatus;
     fields: FormField[];
     settings: FormSettings;
     styling: FormStyling;
+    checklistSettings?: ChecklistSettings;
     destination?: FormDestination;
     thankYouMessage?: string;
     thankYouRedirectUrl?: string;
@@ -155,9 +187,11 @@ export interface CreateFormRequest {
     name: string;
     description?: string;
     slug?: string;
+    type?: FormType;
     fields: FormField[];
     settings?: Partial<FormSettings>;
     styling?: Partial<FormStyling>;
+    checklistSettings?: ChecklistSettings;
     destination?: FormDestination;
     thankYouMessage?: string;
     thankYouRedirectUrl?: string;
@@ -171,10 +205,12 @@ export interface UpdateFormRequest {
     name?: string;
     description?: string;
     slug?: string;
+    type?: FormType;
     status?: FormStatus;
     fields?: FormField[];
     settings?: Partial<FormSettings>;
     styling?: Partial<FormStyling>;
+    checklistSettings?: ChecklistSettings;
     destination?: FormDestination;
     thankYouMessage?: string;
     thankYouRedirectUrl?: string;
@@ -187,6 +223,13 @@ export interface UpdateFormRequest {
 export interface FormQuery extends PaginationQuery {
     status?: FormStatus;
     search?: string;
+    /**
+     * Separa as duas listagens que compartilham a collection: Formulários
+     * (`'form'`) e Modelos de checklist (`'checklist'`). O backend já aceitava o
+     * filtro; sem o campo tipado aqui, o frontend precisava de um workaround
+     * local para mandá-lo.
+     */
+    type?: FormType;
 }
 /**
  * FormAnswer - Resposta individual de um campo

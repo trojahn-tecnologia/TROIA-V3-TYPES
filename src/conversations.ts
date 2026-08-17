@@ -44,6 +44,56 @@ export interface MessagingWindow {
  */
 export type ConversationPriority = 'low' | 'normal' | 'high' | 'urgent';
 
+/**
+ * Leitura de UM relógio de SLA já resolvida pelo SERVIDOR, para o card do
+ * board de Atendimento.
+ *
+ * Existe porque o frontend NÃO possui o calendário de horário comercial: a
+ * barra de esfriamento precisa de tempo ÚTIL, e tempo útil só pode ser
+ * calculado por quem tem `company.businessCalendar` + `company.timezone` +
+ * a tabela de feriados. Um cliente que subtraísse `Date.now() - lastMessageAt`
+ * pintaria de vermelho toda a sexta-feira 18:01 até segunda 08:00, para um
+ * alvo que não consumiu um único minuto.
+ *
+ * `measuredAt` é o instante do SERVIDOR em que `elapsedBusinessMs` e
+ * `remainingBusinessMs` foram medidos. O card NÃO extrapola a partir dele
+ * (não dá: o relógio pode atravessar o fim do expediente entre duas
+ * leituras) — quem atualiza é o refetch de 60s do board
+ * (`useAttendanceKanban`, `refetchInterval: 60_000`).
+ */
+export interface ConversationSlaSnapshot {
+  clockKey: SlaClockKey;
+  state: SlaClockState;
+  /** ISO. Instante absoluto do vencimento, já em tempo útil. */
+  dueAt: string;
+  targetMs: number;
+  /** Tempo útil consumido a partir do qual o nível vira `warning`. */
+  warnAtMs: number;
+  elapsedBusinessMs: number;
+  /** `targetMs - elapsedBusinessMs`. Negativo = já estourado. */
+  remainingBusinessMs: number;
+  useBusinessHours: boolean;
+  measuredAt: string;
+}
+
+/**
+ * Limiares da política de primeira resposta resolvidos para o contexto do
+ * board (empresa + canal opcional). Alimenta a legenda da barra e serve de
+ * piso quando um card ainda não tem relógio (conversa sem inbound).
+ *
+ * `source: 'fallback'` significa que NENHUMA política de conversa casou —
+ * nesse caso os números vêm das constantes do frontend e a UI deve dizer
+ * "padrão do sistema", nunca inventar um nome de política.
+ */
+export interface ConversationSlaThresholdsResponse {
+  policyId: string | null;
+  policyName: string | null;
+  targetMs: number;
+  warnAtMs: number;
+  useBusinessHours: boolean;
+  source: 'policy' | 'fallback';
+}
+
 export interface Conversation {
   id: string;
   appId: string;
@@ -224,6 +274,55 @@ export interface Conversation {
       autoResetOnOpen: boolean;
     }
   };
+
+  /**
+   * Relógios de SLA da conversa. Escritor ÚNICO:
+   * `ConversationsRepository.writeSlaClocks` (que deriva os três espelhos
+   * planos abaixo internamente — esquecê-los é estruturalmente impossível).
+   *
+   * NUNCA gravável pela API: `UpdateConversationSchema` não lista estes
+   * campos e o Zod descarta o que não lista (regra 51).
+   *
+   * Chaves possíveis: `first_response` (recorrente — uma instância por
+   * rodada de "cliente falou, devemos resposta") e `resolution` (uma por
+   * conversa, encerrada no fechamento).
+   */
+  sla?: SlaState;
+  /** Espelho plano: QUALQUER relógio em `breached`. */
+  slaBreached?: boolean;
+  /**
+   * Espelho plano do prazo mais crítico, em ISO. É o campo lido pelo
+   * gatilho de workflow `trigger_date_field` — por isso é plano e por isso
+   * é `$unset` (e não `null`) quando não há relógio: o gatilho trata `null`
+   * como valor e dispararia sobre "sem prazo".
+   *
+   * O dedupe do gatilho de data é por BALDE DE DIA em UTC
+   * (`WorkflowsRepository.dateFieldDayBucket`, `d.toISOString().slice(0,10)`,
+   * repository.ts:880-882, com claim atômico por índice único em
+   * :897-926). Consequência: uma conversa cujo `slaBreachTime` se mova duas
+   * vezes no MESMO dia dispara o workflow no máximo UMA vez. É aceitável e
+   * deliberado — mas precisa estar escrito, porque a alternativa (dedupe por
+   * valor de prazo) faria uma retomada de pausa disparar de novo.
+   */
+  slaBreachTime?: string;
+  /**
+   * Alias de LEITURA de `slaBreachTime`, em paridade literal com `Ticket`.
+   *
+   * DECISÃO DESTE PLANO (o contrato §6 deixava em aberto): a conversa
+   * ESPELHA os três campos planos, `slaDueAt` inclusive. É o nome que o card
+   * compacto do board lê — o mesmo que o `TicketCard` já usa —, e ter dois
+   * nomes para o mesmo instante custa um campo, enquanto divergir por
+   * entidade custaria um ramo em toda superfície compartilhada.
+   *
+   * ⚠️ O MECANISMO é diferente dos outros dois, e a diferença importa: quem
+   * ESCREVE é `projectSlaMirror` (dentro de `writeSlaClocks`), e ele só produz
+   * `slaBreached` + `slaBreachTime`. `slaDueAt` NÃO tem escritor — é campo
+   * legado, e `buildSlaWriteOps` faz `$unset` dele em toda escrita, de
+   * propósito. O alias nasce no mapper de LEITURA do repositório
+   * (`slaDueAt ?? slaBreachTime`). Não "acrescente" `slaDueAt` ao projetor
+   * achando que ele ficou de fora por esquecimento.
+   */
+  slaDueAt?: string;
 
   // Dates
   startedAt: string;
@@ -456,6 +555,18 @@ export interface ConversationKanbanCard {
   lastMessageAt?: string;
   /** Quem falou por último. Alimenta os cards Normal (01) e Compacto (06). */
   lastMessageDirection?: 'inbound' | 'outbound';
+  /**
+   * Relógio de primeira resposta já medido pelo servidor. Ausente em DOIS
+   * casos — conversa que nunca recebeu inbound e empresa sem política de
+   * conversa —, e só neles o card cai no fallback de tempo de parede do
+   * `cooldown.ts`.
+   *
+   * ⚠️ Relógio PARADO (`met`/`cancelled`) continua vindo: o repositório
+   * projeta o relógio existente seja qual for o estado, e o `cooldown.ts` o
+   * trata DENTRO do ramo do SLA (nível `neutral`, `source: 'sla'`). Card com
+   * atendimento respondido não volta a medir parede.
+   */
+  sla?: ConversationSlaSnapshot;
   /** Persistida na conversa (default 'normal'); o board JÁ ordena por ela (sortMode 'priority'). */
   priority?: ConversationPriority;
   /** Tags da CONVERSA. Omitido quando vazio. */
@@ -505,3 +616,4 @@ export interface ConversationKanbanColumnQuery extends ConversationKanbanQuery {
 // Import types
 import { PaginationQuery, ListResponse } from './common';
 import type { KanbanSortMode, ConversationKanbanLaneId } from './kanban';
+import type { SlaClockKey, SlaClockState, SlaState } from './sla';

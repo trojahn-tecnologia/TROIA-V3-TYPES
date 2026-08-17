@@ -45,6 +45,7 @@ exports.WORKFLOW_NODE_TYPES = [
     'action_voice_clone',
     'action_voice_tts',
     'action_voice_clone_delete',
+    'action_create_checklist',
     // Controls
     'control_if',
     'control_switch',

@@ -185,3 +185,12 @@ export * from './ticket-emails';
 
 // Email Retentions module (Plano B — retenção de e-mails antes de virarem ticket)
 export * from './email-retentions';
+
+// Units module (localizações/filiais físicas — dono do pool de checklists)
+export * from './units';
+
+// Checklists module (execução de checklists a partir de Form templates type='checklist')
+export * from './checklists';
+
+// SLA engine (políticas, relógios e log append-only — spec 2026-07-27)
+export * from './sla';

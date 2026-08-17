@@ -91,7 +91,8 @@ export type ActivityCategory =
   | 'integration'
   | 'system'
   | 'workflow'
-  | 'report';
+  | 'report'
+  | 'checklist';
 
 export type EntityType =
   | 'contact'
@@ -106,7 +107,8 @@ export type EntityType =
   | 'plan'
   | 'integration'
   | 'workflow'
-  | 'report';
+  | 'report'
+  | 'checklist';
 
 export type ActorType =
   | 'user'      // Human user

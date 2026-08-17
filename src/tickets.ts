@@ -2,6 +2,15 @@
 import { TicketStatusCategory } from './ticket-pipelines';
 import { ActivityAttachment } from './activities';
 import type { KanbanSortMode } from './kanban';
+import type { SlaState } from './sla';
+
+/**
+ * Prioridade do chamado. Extraída da união inline que estava repetida em 5
+ * declarações deste arquivo — o motor de SLA precisa do nome para tipar
+ * `SlaPriorityMatch` e `SlaPolicyScope.priorities` (contrato §1).
+ * Ordem semântica (menor → maior urgência): low < medium < high < urgent.
+ */
+export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface Ticket {
   id: string;
@@ -13,7 +22,7 @@ export interface Ticket {
   title: string;
   description?: string;
   status: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: TicketPriority;
   category: string;
   tags: string[];
 
@@ -40,8 +49,14 @@ export interface Ticket {
   assignedBy?: string;
 
   // SLA Management
-  slaBreachTime?: string;  // When SLA will be breached
-  slaBreached?: boolean;   // If SLA was breached
+  /** Fonte da verdade dos relógios (motor de SLA). Escrito só pelo backend. */
+  sla?: SlaState;
+  /** Espelho plano — menor prazo vivo. DERIVADO de `sla.clocks` (projectSlaMirror). */
+  slaBreachTime?: string;
+  /** Espelho plano — qualquer relógio violado. DERIVADO de `sla.clocks`. */
+  slaBreached?: boolean;
+  /** Alias de leitura de `slaBreachTime`, mesmo nome que o cartão do kanban usa. NÃO é campo persistido. */
+  slaDueAt?: string;
   responseTime?: number;   // Response time in minutes
   resolutionTime?: number; // Resolution time in minutes
 
@@ -91,7 +106,7 @@ export interface Ticket {
 export interface CreateTicketRequest {
   title: string;
   description?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: TicketPriority;
   category: string;
   tags?: string[];
   pipelineId?: string;
@@ -114,7 +129,7 @@ export interface UpdateTicketRequest {
   status?: string;
   statusReason?: string;
   resolution?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: TicketPriority;
   category?: string;
   tags?: string[];
   stageId?: string;
@@ -137,7 +152,7 @@ export interface TicketQuery extends PaginationQuery {
   filters?: {
     title?: string;
     status?: string;
-    priority?: 'low' | 'medium' | 'high' | 'urgent';
+    priority?: TicketPriority;
     category?: string;
     tags?: string[];
     pipelineId?: string;
@@ -177,15 +192,51 @@ export interface ResolveTicketRequest {
   customerSatisfaction?: number;
 }
 
-// Ticket SLA tracking
-export interface TicketSLA {
-  ticketId: string;
-  responseTimeSLA: number;    // Minutes
-  resolutionTimeSLA: number;  // Minutes
-  breachTime: string;         // When breach will occur
-  breached: boolean;
-  actualResponseTime?: number;
-  actualResolutionTime?: number;
+// ============================================================================
+// TRILHA DE MUDANÇA DE ETAPA (Fase 0 do motor de SLA)
+// ============================================================================
+
+/**
+ * `action` das atividades de trilha. `type` continua sendo `'status_change'`
+ * (valor já existente em `ActivityType`); o `action` é o que a timeline do
+ * chamado recebe como `activityType` (`tickets/timeline-service.ts` mapeia
+ * `activity.action || activity.type`).
+ */
+export const TICKET_STATUS_CHANGE_ACTION = 'status_changed';
+
+/**
+ * Fotografia ESTRUTURADA do estado de etapa/status do chamado, gravada em
+ * `Activity.beforeData` e `Activity.afterData` da trilha.
+ *
+ * Estruturado, nunca prosa: o backfill de ativação do motor reconstrói tempo
+ * pausado lendo `statusCategory` dos dois lados de cada transição. Sem esses
+ * campos a trilha vira decoração de timeline e a Fase 0 não entrega o que
+ * promete.
+ *
+ * `stageId` é opcional porque existe caminho legítimo de mudança só de
+ * `status` (PUT sem `stageId`), e porque chamado legado pode não ter etapa.
+ * `status` é o rótulo humano — no caminho normal é o NOME da etapa
+ * (`TicketsService.create`/`update` gravam `status = stage.name`).
+ */
+export interface TicketStatusChangeSnapshot {
+  stageId?: string;
+  statusCategory: TicketStatusCategory;
+  status: string;
+}
+
+/**
+ * `Activity.metadata` da trilha. Só o que não cabe no snapshot e não pode ser
+ * derivado dele. Fica FORA de `title`/`description`/`summary` de propósito:
+ * `metadata` não entra no índice de texto de `activities`.
+ */
+export interface TicketStatusChangeMetadata {
+  /** Nome da etapa de origem, quando resolvido. */
+  fromStageName?: string;
+  /** Nome da etapa de destino, quando resolvido. */
+  toStageName?: string;
+  /** Presentes só quando a transição TROCOU o pipeline (transferência). */
+  fromPipelineId?: string;
+  toPipelineId?: string;
 }
 
 // Timeline unificada do ticket (Plano A — redesign da tela de tickets)
@@ -238,7 +289,7 @@ export interface TicketExportQuery {
   assigneeIds?: string[];
   teamId?: string;
   status?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: TicketPriority;
   category?: string;
   tags?: string[];
   slaBreached?: boolean;

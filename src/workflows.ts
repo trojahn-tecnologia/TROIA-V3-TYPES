@@ -47,6 +47,7 @@ export const WORKFLOW_NODE_TYPES = [
   'action_voice_clone',
   'action_voice_tts',
   'action_voice_clone_delete',
+  'action_create_checklist',
   // Controls
   'control_if',
   'control_switch',
@@ -178,7 +179,7 @@ export interface DateFieldsMap {
   contact: 'createdAt' | 'updatedAt' | 'lastInteractionAt' | 'birthDate' | 'lastContactedAt';
   lead: 'createdAt' | 'updatedAt' | 'assignedAt' | 'wonDate' | 'lostDate' | 'lastInteractionAt' | 'lastFollowUpAt' | 'lastStepAt' | 'expectedCloseDate' | 'lastActivityAt';
   ticket: 'createdAt' | 'updatedAt' | 'assignedAt' | 'dueDate' | 'firstResponseAt' | 'lastResponseAt' | 'resolvedAt' | 'closedAt' | 'slaBreachTime';
-  conversation: 'createdAt' | 'updatedAt' | 'startedAt' | 'closedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'assignedAt';
+  conversation: 'createdAt' | 'updatedAt' | 'startedAt' | 'closedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'assignedAt' | 'slaBreachTime';
   event: 'startTime' | 'endTime' | 'createdAt' | 'updatedAt';
 }
 
@@ -586,6 +587,38 @@ export interface UpdateContactActionConfig {
   addTags?: string[];
   removeTags?: string[];
   customFields?: Record<string, unknown>;
+}
+
+/**
+ * Create Checklist Action Configuration (modulo Checklists+Units)
+ *
+ * Dispara a criacao de um ou mais Checklists a partir de um Form template do
+ * tipo 'checklist' (templateId), definindo o(s) destino(s) (units) e quem
+ * fica responsavel (assignee) por cada instancia criada.
+ */
+/**
+ * Alvo do node: SEMPRE unidades (sorteadas ou fixas).
+ *
+ * O modo `context_entity` (criar 1 checklist ligado ao lead/ticket do contexto)
+ * foi REMOVIDO em 14/08/2026 por decisão do dono: nunca foi solicitado e só
+ * fazia sentido em automação disparada por uma entidade. No gatilho agendado —
+ * que é o caso de uso real, o sorteio diário — não existe entidade no contexto,
+ * então a configuração salvava, ativava e não criava nada, em silêncio.
+ */
+export type CreateChecklistTarget =
+  | { mode: 'draw_units'; count: number }
+  | { mode: 'fixed_units'; unitIds: string[] };
+
+export type CreateChecklistAssignee =
+  | { mode: 'unit_manager' }
+  | { mode: 'fixed_user'; userId: string };
+
+export interface CreateChecklistActionConfig {
+  templateId: string;
+  target: CreateChecklistTarget;
+  assignee: CreateChecklistAssignee;
+  dueHours?: number;
+  addCreatorAsFollower?: boolean;
 }
 
 /**
@@ -1531,9 +1564,16 @@ export interface WorkflowValidationResult {
 // EXPORT / IMPORT (portabilidade)
 // ============================================================================
 
+/**
+ * `template` = template de MENSAGEM. `checklistTemplate` = modelo de checklist
+ * (`Form` com `type: 'checklist'`) — são coleções diferentes, e tratar os dois
+ * como `template` fazia o wizard de import oferecer templates de mensagem para
+ * remapear o modelo do node "Criar Checklist".
+ */
 export type WorkflowRefType =
   | 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage'
-  | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database';
+  | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database'
+  | 'checklistTemplate' | 'unit';
 
 export interface WorkflowExportRef {
   token: string;              // "$ref:1" — único no arquivo

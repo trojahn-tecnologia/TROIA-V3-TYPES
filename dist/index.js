@@ -156,3 +156,9 @@ __exportStar(require("./projects"), exports);
 __exportStar(require("./ticket-emails"), exports);
 // Email Retentions module (Plano B — retenção de e-mails antes de virarem ticket)
 __exportStar(require("./email-retentions"), exports);
+// Units module (localizações/filiais físicas — dono do pool de checklists)
+__exportStar(require("./units"), exports);
+// Checklists module (execução de checklists a partir de Form templates type='checklist')
+__exportStar(require("./checklists"), exports);
+// SLA engine (políticas, relógios e log append-only — spec 2026-07-27)
+__exportStar(require("./sla"), exports);

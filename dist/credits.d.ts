@@ -13,6 +13,7 @@ export declare enum CreditCategory {
     CRM_CONTACT_CREATED = "crm.contact.created",
     AUTOMATION_WORKFLOW_EXECUTED = "automation.workflow.executed",
     AUTOMATION_FORM_RESPONSE = "automation.form.response",
+    AUTOMATION_CHECKLIST_COMPLETED = "automation.checklist.completed",
     INFRA_USER_ACTIVE = "infra.user.active",
     INFRA_CHANNEL_ACTIVE = "infra.channel.active",
     INFRA_EMAIL_DOMAIN = "infra.email.domain",

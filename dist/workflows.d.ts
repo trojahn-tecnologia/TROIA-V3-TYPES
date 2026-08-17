@@ -8,7 +8,7 @@ import type { DatabaseType } from './databases';
  * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
  * directly and stay in sync automatically.
  */
-export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
@@ -89,7 +89,7 @@ export interface DateFieldsMap {
     contact: 'createdAt' | 'updatedAt' | 'lastInteractionAt' | 'birthDate' | 'lastContactedAt';
     lead: 'createdAt' | 'updatedAt' | 'assignedAt' | 'wonDate' | 'lostDate' | 'lastInteractionAt' | 'lastFollowUpAt' | 'lastStepAt' | 'expectedCloseDate' | 'lastActivityAt';
     ticket: 'createdAt' | 'updatedAt' | 'assignedAt' | 'dueDate' | 'firstResponseAt' | 'lastResponseAt' | 'resolvedAt' | 'closedAt' | 'slaBreachTime';
-    conversation: 'createdAt' | 'updatedAt' | 'startedAt' | 'closedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'assignedAt';
+    conversation: 'createdAt' | 'updatedAt' | 'startedAt' | 'closedAt' | 'lastMessageAt' | 'lastMessageFromCustomer' | 'assignedAt' | 'slaBreachTime';
     event: 'startTime' | 'endTime' | 'createdAt' | 'updatedAt';
 }
 /**
@@ -454,6 +454,42 @@ export interface UpdateContactActionConfig {
     addTags?: string[];
     removeTags?: string[];
     customFields?: Record<string, unknown>;
+}
+/**
+ * Create Checklist Action Configuration (modulo Checklists+Units)
+ *
+ * Dispara a criacao de um ou mais Checklists a partir de um Form template do
+ * tipo 'checklist' (templateId), definindo o(s) destino(s) (units) e quem
+ * fica responsavel (assignee) por cada instancia criada.
+ */
+/**
+ * Alvo do node: SEMPRE unidades (sorteadas ou fixas).
+ *
+ * O modo `context_entity` (criar 1 checklist ligado ao lead/ticket do contexto)
+ * foi REMOVIDO em 14/08/2026 por decisão do dono: nunca foi solicitado e só
+ * fazia sentido em automação disparada por uma entidade. No gatilho agendado —
+ * que é o caso de uso real, o sorteio diário — não existe entidade no contexto,
+ * então a configuração salvava, ativava e não criava nada, em silêncio.
+ */
+export type CreateChecklistTarget = {
+    mode: 'draw_units';
+    count: number;
+} | {
+    mode: 'fixed_units';
+    unitIds: string[];
+};
+export type CreateChecklistAssignee = {
+    mode: 'unit_manager';
+} | {
+    mode: 'fixed_user';
+    userId: string;
+};
+export interface CreateChecklistActionConfig {
+    templateId: string;
+    target: CreateChecklistTarget;
+    assignee: CreateChecklistAssignee;
+    dueHours?: number;
+    addCreatorAsFollower?: boolean;
 }
 /**
  * Assign Action Configuration
@@ -1206,7 +1242,13 @@ export interface WorkflowValidationResult {
         severity: 'error' | 'warning';
     }>;
 }
-export type WorkflowRefType = 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage' | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database';
+/**
+ * `template` = template de MENSAGEM. `checklistTemplate` = modelo de checklist
+ * (`Form` com `type: 'checklist'`) — são coleções diferentes, e tratar os dois
+ * como `template` fazia o wizard de import oferecer templates de mensagem para
+ * remapear o modelo do node "Criar Checklist".
+ */
+export type WorkflowRefType = 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage' | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database' | 'checklistTemplate' | 'unit';
 export interface WorkflowExportRef {
     token: string;
     type: WorkflowRefType;

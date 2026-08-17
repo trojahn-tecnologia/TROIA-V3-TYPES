@@ -71,6 +71,9 @@ export type ValidModuleId =
   | 'websites'
   | 'voices'
   | 'forms'
+  | 'units'
+  | 'checklists'
+  | 'sla-policies'
   | 'ticket-pipelines'
   | 'ticket-stages'
 

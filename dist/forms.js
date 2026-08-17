@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormStatus = exports.FormFieldType = void 0;
+exports.FormStatus = exports.CONFORMITY_VALUES = exports.FormFieldType = void 0;
 // ============================================================
 // FORM FIELD TYPES
 // ============================================================
@@ -28,7 +28,13 @@ var FormFieldType;
     FormFieldType["PARAGRAPH"] = "paragraph";
     FormFieldType["CPF"] = "cpf";
     FormFieldType["CNPJ"] = "cnpj";
+    FormFieldType["PHOTO"] = "photo";
+    FormFieldType["CONFORMITY"] = "conformity";
 })(FormFieldType || (exports.FormFieldType = FormFieldType = {}));
+/**
+ * CONFORMITY_VALUES - Valores aceitos pelo campo FormFieldType.CONFORMITY.
+ */
+exports.CONFORMITY_VALUES = ['conforme', 'nao_conforme', 'na'];
 // ============================================================
 // FORM STATUS
 // ============================================================

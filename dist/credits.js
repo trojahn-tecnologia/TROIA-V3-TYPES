@@ -19,6 +19,7 @@ var CreditCategory;
     CreditCategory["CRM_CONTACT_CREATED"] = "crm.contact.created";
     CreditCategory["AUTOMATION_WORKFLOW_EXECUTED"] = "automation.workflow.executed";
     CreditCategory["AUTOMATION_FORM_RESPONSE"] = "automation.form.response";
+    CreditCategory["AUTOMATION_CHECKLIST_COMPLETED"] = "automation.checklist.completed";
     CreditCategory["INFRA_USER_ACTIVE"] = "infra.user.active";
     CreditCategory["INFRA_CHANNEL_ACTIVE"] = "infra.channel.active";
     CreditCategory["INFRA_EMAIL_DOMAIN"] = "infra.email.domain";
@@ -48,6 +49,7 @@ exports.CREDIT_CATEGORIES = {
     [CreditCategory.CRM_CONTACT_CREATED]: { label: 'Contato criado', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.AUTOMATION_WORKFLOW_EXECUTED]: { label: 'Workflow executado', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.AUTOMATION_FORM_RESPONSE]: { label: 'Resposta de formulário', unit: 'per_action', hasDirection: false, hasProviderId: false },
+    [CreditCategory.AUTOMATION_CHECKLIST_COMPLETED]: { label: 'Checklist concluído', unit: 'per_action', hasDirection: false, hasProviderId: false },
     [CreditCategory.INFRA_USER_ACTIVE]: { label: 'Usuário ativo', unit: 'per_month', hasDirection: false, hasProviderId: false },
     [CreditCategory.INFRA_CHANNEL_ACTIVE]: { label: 'Canal ativo', unit: 'per_month', hasDirection: false, hasProviderId: false },
     [CreditCategory.INFRA_EMAIL_DOMAIN]: { label: 'Domínio de email', unit: 'per_month', hasDirection: false, hasProviderId: false },

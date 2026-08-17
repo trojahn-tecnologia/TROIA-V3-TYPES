@@ -42,8 +42,8 @@ export interface ActivityAttachment {
     mimeType?: string;
 }
 export type ActivityType = 'creation' | 'modification' | 'deletion' | 'assignment' | 'status_change' | 'communication' | 'interaction' | 'system' | 'integration' | 'workflow';
-export type ActivityCategory = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'assignment' | 'payment' | 'integration' | 'system' | 'workflow' | 'report';
-export type EntityType = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'team' | 'assignment' | 'plan' | 'integration' | 'workflow' | 'report';
+export type ActivityCategory = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'assignment' | 'payment' | 'integration' | 'system' | 'workflow' | 'report' | 'checklist';
+export type EntityType = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'team' | 'assignment' | 'plan' | 'integration' | 'workflow' | 'report' | 'checklist';
 export type ActorType = 'user' | 'system' | 'bot' | 'webhook' | 'cron' | 'api' | 'integration';
 export interface RelatedEntity {
     id: string;

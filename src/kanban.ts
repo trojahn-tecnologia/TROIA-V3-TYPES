@@ -55,6 +55,12 @@ export interface TicketKanbanBoardAggregates {
   /** Contagem por statusCategory de TODOS os tickets matched do pipeline (não só janelas). */
   statusCategoryCounts: Record<string, number>;
   priorityCounts: Record<string, number>;
+  /**
+   * Chamados com SLA violado em TODO o pipeline filtrado (não só nas janelas
+   * carregadas). Contado a partir do espelho plano `slaBreached` — a projeção
+   * de `sla.clocks` feita por `projectSlaMirror`.
+   */
+  slaBreachedCount: number;
 }
 
 /** Modos de ordenação suportados pelo kanban de tickets (SP3). Sem 'idle' — tickets têm uma única fonte de interação. */

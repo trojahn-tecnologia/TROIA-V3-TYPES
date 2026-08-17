@@ -33,6 +33,15 @@ var NotificationType;
     NotificationType["TICKET_ASSIGNED"] = "ticket_assigned";
     NotificationType["TICKET_STATUS_CHANGED"] = "ticket_status_changed";
     NotificationType["TICKET_COMMENT_ADDED"] = "ticket_comment_added";
+    // SLA (2026-08-15) — dois níveis nativos (decisão 9): aviso e violação.
+    // O nível `l2` da política mapeia para SLA_BREACH com prioridade URGENT;
+    // tudo além disso é gatilho de workflow por `slaBreachTime`.
+    //
+    // Nenhuma entrada em `NOTIFICATION_TYPE_SUPPORTED_CHANNELS`: o default de
+    // `getSupportedChannelsForType` já é `['inApp','push','email','whatsapp']`,
+    // que é exatamente o conjunto desejado — entrada no mapa só RESTRINGE.
+    NotificationType["SLA_WARNING"] = "sla_warning";
+    NotificationType["SLA_BREACH"] = "sla_breach";
     NotificationType["CONVERSATION_ASSIGNED"] = "conversation_assigned";
     NotificationType["CONVERSATION_MESSAGE_RECEIVED"] = "conversation_message_received";
     // Projects
@@ -48,6 +57,13 @@ var NotificationType;
     NotificationType["LEAD_ALERT_WARNING"] = "lead_alert_warning";
     NotificationType["LEAD_ALERT_CRITICAL"] = "lead_alert_critical";
     NotificationType["LEAD_WEEKLY_DIGEST"] = "lead_weekly_digest";
+    // Checklist events (modulo Checklists+Units)
+    NotificationType["CHECKLIST_ASSIGNED"] = "checklist_assigned";
+    NotificationType["CHECKLIST_DUE_SOON"] = "checklist_due_soon";
+    NotificationType["CHECKLIST_EXPIRED"] = "checklist_expired";
+    NotificationType["CHECKLIST_COMPLETED"] = "checklist_completed";
+    NotificationType["CHECKLIST_APPROVED"] = "checklist_approved";
+    NotificationType["CHECKLIST_REJECTED"] = "checklist_rejected";
     // Escalation events
     NotificationType["ESCALATION_TRIGGERED"] = "escalation_triggered";
     NotificationType["ESCALATION_REASSIGNED"] = "escalation_reassigned";
@@ -89,6 +105,7 @@ var NotificationCategory;
     NotificationCategory["TICKETS"] = "tickets";
     NotificationCategory["CONVERSATIONS"] = "conversations";
     NotificationCategory["LEADS"] = "leads";
+    NotificationCategory["CHECKLISTS"] = "checklists";
     NotificationCategory["PAYMENT"] = "payment";
     NotificationCategory["TEAM"] = "team";
     NotificationCategory["CALENDAR"] = "calendar";
