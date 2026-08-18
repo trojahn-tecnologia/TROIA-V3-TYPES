@@ -3,18 +3,16 @@ import { FullTenantDocument, ActiveStatus, PaginationQuery, GenericQueryOptions,
 import { ModulePermission, ValidModuleId } from './modules';
 
 /**
- * Tela inicial atribuída ao Level — define onde o usuário cai ao logar.
+ * Telas iniciais que correspondem 1:1 a um módulo do catálogo.
  *
  * Validação backend: se definida, o Level precisa ter permission `read` no
- * módulo correspondente (mesmo request).
- *
- * Default no frontend (quando undefined): 'dashboards-support'.
+ * módulo de mesmo nome (mesmo request) — `validateLandingPageCoherence`.
  *
  * Tipo derivado de `ValidModuleId` via `Extract<>` — adicionar um valor aqui
  * que não exista em `ValidModuleId` é erro de compilação, garantindo a
- * invariante "toda landing page é um moduleId válido" em compile-time.
+ * invariante "toda landing page de módulo é um moduleId válido".
  */
-export type LandingPage = Extract<
+export type ModuleLandingPage = Extract<
   ValidModuleId,
   | 'dashboards-commercial'
   | 'dashboards-support'
@@ -25,6 +23,32 @@ export type LandingPage = Extract<
   | 'calendar'
   | 'contacts'
 >;
+
+/**
+ * Telas iniciais de rota LIVRE — não têm módulo correspondente porque a rota
+ * não exige permissão de módulo, por decisão de produto.
+ *
+ * `checklists-my` = "Meus checklists" (`/checklists/my`), a caixa de entrada
+ * do responsável pelo checklist. A rota é `app+auth` no backend
+ * (`checklists/router.ts`) e o item de menu é deliberadamente livre no
+ * Sidebar, justamente porque a persona típica — gerente de loja — NÃO tem
+ * `checklists:read` (que é permissão de gestão e abre o tenant inteiro).
+ * Sem esta exceção, um nível de gerente ficaria sem tela inicial válida e
+ * cairia no default `dashboards-support`, que hoje não checa permissão.
+ *
+ * Consequência para quem for adicionar um valor aqui: `landingPage` deixa de
+ * ser garantidamente um moduleId, então todo consumidor que assume essa
+ * equivalência precisa passar por `isFreeLandingPage` antes.
+ */
+export const FREE_LANDING_PAGES = ['checklists-my'] as const;
+
+export type FreeLandingPage = (typeof FREE_LANDING_PAGES)[number];
+
+export type LandingPage = ModuleLandingPage | FreeLandingPage;
+
+/** `true` quando a tela inicial não tem módulo para validar permissão. */
+export const isFreeLandingPage = (value: LandingPage): value is FreeLandingPage =>
+  (FREE_LANDING_PAGES as readonly string[]).includes(value);
 
 /**
  * Default usado pelo frontend quando `Level.landingPage` é undefined.
