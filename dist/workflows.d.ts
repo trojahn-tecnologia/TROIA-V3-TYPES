@@ -8,7 +8,7 @@ import type { DatabaseType } from './databases';
  * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
  * directly and stay in sync automatically.
  */
-export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "control_if", "control_switch", "control_delay", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "control_if", "control_switch", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
@@ -572,13 +572,6 @@ export interface SwitchControlConfig {
     defaultCase?: boolean;
 }
 /**
- * Delay Control Configuration
- */
-export interface DelayControlConfig {
-    duration: number;
-    unit: 'seconds' | 'minutes' | 'hours' | 'days';
-}
-/**
  * Loop Control Configuration
  */
 export interface LoopControlConfig {
@@ -587,24 +580,48 @@ export interface LoopControlConfig {
     condition?: string;
 }
 /**
+ * Até quando o node "Aguardar" espera. União discriminada por `mode` —
+ * exatamente um dos três formatos.
+ *
+ * - `duration`: espera um tempo corrido. Teto de 72h (rejeitado no save,
+ *   saturado em runtime).
+ * - `time`: espera até o próximo HH:mm, no fuso resolvido. `weekdays` (0=Dom..6=Sáb)
+ *   restringe os dias aceitos; ausente = qualquer dia.
+ * - `business_hours`: espera até a próxima abertura da janela. Se já estiver
+ *   DENTRO da janela, o node não suspende — segue na hora.
+ */
+export type WaitUntilConfig = {
+    mode: 'duration';
+    duration: number;
+    unit: 'minutes' | 'hours' | 'days';
+} | {
+    mode: 'time';
+    time: string;
+    weekdays?: number[];
+    timezone?: string;
+} | {
+    mode: 'business_hours';
+    businessHours: WorkflowBusinessHoursConfig;
+};
+/**
  * Wait For Control Configuration (control_wait_for)
- * Espera timeout OU evento de cancelamento — duas saídas: 'timeout' | 'event'.
+ * Espera até `until` OU até o evento de cancelamento — duas saídas: 'timeout' | 'event'.
  */
 export interface WaitForControlConfig {
-    timeout: {
-        duration: number;
-        unit: 'minutes' | 'hours' | 'days';
-    };
+    /**
+     * Até quando esperar. Ausente = fallback `{ mode: 'duration', duration: 24, unit: 'hours' }`.
+     */
+    until?: WaitUntilConfig;
+    /** Cancelamento opcional — vale para os TRÊS modos de `until`. */
     cancelEvent?: {
         eventType: string;
         entityType?: string;
         matchField?: string;
         matchValue?: string;
     };
-    /** Smart Delay: se preenchido, SUBSTITUI o timeout (espera até este horário HH:mm). */
-    waitUntilTime?: string;
-    waitUntilWeekday?: boolean;
 }
+/** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
+export declare const WAIT_UNTIL_MAX_DURATION_MS: number;
 /**
  * Split Control Configuration (control_split — teste A/B)
  * sourceHandle das edges: 'path-0'..'path-N' (índice do path).
@@ -751,7 +768,7 @@ export interface SkillOutputConfig {
 /**
  * Node Configuration - Union of all config types
  */
-export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | DelayControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
+export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
 /**
  * Workflow Variable Value - Type-safe recursive value type for workflow variables
  */

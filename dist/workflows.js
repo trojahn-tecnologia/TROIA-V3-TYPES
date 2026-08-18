@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -49,7 +49,6 @@ exports.WORKFLOW_NODE_TYPES = [
     // Controls
     'control_if',
     'control_switch',
-    'control_delay',
     'control_wait_for',
     'control_loop',
     'control_split',
@@ -117,3 +116,5 @@ exports.BUSINESS_HOURS_NODE_TYPES = [
     'ai_agent',
     'ai_agent_inline',
 ];
+/** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
+exports.WAIT_UNTIL_MAX_DURATION_MS = 72 * 60 * 60 * 1000;

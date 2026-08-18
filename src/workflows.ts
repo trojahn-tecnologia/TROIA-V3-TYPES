@@ -51,7 +51,6 @@ export const WORKFLOW_NODE_TYPES = [
   // Controls
   'control_if',
   'control_switch',
-  'control_delay',
   'control_wait_for',
   'control_loop',
   'control_split',
@@ -709,14 +708,6 @@ export interface SwitchControlConfig {
 }
 
 /**
- * Delay Control Configuration
- */
-export interface DelayControlConfig {
-  duration: number;
-  unit: 'seconds' | 'minutes' | 'hours' | 'days';
-}
-
-/**
  * Loop Control Configuration
  */
 export interface LoopControlConfig {
@@ -726,21 +717,41 @@ export interface LoopControlConfig {
 }
 
 /**
+ * Até quando o node "Aguardar" espera. União discriminada por `mode` —
+ * exatamente um dos três formatos.
+ *
+ * - `duration`: espera um tempo corrido. Teto de 72h (rejeitado no save,
+ *   saturado em runtime).
+ * - `time`: espera até o próximo HH:mm, no fuso resolvido. `weekdays` (0=Dom..6=Sáb)
+ *   restringe os dias aceitos; ausente = qualquer dia.
+ * - `business_hours`: espera até a próxima abertura da janela. Se já estiver
+ *   DENTRO da janela, o node não suspende — segue na hora.
+ */
+export type WaitUntilConfig =
+  | { mode: 'duration'; duration: number; unit: 'minutes' | 'hours' | 'days' }
+  | { mode: 'time'; time: string; weekdays?: number[]; timezone?: string }
+  | { mode: 'business_hours'; businessHours: WorkflowBusinessHoursConfig };
+
+/**
  * Wait For Control Configuration (control_wait_for)
- * Espera timeout OU evento de cancelamento — duas saídas: 'timeout' | 'event'.
+ * Espera até `until` OU até o evento de cancelamento — duas saídas: 'timeout' | 'event'.
  */
 export interface WaitForControlConfig {
-  timeout: { duration: number; unit: 'minutes' | 'hours' | 'days' };
+  /**
+   * Até quando esperar. Ausente = fallback `{ mode: 'duration', duration: 24, unit: 'hours' }`.
+   */
+  until?: WaitUntilConfig;
+  /** Cancelamento opcional — vale para os TRÊS modos de `until`. */
   cancelEvent?: {
     eventType: string;      // ex: 'message.received'
     entityType?: string;    // informativo — o significado do matchValue é fixo por eventType
     matchField?: string;    // informativo (não usado pelo motor)
     matchValue?: string;    // template, ex: '{{conversation.id}}'
   };
-  /** Smart Delay: se preenchido, SUBSTITUI o timeout (espera até este horário HH:mm). */
-  waitUntilTime?: string;
-  waitUntilWeekday?: boolean;
 }
+
+/** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
+export const WAIT_UNTIL_MAX_DURATION_MS = 72 * 60 * 60 * 1000;
 
 /**
  * Split Control Configuration (control_split — teste A/B)
@@ -912,7 +923,6 @@ export type NodeConfig =
   | SetVariableActionConfig
   | IfControlConfig
   | SwitchControlConfig
-  | DelayControlConfig
   | LoopControlConfig
   | WaitForControlConfig
   | SplitControlConfig
