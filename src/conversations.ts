@@ -116,6 +116,14 @@ export interface Conversation {
   source: string;                  // Universal source identifier — inclui 'import' (D5: conversa "Histórico importado" fechada, criada por ConversationsService.createImportedConversation)
 
   // Participants
+  /**
+   * @deprecated Use `contact.customerId`.
+   *
+   * Campo ÓRFÃO: nenhum fluxo de negócio o escreve — só o CRUD genérico
+   * escrevia, e `CreateConversationSchema`/`UpdateConversationSchema` deixaram
+   * de aceitá-lo (C7, 2026-08-19). A LEITURA continua tolerante e o dado NÃO é
+   * apagado do banco (reversível). O vínculo de verdade é `Contact.customerId`.
+   */
   customerId?: string;
   userId?: string;      // User associated with conversation (for AI agent context)
 
@@ -130,6 +138,20 @@ export interface Conversation {
     picture?: string;   // Contact avatar URL
     phone?: string;     // Contact primary phone
     tags?: string[];    // Contact tags (populated for list rendering)
+    /**
+     * FK do vínculo real contato ↔ Cliente (`Contact.customerId`). É ESTE o
+     * campo que o header do atendimento usa — não `Conversation.customerId`
+     * (órfão, ver abaixo) nem `Lead.customerId` (cliente resultante da
+     * conversão do lead).
+     */
+    customerId?: string;
+    /**
+     * Cliente já resolvido pelo backend — só o necessário para a pílula do
+     * header. Populado nos DOIS caminhos de projeção do
+     * `conversations/repository.ts` (Two-Phase Fetch e aggregation); se só um
+     * for alterado, o cliente aparece de forma intermitente conforme a rota.
+     */
+    customer?: { id: string; name: string };
   };
 
   // ✅ Populated via aggregation (not stored in database)
@@ -175,6 +197,21 @@ export interface Conversation {
   // ✅ AI Agent integration (defines if conversation is AI-powered)
   agentId?: string;           // AI Agent ID (ObjectId) - if present, conversation is AI-powered
   agentStatus?: 'active' | 'inactive' | 'paused'; // AI Agent status in this conversation
+
+  // ============================================================================
+  // CSAT / FORA DO HORÁRIO — campos INTERNOS (fora do UpdateConversationSchema;
+  // escritos só por métodos dedicados do ConversationsRepository)
+  // ============================================================================
+  /** Nota CSAT: 0 = não coletada (3 tentativas inválidas); 1–5 = nota (menor = melhor) */
+  satisfaction?: number;
+  /** Pesquisa CSAT enviada, aguardando resposta do contato */
+  satisfactionPending?: boolean;
+  /** Tentativas de resposta inválida (0–3) */
+  satisfactionTryings?: number;
+  /** Quando a nota foi registrada (ISO na API; Date no banco) */
+  satisfactionAt?: string;
+  /** Auto-respostas fora do horário já enviadas nesta conversa (máx 3) */
+  outOfHoursTryings?: number;
 
   // Provider integration (via lookup)
   provider?: {                // ✅ Populated provider data (via lookup, not stored)

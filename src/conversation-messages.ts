@@ -35,6 +35,10 @@ export interface AudioContent {
   duration?: number; // seconds
   size?: number; // bytes
   mimeType?: string;
+  // Dual-file de voz gravada na UI: `url` = derivada MP3 (toca em qualquer
+  // browser, incl. Safari/iOS < 18.4) e `originalUrl` = Ogg/Opus original,
+  // que é o que vai ao provider (voice note ptt exige ogg/opus).
+  originalUrl?: string;
 }
 
 export interface DocumentContent {

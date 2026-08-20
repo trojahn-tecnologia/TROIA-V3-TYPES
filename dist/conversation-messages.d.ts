@@ -29,6 +29,7 @@ export interface AudioContent {
     duration?: number;
     size?: number;
     mimeType?: string;
+    originalUrl?: string;
 }
 export interface DocumentContent {
     type: 'document';

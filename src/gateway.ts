@@ -113,7 +113,7 @@ export interface GatewayEventData {
   to?: string;  // Recipient (empresa/bot number)
   fromMe?: boolean;  // ✅ Message direction: true = sent by us, false = received
   message?: string;
-  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'poll' | 'buttons' | 'list' | 'unknown';
+  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'buttons' | 'list' | 'unknown';
 
   // ✅ Structured sender information (NUNCA string)
   from?: MessageSender;
@@ -151,6 +151,11 @@ export interface GatewayEventData {
   edit?: {
     targetMessageId: string;  // providerMessageId da mensagem editada
     newText: string;
+  };
+
+  // Delete data (cliente apagou mensagem "para todos" no WhatsApp — revoke)
+  delete?: {
+    targetMessageId: string;  // providerMessageId da mensagem apagada
   };
 
   // ✅ Flag de mensagem encaminhada (WhatsApp ContextInfo.isForwarded)

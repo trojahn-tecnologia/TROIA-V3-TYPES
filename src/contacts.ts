@@ -29,9 +29,13 @@ export interface ContactIdentifiers {
   instagram: string[];
 
   // Facebook: ["username", "fb_id_123456"]
+  // ✅ CANÔNICO `string[]` — o Zod do backend normaliza o payload legado
+  // `{ id, username }` para a string do id (nunca grava objeto), igual ao que
+  // já é feito em whatsapp e instagram.
   facebook: string[];
 
   // Telegram: ["@username", "123456789"]
+  // ✅ CANÔNICO `string[]` — mesma normalização do facebook acima.
   telegram: string[];
 }
 

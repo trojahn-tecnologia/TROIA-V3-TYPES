@@ -85,7 +85,7 @@ export interface GatewayEventData {
     to?: string;
     fromMe?: boolean;
     message?: string;
-    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'poll' | 'buttons' | 'list' | 'unknown';
+    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'buttons' | 'list' | 'unknown';
     from?: MessageSender;
     group?: MessageGroup;
     media?: MediaData;
@@ -109,6 +109,9 @@ export interface GatewayEventData {
     edit?: {
         targetMessageId: string;
         newText: string;
+    };
+    delete?: {
+        targetMessageId: string;
     };
     isForwarded?: boolean;
     quoted?: {

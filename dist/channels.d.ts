@@ -43,6 +43,52 @@ export interface ChannelExpirationConfig {
     /** Mensagem opcional a ser enviada quando o atendimento expirar */
     expirationMessage?: string;
 }
+/**
+ * Configuração de transcrição automática (STT) de mídias recebidas no canal.
+ * Canal SEM este campo = tudo habilitado (comportamento legado, day-0).
+ * A partir do primeiro save via UI o campo passa a existir e é respeitado.
+ * Afeta apenas a transcrição AUTOMÁTICA no recebimento — a transcrição
+ * sob demanda (botão no chat) ignora estas flags.
+ */
+export interface ChannelTranscriptionConfig {
+    /** Transcrever automaticamente áudios recebidos */
+    audio: boolean;
+    /** Transcrever automaticamente vídeos recebidos */
+    video: boolean;
+}
+/**
+ * Opção de resposta da pesquisa CSAT. Escala fixa: menor = melhor
+ * (1=Ótimo … 5=Péssimo). O contato pode responder com o número, o emoji
+ * ou a legenda.
+ */
+export interface ChannelSatisfactionOption {
+    value: 1 | 2 | 3 | 4 | 5;
+    emoji: string;
+    label: string;
+}
+/**
+ * Pesquisa de satisfação (CSAT) enviada ao contato no encerramento do
+ * atendimento. Ausente ou enabled !== true = desligado (day-0 off).
+ * Só atua quando a conversa não está sob agente IA ativo.
+ */
+export interface ChannelSatisfactionConfig {
+    enabled: boolean;
+    /** Texto da pesquisa enviada junto das opções */
+    message: string;
+    /** 2 a 5 opções com value único */
+    options: ChannelSatisfactionOption[];
+    /** Janela (minutos) após o encerramento para aceitar a resposta */
+    timeoutMinutes: number;
+}
+/**
+ * Auto-resposta para mensagens recebidas fora do horário comercial da
+ * empresa (company.businessCalendar). Ausente ou enabled !== true =
+ * desligado. Máximo 3 respostas por conversa; só sem agente IA ativo.
+ */
+export interface ChannelOutOfHoursConfig {
+    enabled: boolean;
+    message: string;
+}
 export type ChannelUserRole = 'viewer' | 'attendant';
 export type ChannelUserScope = 'own' | 'team' | 'all';
 export interface ChannelUser {
@@ -113,6 +159,12 @@ export interface Channel {
     disconnectInfo?: ChannelDisconnectInfo;
     /** Configuração de expiração automática de atendimentos */
     expirationConfig?: ChannelExpirationConfig;
+    /** Transcrição automática de áudios/vídeos recebidos — ausente = tudo habilitado */
+    transcriptionConfig?: ChannelTranscriptionConfig;
+    /** Pesquisa CSAT no encerramento — ausente = desligado */
+    satisfactionConfig?: ChannelSatisfactionConfig;
+    /** Auto-resposta fora do horário comercial — ausente = desligado */
+    outOfHoursConfig?: ChannelOutOfHoursConfig;
     /**
      * Distribuição automática de conversas — config unificada (D8, D9).
      * Mesmo shape que `Funnel.assignmentConfig` e `TicketPipeline.assignmentConfig`.
@@ -206,6 +258,12 @@ export interface UpdateChannelRequest {
     identifyUser?: boolean;
     /** Configuração de expiração automática de atendimentos */
     expirationConfig?: ChannelExpirationConfig;
+    /** Transcrição automática de áudios/vídeos recebidos — ausente = tudo habilitado */
+    transcriptionConfig?: ChannelTranscriptionConfig;
+    /** Pesquisa CSAT no encerramento — ausente = desligado */
+    satisfactionConfig?: ChannelSatisfactionConfig;
+    /** Auto-resposta fora do horário comercial — ausente = desligado */
+    outOfHoursConfig?: ChannelOutOfHoursConfig;
     status?: ExtendedStatus;
 }
 /**
