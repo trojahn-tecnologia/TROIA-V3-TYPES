@@ -43,6 +43,7 @@ export type ValidModuleId =
   | 'funnel-steps'
   | 'goals'
   | 'projects'
+  | 'gamification'
 
   // Feature modules
   | 'products'

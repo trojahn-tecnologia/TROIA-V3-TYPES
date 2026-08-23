@@ -90,3 +90,6 @@ export * from './email-retentions';
 export * from './units';
 export * from './checklists';
 export * from './sla';
+export * from './lead-capture';
+export * from './gamification';
+export * from './seller-dashboard';

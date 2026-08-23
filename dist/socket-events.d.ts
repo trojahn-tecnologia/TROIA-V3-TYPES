@@ -6,6 +6,7 @@
 import type { SoundKey } from './notifications';
 import type { ChannelDisconnectInfo } from './channels';
 import type { ChannelSyncStatus, ChannelActivityType } from './channel-dashboard';
+import type { LeadCaptureSession } from './lead-capture';
 export declare const SOCKET_EVENTS: {
     readonly CONVERSATION_MESSAGE: "conversation:message";
     readonly CONVERSATION_UPDATED: "conversation:updated";
@@ -73,6 +74,7 @@ export declare const SOCKET_EVENTS: {
     readonly HISTORY_IMPORT_PROGRESS: "history-import:progress";
     readonly HISTORY_IMPORT_COMPLETED: "history-import:completed";
     readonly HISTORY_IMPORT_FAILED: "history-import:failed";
+    readonly LEAD_CAPTURE_SESSION_UPDATED: "lead-capture:session-updated";
 };
 export type SocketEventName = typeof SOCKET_EVENTS[keyof typeof SOCKET_EVENTS];
 /**
@@ -700,6 +702,14 @@ export interface CreditPaymentConfirmedEvent {
     paymentId: string;
     status: 'active';
 }
+/**
+ * Payload do evento `LEAD_CAPTURE_SESSION_UPDATED` — user-specific.
+ * Carrega a sessão inteira (já é o que a modal renderiza); a modal/dashboard
+ * invalidam `['lead-capture-session', uuid]` e `['seller-dashboard']`.
+ */
+export interface LeadCaptureSessionUpdatedPayload {
+    session: LeadCaptureSession;
+}
 export interface SocketEventMap {
     [SOCKET_EVENTS.CONVERSATION_MESSAGE]: ConversationMessageEvent;
     [SOCKET_EVENTS.CONVERSATION_MESSAGE_NOTIFY]: ConversationMessageNotifyEvent;
@@ -752,6 +762,7 @@ export interface SocketEventMap {
     [SOCKET_EVENTS.TEAM_UNREAD_COUNT]: TeamUnreadCountEvent;
     [SOCKET_EVENTS.CREDIT_PAYMENT_CONFIRMED]: CreditPaymentConfirmedEvent;
     [SOCKET_EVENTS.NOTIFICATION_SOUND]: SoundNotificationEvent;
+    [SOCKET_EVENTS.LEAD_CAPTURE_SESSION_UPDATED]: LeadCaptureSessionUpdatedPayload;
 }
 export declare const SOCKET_ROOMS: {
     /**

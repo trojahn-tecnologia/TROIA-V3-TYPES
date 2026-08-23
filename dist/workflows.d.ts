@@ -17,6 +17,35 @@ export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 export declare const WORKFLOW_STATUSES: readonly ["active", "inactive", "draft", "archived"];
 export type WorkflowStatus = (typeof WORKFLOW_STATUSES)[number];
 /**
+ * Pausa automática (2026-08-22): um workflow ativo vira `inactive` sozinho
+ * quando as últimas N execuções terminadas (sem as de teste) falharam, ou
+ * quando um canal que ele usa é excluído. `autoPause` guarda o motivo; é
+ * limpo ao reativar.
+ */
+export declare const WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = 10;
+export declare const WORKFLOW_AUTO_PAUSE_REASONS: readonly ["consecutive_failures", "channel_deleted"];
+export type WorkflowAutoPauseReason = (typeof WORKFLOW_AUTO_PAUSE_REASONS)[number];
+export interface WorkflowAutoPauseDetails {
+    /** `consecutive_failures`: quantas falhas seguidas (= a constante no momento). */
+    consecutiveFailures?: number;
+    /** `consecutive_failures`: `error` da execução que fechou a sequência. */
+    lastError?: string;
+    /** `channel_deleted`: canal excluído. */
+    channelId?: string;
+    channelName?: string;
+}
+export interface WorkflowAutoPauseInfo {
+    reason: WorkflowAutoPauseReason;
+    at: Date;
+    details: WorkflowAutoPauseDetails;
+}
+/** Forma na API (`at` em ISO). */
+export interface WorkflowAutoPauseResponse {
+    reason: WorkflowAutoPauseReason;
+    at: string;
+    details: WorkflowAutoPauseDetails;
+}
+/**
  * Execution Statuses — runtime constant + derived type.
  */
 export declare const WORKFLOW_EXECUTION_STATUSES: readonly ["pending", "running", "completed", "failed", "cancelled", "suspended"];
@@ -931,6 +960,8 @@ export interface Workflow {
     name: string;
     description?: string;
     status: WorkflowStatus;
+    /** Presente só quando a última pausa foi automática. Limpo ao reativar. */
+    autoPause?: WorkflowAutoPauseInfo;
     definition: WorkflowDefinition;
     folderId?: ObjectId;
     /** Classificação de uso. Default: 'automation' */
@@ -948,7 +979,7 @@ export interface Workflow {
 /**
  * Workflow Response (API Response)
  */
-export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
+export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'autoPause'> {
     id: string;
     folderId?: string;
     appId: string;
@@ -956,6 +987,7 @@ export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'a
     createdAt: string;
     updatedAt: string;
     deletedAt?: string;
+    autoPause?: WorkflowAutoPauseResponse;
 }
 /**
  * Single run entry for a node (supports multiple iterations/retries).

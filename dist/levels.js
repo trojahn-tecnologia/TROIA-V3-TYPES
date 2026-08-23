@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_LANDING_PAGE = exports.isFreeLandingPage = exports.FREE_LANDING_PAGES = void 0;
+exports.DEFAULT_LANDING_PAGE = exports.resolveLandingPageModule = exports.isFreeLandingPage = exports.isAliasLandingPage = exports.ALIAS_LANDING_PAGES = exports.FREE_LANDING_PAGES = void 0;
 /**
  * Telas iniciais de rota LIVRE — não têm módulo correspondente porque a rota
  * não exige permissão de módulo, por decisão de produto.
@@ -18,9 +18,40 @@ exports.DEFAULT_LANDING_PAGE = exports.isFreeLandingPage = exports.FREE_LANDING_
  * equivalência precisa passar por `isFreeLandingPage` antes.
  */
 exports.FREE_LANDING_PAGES = ['checklists-my'];
+/**
+ * Telas iniciais ALIAS — rotas que pertencem a um módulo existente mas não
+ * têm id próprio no catálogo. A permissão validada é a do módulo DONO.
+ *
+ * `crm-seller` = "Dashboard do vendedor" (`/crm/seller`), dentro do módulo
+ * `crm` (D10: quem tem `crm:read` vê o dashboard; sem módulo novo).
+ */
+exports.ALIAS_LANDING_PAGES = {
+    'crm-seller': 'crm',
+};
+/** `true` quando a tela inicial é um alias de módulo (ex.: `crm-seller` → `crm`). */
+const isAliasLandingPage = (value) => Object.prototype.hasOwnProperty.call(exports.ALIAS_LANDING_PAGES, value);
+exports.isAliasLandingPage = isAliasLandingPage;
 /** `true` quando a tela inicial não tem módulo para validar permissão. */
 const isFreeLandingPage = (value) => exports.FREE_LANDING_PAGES.includes(value);
 exports.isFreeLandingPage = isFreeLandingPage;
+/**
+ * Módulo cuja permissão `read` a tela inicial exige.
+ * - rota livre → `null` (nada a validar)
+ * - alias → módulo dono (`ALIAS_LANDING_PAGES`)
+ * - demais → o próprio valor (é um `ValidModuleId`)
+ *
+ * ÚNICO ponto que traduz tela inicial → módulo. Backend
+ * (`validateLandingPageCoherence`) e frontend (`LevelFormPage`) consomem daqui
+ * — nunca assumir `landingPage === moduleId`.
+ */
+const resolveLandingPageModule = (landingPage) => {
+    if ((0, exports.isFreeLandingPage)(landingPage))
+        return null;
+    if ((0, exports.isAliasLandingPage)(landingPage))
+        return exports.ALIAS_LANDING_PAGES[landingPage];
+    return landingPage;
+};
+exports.resolveLandingPageModule = resolveLandingPageModule;
 /**
  * Default usado pelo frontend quando `Level.landingPage` é undefined.
  * Backend redirect handler também deve referenciar essa constante (Phase 2).

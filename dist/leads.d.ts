@@ -32,6 +32,22 @@ export interface StepHistoryEntry {
     movedByName?: string;
     duration?: number;
 }
+/**
+ * Bloco persistido no lead capturado por QR Code (spec §4.1) — histórico e
+ * gamificação. NÃO usa `lead.teamId` (que significa "fila da equipe" na
+ * distribuição): a equipe/unidade da captura vivem aqui.
+ */
+export interface LeadCaptureInfo {
+    sessionUuid: string;
+    code: string;
+    /** Vendedor que gerou o QR. */
+    capturedBy: string;
+    teamId?: string;
+    unitId?: string;
+    filledAt: string;
+    confirmedAt?: string;
+    conversationId?: string;
+}
 export interface Lead {
     id: string;
     appId: string;
@@ -108,6 +124,8 @@ export interface Lead {
     pageName?: string;
     lostReason?: string;
     interests?: LeadInterest[];
+    /** Captura por QR Code (spec §4.1). Ausente = lead não veio de QR. */
+    capture?: LeadCaptureInfo;
     createdAt: string;
     updatedAt: string;
 }
@@ -143,6 +161,8 @@ export interface CreateLeadRequest {
     position?: string;
     emails?: string[];
     phones?: string[];
+    /** Só o fluxo interno de captura por QR preenche (nunca vem do cliente HTTP — Zod de `POST /leads` não expõe). */
+    capture?: LeadCaptureInfo;
 }
 export interface UpdateLeadRequest {
     contactId?: string;
@@ -243,6 +263,14 @@ export interface LeadQuery extends PaginationQuery {
         stepId?: string | string[];
         assigneeId?: string | string[];
         teamId?: string | string[];
+        /**
+         * Filtro por respostas do formulário de captura do funil (D3 — duas fases
+         * via `checklists.answers`). Só campos de escolha. Exige `funnelId` único.
+         */
+        formAnswers?: Array<{
+            fieldId: string;
+            values: string[];
+        }>;
         customerId?: string;
         scoreMin?: number;
         scoreMax?: number;
@@ -353,6 +381,16 @@ export interface LeadKanbanCard {
         id: string;
         name: string;
     };
+    /**
+     * Respostas do formulário de captura, já ROTULADAS (label da opção) — só
+     * vem quando o filtro "Formulário" está ativo (Parte 3, `LeadsService.attachFormAnswersToCards`).
+     * Chips lilás no card do kanban (mockup 12-B).
+     */
+    formAnswers?: Array<{
+        fieldId: string;
+        fieldLabel: string;
+        value: string;
+    }>;
 }
 /**
  * Limiares efetivos de UMA etapa, já resolvidos pela cascata etapa → funil →

@@ -7,6 +7,7 @@
 import type { SoundKey } from './notifications';
 import type { ChannelDisconnectInfo } from './channels';
 import type { ChannelSyncStatus, ChannelActivityType } from './channel-dashboard';
+import type { LeadCaptureSession } from './lead-capture';
 
 // ============================================================================
 // EVENT NAMES (String Literals for Type Safety)
@@ -116,6 +117,10 @@ export const SOCKET_EVENTS = {
   HISTORY_IMPORT_PROGRESS: 'history-import:progress',
   HISTORY_IMPORT_COMPLETED: 'history-import:completed',
   HISTORY_IMPORT_FAILED: 'history-import:failed',
+
+  // Lead Capture (QR Code) — emitido SÓ na sala `user:{userId}` do vendedor
+  // a cada mudança de status da sessão (waiting_scan → filled → confirmed → …)
+  LEAD_CAPTURE_SESSION_UPDATED: 'lead-capture:session-updated',
 } as const;
 
 // Type for event names
@@ -814,6 +819,15 @@ export interface CreditPaymentConfirmedEvent {
   status: 'active';
 }
 
+/**
+ * Payload do evento `LEAD_CAPTURE_SESSION_UPDATED` — user-specific.
+ * Carrega a sessão inteira (já é o que a modal renderiza); a modal/dashboard
+ * invalidam `['lead-capture-session', uuid]` e `['seller-dashboard']`.
+ */
+export interface LeadCaptureSessionUpdatedPayload {
+  session: LeadCaptureSession;
+}
+
 // ============================================================================
 // SOCKET EVENT MAP (For Type-Safe Emit/On)
 // ============================================================================
@@ -897,6 +911,9 @@ export interface SocketEventMap {
 
   // Notification Sound (canal `sound` first-class)
   [SOCKET_EVENTS.NOTIFICATION_SOUND]: SoundNotificationEvent;
+
+  // Lead Capture (QR Code)
+  [SOCKET_EVENTS.LEAD_CAPTURE_SESSION_UPDATED]: LeadCaptureSessionUpdatedPayload;
 }
 
 // ============================================================================

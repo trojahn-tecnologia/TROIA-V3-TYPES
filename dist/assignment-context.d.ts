@@ -34,7 +34,9 @@ export type AssignmentStrategy = 'manual' | 'sequential' | 'fixed_operator' | 'f
 /** Usuário puxou o atendimento para si (startAttendance). */
  | 'self_assigned'
 /** Regra Lead → Conversa (syncConversationAssigneeIfEligible). */
- | 'lead_sync';
+ | 'lead_sync'
+/** Lead criado pela página pública do QR Code, já atribuído ao vendedor que gerou o QR (spec §4.1). */
+ | 'qr_capture';
 /**
  * Contexto canônico passado pros services de domínio (`LeadsService`,
  * `ConversationsService`, `TicketsService`) ao executar uma atribuição.

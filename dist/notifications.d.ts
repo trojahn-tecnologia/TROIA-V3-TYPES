@@ -52,6 +52,7 @@ export declare enum NotificationType {
     SHIFT_REMINDER = "shift_reminder",
     EVENT_REMINDER = "event_reminder",// Lembrete de evento (X min antes) — event.reminders
     AGENDA_DAILY_SUMMARY = "agenda_daily_summary",// Resumo diário da agenda às 08:00
+    WORKFLOW_AUTO_PAUSED = "workflow_auto_paused",// Workflow pausado sozinho (10 falhas seguidas ou canal excluído)
     CUSTOM_NOTIFICATION = "custom_notification"
 }
 /**
@@ -78,6 +79,7 @@ export declare enum NotificationCategory {
     PAYMENT = "payment",
     TEAM = "team",
     CALENDAR = "calendar",
+    AUTOMATION = "automation",
     CUSTOM = "custom"
 }
 /**

@@ -44,11 +44,44 @@ export const FREE_LANDING_PAGES = ['checklists-my'] as const;
 
 export type FreeLandingPage = (typeof FREE_LANDING_PAGES)[number];
 
-export type LandingPage = ModuleLandingPage | FreeLandingPage;
+/**
+ * Telas iniciais ALIAS — rotas que pertencem a um módulo existente mas não
+ * têm id próprio no catálogo. A permissão validada é a do módulo DONO.
+ *
+ * `crm-seller` = "Dashboard do vendedor" (`/crm/seller`), dentro do módulo
+ * `crm` (D10: quem tem `crm:read` vê o dashboard; sem módulo novo).
+ */
+export const ALIAS_LANDING_PAGES = {
+  'crm-seller': 'crm',
+} as const satisfies Record<string, ModuleLandingPage>;
+
+export type AliasLandingPage = keyof typeof ALIAS_LANDING_PAGES;
+
+export type LandingPage = ModuleLandingPage | FreeLandingPage | AliasLandingPage;
+
+/** `true` quando a tela inicial é um alias de módulo (ex.: `crm-seller` → `crm`). */
+export const isAliasLandingPage = (value: LandingPage): value is AliasLandingPage =>
+  Object.prototype.hasOwnProperty.call(ALIAS_LANDING_PAGES, value);
 
 /** `true` quando a tela inicial não tem módulo para validar permissão. */
 export const isFreeLandingPage = (value: LandingPage): value is FreeLandingPage =>
   (FREE_LANDING_PAGES as readonly string[]).includes(value);
+
+/**
+ * Módulo cuja permissão `read` a tela inicial exige.
+ * - rota livre → `null` (nada a validar)
+ * - alias → módulo dono (`ALIAS_LANDING_PAGES`)
+ * - demais → o próprio valor (é um `ValidModuleId`)
+ *
+ * ÚNICO ponto que traduz tela inicial → módulo. Backend
+ * (`validateLandingPageCoherence`) e frontend (`LevelFormPage`) consomem daqui
+ * — nunca assumir `landingPage === moduleId`.
+ */
+export const resolveLandingPageModule = (landingPage: LandingPage): ValidModuleId | null => {
+  if (isFreeLandingPage(landingPage)) return null;
+  if (isAliasLandingPage(landingPage)) return ALIAS_LANDING_PAGES[landingPage];
+  return landingPage;
+};
 
 /**
  * Default usado pelo frontend quando `Level.landingPage` é undefined.

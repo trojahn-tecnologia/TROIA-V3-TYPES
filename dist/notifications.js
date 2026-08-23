@@ -81,6 +81,8 @@ var NotificationType;
     // Calendar / agenda (2026-07-24)
     NotificationType["EVENT_REMINDER"] = "event_reminder";
     NotificationType["AGENDA_DAILY_SUMMARY"] = "agenda_daily_summary";
+    // Automação (2026-08-22)
+    NotificationType["WORKFLOW_AUTO_PAUSED"] = "workflow_auto_paused";
     // Custom notifications
     NotificationType["CUSTOM_NOTIFICATION"] = "custom_notification";
 })(NotificationType || (exports.NotificationType = NotificationType = {}));
@@ -110,6 +112,7 @@ var NotificationCategory;
     NotificationCategory["PAYMENT"] = "payment";
     NotificationCategory["TEAM"] = "team";
     NotificationCategory["CALENDAR"] = "calendar";
+    NotificationCategory["AUTOMATION"] = "automation";
     NotificationCategory["CUSTOM"] = "custom";
 })(NotificationCategory || (exports.NotificationCategory = NotificationCategory = {}));
 /**
@@ -255,6 +258,8 @@ exports.DEFAULT_NOTIFICATION_TYPES = [
     // Calendar / agenda
     NotificationType.EVENT_REMINDER,
     NotificationType.AGENDA_DAILY_SUMMARY,
+    // Automação — nasce marcado para usuário NOVO; usuário existente marca na tela (decisão do dono 22/08)
+    NotificationType.WORKFLOW_AUTO_PAUSED,
     // Custom
     NotificationType.CUSTOM_NOTIFICATION,
 ];

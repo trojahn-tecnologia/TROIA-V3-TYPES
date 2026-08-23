@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -64,6 +64,14 @@ exports.WORKFLOW_NODE_TYPES = [
  * Workflow Statuses — runtime constant + derived type.
  */
 exports.WORKFLOW_STATUSES = ['active', 'inactive', 'draft', 'archived'];
+/**
+ * Pausa automática (2026-08-22): um workflow ativo vira `inactive` sozinho
+ * quando as últimas N execuções terminadas (sem as de teste) falharam, ou
+ * quando um canal que ele usa é excluído. `autoPause` guarda o motivo; é
+ * limpo ao reativar.
+ */
+exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = 10;
+exports.WORKFLOW_AUTO_PAUSE_REASONS = ['consecutive_failures', 'channel_deleted'];
 /**
  * Execution Statuses — runtime constant + derived type.
  */

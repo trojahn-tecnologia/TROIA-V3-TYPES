@@ -97,6 +97,9 @@ exports.SOCKET_EVENTS = {
     HISTORY_IMPORT_PROGRESS: 'history-import:progress',
     HISTORY_IMPORT_COMPLETED: 'history-import:completed',
     HISTORY_IMPORT_FAILED: 'history-import:failed',
+    // Lead Capture (QR Code) — emitido SÓ na sala `user:{userId}` do vendedor
+    // a cada mudança de status da sessão (waiting_scan → filled → confirmed → …)
+    LEAD_CAPTURE_SESSION_UPDATED: 'lead-capture:session-updated',
 };
 // ============================================================================
 // ROOM PATTERNS

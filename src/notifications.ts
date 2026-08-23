@@ -89,6 +89,9 @@ export enum NotificationType {
   EVENT_REMINDER = 'event_reminder',            // Lembrete de evento (X min antes) — event.reminders
   AGENDA_DAILY_SUMMARY = 'agenda_daily_summary', // Resumo diário da agenda às 08:00
 
+  // Automação (2026-08-22)
+  WORKFLOW_AUTO_PAUSED = 'workflow_auto_paused', // Workflow pausado sozinho (10 falhas seguidas ou canal excluído)
+
   // Custom notifications
   CUSTOM_NOTIFICATION = 'custom_notification',
 }
@@ -118,6 +121,7 @@ export enum NotificationCategory {
   PAYMENT = 'payment',
   TEAM = 'team',
   CALENDAR = 'calendar',
+  AUTOMATION = 'automation',
   CUSTOM = 'custom',
 }
 
@@ -290,6 +294,8 @@ export const DEFAULT_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Calendar / agenda
   NotificationType.EVENT_REMINDER,
   NotificationType.AGENDA_DAILY_SUMMARY,
+  // Automação — nasce marcado para usuário NOVO; usuário existente marca na tela (decisão do dono 22/08)
+  NotificationType.WORKFLOW_AUTO_PAUSED,
   // Custom
   NotificationType.CUSTOM_NOTIFICATION,
 ];

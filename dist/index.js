@@ -162,3 +162,9 @@ __exportStar(require("./units"), exports);
 __exportStar(require("./checklists"), exports);
 // SLA engine (políticas, relógios e log append-only — spec 2026-07-27)
 __exportStar(require("./sla"), exports);
+// Lead Capture (QR Code) — sessão Redis, página pública, socket (spec 2026-08-20)
+__exportStar(require("./lead-capture"), exports);
+// Gamification — regras, níveis, livro-caixa, ranking
+__exportStar(require("./gamification"), exports);
+// Seller Dashboard — GET /api/leads/seller-dashboard (dentro do módulo CRM)
+__exportStar(require("./seller-dashboard"), exports);

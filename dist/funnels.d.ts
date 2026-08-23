@@ -2,6 +2,23 @@ import { PaginationQuery, ListResponse, AppAwareDocument, ActiveStatus } from '.
 import type { DistributionConfig } from './distribution';
 import type { AlertConfig } from './alerts';
 /**
+ * Captura de leads por QR Code (D16). "Ligada" = objeto presente (qualquer
+ * campo). `channelId` preenchido = Etapa 2 (confirmação no WhatsApp) ligada.
+ * `message` aceita a variável `{{code}}`.
+ */
+export interface FunnelCaptureConfig {
+    /** Modelo de captura (`Form` com `type: 'form'`). */
+    formId?: string;
+    /** Canal WhatsApp de confirmação; preenchido = Etapa 2 ligada. */
+    channelId?: string;
+    /** Ex.: "Olá! Quero participar da promoção. Código {{code}}" */
+    message?: string;
+    /** Texto LGPD da página pública (D9). */
+    consentText?: string;
+    /** Página pública: e-mail obrigatório (default: opcional). */
+    emailRequired?: boolean;
+}
+/**
  * Funnel - Sales funnel structure
  * Each funnel has its own independent steps.
  *
@@ -41,6 +58,8 @@ export interface Funnel extends AppAwareDocument {
     types?: string[];
     /** Config default dos alertas de inatividade deste funil (override por etapa em FunnelStep). */
     alertConfig?: AlertConfig;
+    /** Captura por QR Code (D16). Ausente = captura desligada neste funil. */
+    capture?: FunnelCaptureConfig;
 }
 export interface CreateFunnelRequest {
     name: string;
@@ -60,6 +79,8 @@ export interface CreateFunnelRequest {
     types?: string[];
     /** Config default dos alertas de inatividade deste funil. */
     alertConfig?: AlertConfig;
+    /** Captura por QR Code (D16). */
+    capture?: FunnelCaptureConfig;
 }
 export interface UpdateFunnelRequest {
     name?: string;
@@ -80,6 +101,8 @@ export interface UpdateFunnelRequest {
     types?: string[];
     /** Config default dos alertas de inatividade deste funil. */
     alertConfig?: AlertConfig;
+    /** Captura por QR Code (D16). `null` = desligar (remove o bloco). */
+    capture?: FunnelCaptureConfig | null;
 }
 export type FunnelResponse = Omit<Funnel, '_id'> & {
     id: string;
