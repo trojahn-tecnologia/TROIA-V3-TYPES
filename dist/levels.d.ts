@@ -10,7 +10,7 @@ import { ModulePermission, ValidModuleId } from './modules';
  * que não exista em `ValidModuleId` é erro de compilação, garantindo a
  * invariante "toda landing page de módulo é um moduleId válido".
  */
-export type ModuleLandingPage = Extract<ValidModuleId, 'dashboards-commercial' | 'dashboards-support' | 'dashboards-marketing' | 'crm' | 'chat' | 'tickets' | 'calendar' | 'contacts'>;
+export type ModuleLandingPage = Extract<ValidModuleId, 'dashboards-commercial' | 'dashboards-support' | 'dashboards-marketing' | 'dashboards-analytics' | 'crm' | 'chat' | 'tickets' | 'calendar' | 'contacts'>;
 /**
  * Telas iniciais de rota LIVRE — não têm módulo correspondente porque a rota
  * não exige permissão de módulo, por decisão de produto.

@@ -189,6 +189,13 @@ export * from './email-retentions';
 // Units module (localizações/filiais físicas — dono do pool de checklists)
 export * from './units';
 
+// Views — visitas medidas (contador de fluxo físico, GA, tracker próprio).
+// `ViewIngestBatch` é o contrato único de ingestão, agnóstico a provider.
+export * from './views';
+
+// Dashboard de Analytics — leitura agregada das visitas medidas.
+export * from './dashboards-analytics';
+
 // Checklists module (execução de checklists a partir de Form templates type='checklist')
 export * from './checklists';
 

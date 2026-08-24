@@ -51,6 +51,12 @@ export const LEAD_CHANNELS = [
   'tiktok',
   'linkedin',
   'bing',
+  /**
+   * Presencial — loja, quiosque, escritório. Genérico de propósito: cobre
+   * qualquer ponto físico. É o canal do lead capturado no balcão (QR Code) e
+   * das visitas contadas por sensor de fluxo.
+   */
+  'physical',
   'other',
 ] as const;
 export type LeadChannel = typeof LEAD_CHANNELS[number];
@@ -90,6 +96,7 @@ export const LEAD_CHANNEL_LABELS: Record<LeadChannel, string> = {
   tiktok: 'TikTok',
   linkedin: 'LinkedIn',
   bing: 'Bing',
+  physical: 'Físico',
   other: 'Outro',
 };
 

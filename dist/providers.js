@@ -54,6 +54,11 @@ var ProviderId;
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
     ProviderId["DATABASE_DWV"] = "database-dwv";
     ProviderId["DATABASE_KENLO"] = "database-kenlo";
+    // Views Providers (contadores de visitantes / analytics de tráfego)
+    ProviderId["VIEWS_BEST_FLOW"] = "views-best-flow";
+    ProviderId["VIEWS_GOOGLE_ANALYTICS"] = "views-google-analytics";
+    ProviderId["VIEWS_TROIA_TRACKER"] = "views-troia-tracker";
+    ProviderId["VIEWS_API"] = "views-api";
     // Vector Storage Providers
     ProviderId["VECTOR_PINECONE"] = "vector-pinecone";
     // Meta Platform (Unified Meta services)
@@ -108,6 +113,11 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.DATABASE_JETIMOB]: 'database',
     [ProviderId.DATABASE_DWV]: 'database',
     [ProviderId.DATABASE_KENLO]: 'database',
+    // Views (contadores de visitantes)
+    [ProviderId.VIEWS_BEST_FLOW]: 'views',
+    [ProviderId.VIEWS_GOOGLE_ANALYTICS]: 'views',
+    [ProviderId.VIEWS_TROIA_TRACKER]: 'views',
+    [ProviderId.VIEWS_API]: 'views',
     // Vector
     [ProviderId.VECTOR_PINECONE]: 'vector',
     // Meta
@@ -221,6 +231,15 @@ var ProviderCapability;
      * admin — nada muda no app.
      */
     ProviderCapability["GEO_LOOKUP"] = "geo_lookup";
+    /**
+     * Busca contagem de visitantes de uma fonte externa (contador de fluxo por
+     * câmera, Google Analytics, etc). É o que o worker de views usa para
+     * selecionar quais integrações sincronizar — deliberadamente separado de
+     * `SYNC_DATA`, que arrasta a integração para o `IntegrationSyncScheduler`
+     * genérico, onde o `switch` cai no `default:` e marca `lastSyncAt` sem ter
+     * feito nada. Ver `@DOCS/modules/VIEWS.md`.
+     */
+    ProviderCapability["FETCH_VISITOR_COUNT"] = "fetch_visitor_count";
     // Social media capabilities
     ProviderCapability["CREATE_POST"] = "create_post";
     ProviderCapability["CREATE_STORY"] = "create_story";

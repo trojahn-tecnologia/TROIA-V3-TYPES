@@ -240,10 +240,14 @@ export declare enum ProviderId {
     DATABASE_JETIMOB = "database-jetimob",
     DATABASE_DWV = "database-dwv",
     DATABASE_KENLO = "database-kenlo",
+    VIEWS_BEST_FLOW = "views-best-flow",
+    VIEWS_GOOGLE_ANALYTICS = "views-google-analytics",
+    VIEWS_TROIA_TRACKER = "views-troia-tracker",
+    VIEWS_API = "views-api",
     VECTOR_PINECONE = "vector-pinecone",
     META = "meta"
 }
-export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo';
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo' | 'views';
 export declare const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory>;
 /** Check if a providerId belongs to a given category */
 export declare const isProviderCategory: (providerId: string | null | undefined, category: ProviderCategory) => boolean;
@@ -333,6 +337,15 @@ export declare enum ProviderCapability {
      * admin — nada muda no app.
      */
     GEO_LOOKUP = "geo_lookup",
+    /**
+     * Busca contagem de visitantes de uma fonte externa (contador de fluxo por
+     * câmera, Google Analytics, etc). É o que o worker de views usa para
+     * selecionar quais integrações sincronizar — deliberadamente separado de
+     * `SYNC_DATA`, que arrasta a integração para o `IntegrationSyncScheduler`
+     * genérico, onde o `switch` cai no `default:` e marca `lastSyncAt` sem ter
+     * feito nada. Ver `@DOCS/modules/VIEWS.md`.
+     */
+    FETCH_VISITOR_COUNT = "fetch_visitor_count",
     CREATE_POST = "create_post",
     CREATE_STORY = "create_story",
     CREATE_CAMPAIGN = "create_campaign",

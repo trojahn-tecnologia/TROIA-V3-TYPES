@@ -82,6 +82,7 @@ export type ValidModuleId =
   | 'dashboards-commercial'
   | 'dashboards-support'
   | 'dashboards-marketing'
+  | 'dashboards-analytics'
 
   | 'quality';
 

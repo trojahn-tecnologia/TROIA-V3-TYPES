@@ -13,6 +13,13 @@ export interface Unit {
   companyId: string;
   name: string;
   code?: string;
+  /**
+   * CPF/CNPJ da unidade, SÓ DÍGITOS (sem máscara) — é assim que o índice único
+   * parcial `(appId, companyId, document)` compara. É também a chave que liga
+   * uma fonte externa de visitas à unidade: o contador de fluxo identifica a
+   * loja pelo CNPJ, não por um id nosso.
+   */
+  document?: string;
   description?: string;
   address?: Address;
   location?: UnitLocation;
@@ -32,6 +39,8 @@ export interface UnitResponse extends Omit<Unit, '_id'> {
 export interface CreateUnitRequest {
   name: string;
   code?: string;
+  /** CPF/CNPJ. Aceita com ou sem máscara — o backend normaliza para dígitos. */
+  document?: string;
   description?: string;
   address?: Address;
   location?: UnitLocation;
@@ -46,9 +55,13 @@ export interface CreateUnitRequest {
  * sucesso!". `undefined` (chave ausente) continua significando "não mexer".
  */
 export interface UpdateUnitRequest
-  extends Omit<Partial<CreateUnitRequest>, 'code' | 'description' | 'address' | 'location'> {
+  extends Omit<
+    Partial<CreateUnitRequest>,
+    'code' | 'document' | 'description' | 'address' | 'location'
+  > {
   status?: ActiveStatus;
   code?: string | null;
+  document?: string | null;
   description?: string | null;
   address?: Address | null;
   location?: UnitLocation | null;

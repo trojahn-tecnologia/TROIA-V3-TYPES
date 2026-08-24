@@ -81,6 +81,12 @@ export interface ChannelFunnel {
     leadsSharePct: number;
     funnel: ChannelFunnelStages;
     diagnosis: ChannelFunnelDiagnosis;
+    /**
+     * `true` = os visitantes DESTE canal são estimados. A decisão é por canal:
+     * hoje só o presencial tem sensor, então "Físico" vem medido e os demais
+     * continuam estimados até a fonte deles existir.
+     */
+    visitorsIsProxy?: boolean;
 }
 export type MarketingCampaignStatus = 'active' | 'paused' | 'ended' | 'continuous';
 export interface CampaignMasterRow {
@@ -148,7 +154,20 @@ export interface MarketingDashboardKpis {
     revenue: KpiValue;
 }
 export interface MarketingDashboardWarnings {
+    /**
+     * `true` = o número de visitantes é ESTIMADO (`leads × 20`), porque o tenant
+     * não tem nenhuma fonte de visitas medida nos últimos 90 dias. Decidido pelo
+     * DADO, nunca por flag de configuração.
+     */
     visitorsIsProxy?: boolean;
+    /**
+     * `true` = o número é medido de verdade, mas o período pedido termina depois
+     * da última medição, então ainda vai crescer. É o estado NORMAL de um período
+     * corrente: contador de fluxo físico publica com até 7 dias de atraso.
+     */
+    visitorsArePartial?: boolean;
+    /** Fim da última janela medida, em ISO. Alimenta o "medido até DD/MM HH:mm". */
+    visitorsCoverageUntil?: string | null;
     leakageReasonsAreSynthetic?: boolean;
     /**
      * `true` quando a tenant não tem integração ativa com plataformas de ads

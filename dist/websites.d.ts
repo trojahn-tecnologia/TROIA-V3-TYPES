@@ -150,6 +150,15 @@ export interface WebsitePublicData {
         url: string;
         key: string;
     };
+    /**
+     * Tracker de visitas. Só a chave PÚBLICA do site (`vs_…`) — nunca credencial.
+     * O que separa um site do outro é o header `Origin`, checado no backend.
+     */
+    views?: {
+        key: string;
+        endpoint: string;
+        scriptUrl: string;
+    };
 }
 export interface CreateWebsiteRequest {
     name: string;

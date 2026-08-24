@@ -158,6 +158,11 @@ __exportStar(require("./ticket-emails"), exports);
 __exportStar(require("./email-retentions"), exports);
 // Units module (localizações/filiais físicas — dono do pool de checklists)
 __exportStar(require("./units"), exports);
+// Views — visitas medidas (contador de fluxo físico, GA, tracker próprio).
+// `ViewIngestBatch` é o contrato único de ingestão, agnóstico a provider.
+__exportStar(require("./views"), exports);
+// Dashboard de Analytics — leitura agregada das visitas medidas.
+__exportStar(require("./dashboards-analytics"), exports);
 // Checklists module (execução de checklists a partir de Form templates type='checklist')
 __exportStar(require("./checklists"), exports);
 // SLA engine (políticas, relógios e log append-only — spec 2026-07-27)

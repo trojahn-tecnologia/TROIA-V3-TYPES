@@ -88,6 +88,8 @@ export * from './projects';
 export * from './ticket-emails';
 export * from './email-retentions';
 export * from './units';
+export * from './views';
+export * from './dashboards-analytics';
 export * from './checklists';
 export * from './sla';
 export * from './lead-capture';

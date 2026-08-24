@@ -350,6 +350,12 @@ export enum ProviderId {
   DATABASE_DWV = 'database-dwv',
   DATABASE_KENLO = 'database-kenlo',
 
+  // Views Providers (contadores de visitantes / analytics de tráfego)
+  VIEWS_BEST_FLOW = 'views-best-flow',
+  VIEWS_GOOGLE_ANALYTICS = 'views-google-analytics',
+  VIEWS_TROIA_TRACKER = 'views-troia-tracker',
+  VIEWS_API = 'views-api',
+
   // Vector Storage Providers
   VECTOR_PINECONE = 'vector-pinecone',
 
@@ -361,7 +367,7 @@ export enum ProviderId {
 // PROVIDER CATEGORY MAPPING (Static, centralized)
 // ============================================================================
 
-export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo';
+export type ProviderCategory = 'email' | 'messaging' | 'social' | 'payment' | 'calendar' | 'web' | 'ai' | 'database' | 'vector' | 'meta' | 'geo' | 'views';
 
 export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   // Email
@@ -420,6 +426,12 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   [ProviderId.DATABASE_JETIMOB]: 'database',
   [ProviderId.DATABASE_DWV]: 'database',
   [ProviderId.DATABASE_KENLO]: 'database',
+
+  // Views (contadores de visitantes)
+  [ProviderId.VIEWS_BEST_FLOW]: 'views',
+  [ProviderId.VIEWS_GOOGLE_ANALYTICS]: 'views',
+  [ProviderId.VIEWS_TROIA_TRACKER]: 'views',
+  [ProviderId.VIEWS_API]: 'views',
 
   // Vector
   [ProviderId.VECTOR_PINECONE]: 'vector',
@@ -551,6 +563,16 @@ export enum ProviderCapability {
    * admin — nada muda no app.
    */
   GEO_LOOKUP = 'geo_lookup',
+
+  /**
+   * Busca contagem de visitantes de uma fonte externa (contador de fluxo por
+   * câmera, Google Analytics, etc). É o que o worker de views usa para
+   * selecionar quais integrações sincronizar — deliberadamente separado de
+   * `SYNC_DATA`, que arrasta a integração para o `IntegrationSyncScheduler`
+   * genérico, onde o `switch` cai no `default:` e marca `lastSyncAt` sem ter
+   * feito nada. Ver `@DOCS/modules/VIEWS.md`.
+   */
+  FETCH_VISITOR_COUNT = 'fetch_visitor_count',
 
   // Social media capabilities
   CREATE_POST = 'create_post',

@@ -45,6 +45,12 @@ exports.LEAD_CHANNELS = [
     'tiktok',
     'linkedin',
     'bing',
+    /**
+     * Presencial — loja, quiosque, escritório. Genérico de propósito: cobre
+     * qualquer ponto físico. É o canal do lead capturado no balcão (QR Code) e
+     * das visitas contadas por sensor de fluxo.
+     */
+    'physical',
     'other',
 ];
 /** Labels pt-BR canônicos por enum — único lugar onde a string é definida. */
@@ -80,6 +86,7 @@ exports.LEAD_CHANNEL_LABELS = {
     tiktok: 'TikTok',
     linkedin: 'LinkedIn',
     bing: 'Bing',
+    physical: 'Físico',
     other: 'Outro',
 };
 /** Helpers — retornam label canônico ou o próprio valor (defensivo contra valores legacy). */

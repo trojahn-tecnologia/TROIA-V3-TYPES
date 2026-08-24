@@ -7,7 +7,7 @@ export type LeadSource = typeof LEAD_SOURCES[number];
 export declare const LEAD_MEDIUMS: readonly ["organic", "paid"];
 export type LeadMedium = typeof LEAD_MEDIUMS[number];
 /** Sub-canal semântico de captura (NÃO confundir com Channel collection / channelId). */
-export declare const LEAD_CHANNELS: readonly ["whatsapp", "instagram", "facebook", "messenger", "telegram", "email", "website", "phone", "google", "youtube", "tiktok", "linkedin", "bing", "other"];
+export declare const LEAD_CHANNELS: readonly ["whatsapp", "instagram", "facebook", "messenger", "telegram", "email", "website", "phone", "google", "youtube", "tiktok", "linkedin", "bing", "physical", "other"];
 export type LeadChannel = typeof LEAD_CHANNELS[number];
 /** Labels pt-BR canônicos por enum — único lugar onde a string é definida. */
 export declare const LEAD_SOURCE_LABELS: Record<LeadSource, string>;
