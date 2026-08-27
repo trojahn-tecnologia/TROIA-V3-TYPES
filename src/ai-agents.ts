@@ -152,6 +152,29 @@ export interface AIAgentEscalationConfig {
 }
 
 /**
+ * Ajuste POR AGENTE do cadastro oficial do negócio (Fase 3 do verificador de
+ * fonte, 2026-08-25). O padrão vem da EMPRESA (`companies`: address, phone,
+ * email, website); um agente que atende outra unidade sobrescreve CAMPO A
+ * CAMPO — campo ausente herda o valor da empresa.
+ *
+ * O bloco resolvido é injetado no system prompt composto
+ * (`<official_business_info>`) e entra como fonte fixa na evidência do
+ * verificador de fonte e na trava determinística — o agente responde
+ * endereço/telefone com o dado REAL em vez de inventar.
+ */
+export interface AIAgentOfficialInfoOverride {
+  /** Endereço em linha ("Rua X, 123, Centro, Cidade - UF, CEP") */
+  addressLine?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  /** Horário de atendimento em texto livre ("Seg-Sex 9h-18h") */
+  businessHoursText?: string;
+  /** Outros dados oficiais (chave Pix, CNPJ da unidade, etc.) */
+  notes?: string;
+}
+
+/**
  * Regra binária da rubrica do MessageGuard (Onda 1 do blueprint, 2026-07-15).
  * Extraída automaticamente do systemPrompt no save (método candidate-based,
  * RLCF): cada regra é atômica e verificável por um judge pequeno.
@@ -232,6 +255,8 @@ export interface AIAgent {
    *   legado — o modelo escolhe entre as tools/destinos disponíveis.
    */
   escalationConfig?: AIAgentEscalationConfig;
+  /** Ajuste por agente do cadastro oficial do negócio (herda da empresa campo a campo) */
+  officialInfoOverride?: AIAgentOfficialInfoOverride;
   /** Rubrica do MessageGuard — gerada pelo sistema no save (não settável via API) */
   guardRubric?: AIAgentGuardRubric;
   responseStyle?: string;                   // Agent response style (professional, casual, etc.)
@@ -425,6 +450,8 @@ export interface CreateAIAgentRequest {
   };
   enabledCapabilities?: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
   escalationConfig?: AIAgentEscalationConfig;
+  /** Ajuste por agente do cadastro oficial do negócio (herda da empresa campo a campo) */
+  officialInfoOverride?: AIAgentOfficialInfoOverride;
   webhooks?: Omit<AIAgentWebhook, 'createdAt' | 'updatedAt'>[];
 }
 
@@ -452,6 +479,8 @@ export interface UpdateAIAgentRequest {
   };
   enabledCapabilities?: AIAgentCapabilityConfig[];  // ✅ UNIFIED: Capabilities + Configurations
   escalationConfig?: AIAgentEscalationConfig;
+  /** Ajuste por agente do cadastro oficial do negócio (herda da empresa campo a campo) */
+  officialInfoOverride?: AIAgentOfficialInfoOverride;
   webhooks?: Omit<AIAgentWebhook, 'createdAt' | 'updatedAt'>[];
   /**
    * ID do `agent-quality-snapshots` doc que originou este update (Sprint UI-4).

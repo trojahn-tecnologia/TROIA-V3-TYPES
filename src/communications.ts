@@ -34,7 +34,7 @@ export interface MessageData {
   message?: string;
   messageId?: string;  // ✅ MongoDB message ID for correlation
   replyToMessageId?: string;  // ✅ ID of message being replied to (for quoted messages)
-  type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction' | 'edit' | 'delete';
+  type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'poll' | 'reaction' | 'edit' | 'delete';
 
   // ✅ Structured media object
   media?: MediaData;
@@ -52,6 +52,13 @@ export interface MessageData {
     longitude: number;
     name?: string;
     address?: string;
+  };
+
+  // ✅ Poll data para CRIAR enquete (gateway-whatsapp; Meta Cloud não suporta)
+  poll?: {
+    name: string;
+    options: string[];
+    selectableCount?: number;
   };
 
   // ✅ Contact data for sending vCard (not the recipient!)

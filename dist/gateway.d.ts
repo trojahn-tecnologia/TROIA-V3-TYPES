@@ -85,7 +85,7 @@ export interface GatewayEventData {
     to?: string;
     fromMe?: boolean;
     message?: string;
-    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'buttons' | 'list' | 'unknown';
+    messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'poll-vote' | 'buttons' | 'list' | 'unknown';
     from?: MessageSender;
     group?: MessageGroup;
     media?: MediaData;
@@ -112,6 +112,15 @@ export interface GatewayEventData {
     };
     delete?: {
         targetMessageId: string;
+    };
+    poll?: {
+        name: string;
+        options: string[];
+        selectableCount?: number;
+    };
+    pollVote?: {
+        pollMessageId: string;
+        selectedOptionHashes: string[];
     };
     isForwarded?: boolean;
     quoted?: {

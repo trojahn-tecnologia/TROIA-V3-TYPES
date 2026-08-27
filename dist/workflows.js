@@ -46,6 +46,11 @@ exports.WORKFLOW_NODE_TYPES = [
     'action_voice_tts',
     'action_voice_clone_delete',
     'action_create_checklist',
+    'action_find_unit',
+    'action_find_user',
+    'action_find_contact',
+    'action_url_to_pdf',
+    'action_nfe_pdf',
     // Controls
     'control_if',
     'control_switch',

@@ -8,6 +8,8 @@ exports.getViableModels = getViableModels;
 exports.getProviderFromModel = getProviderFromModel;
 exports.getModelDefinition = getModelDefinition;
 exports.modelSupports = modelSupports;
+exports.getGatewaySlug = getGatewaySlug;
+exports.isGatewayCapable = isGatewayCapable;
 /**
  * Catálogo completo de modelos de IA suportados
  *
@@ -23,6 +25,7 @@ exports.AI_MODELS = [
     // ═══════════════════════════════════════════════════════════════
     {
         id: 'gpt-4.1-nano',
+        gatewaySlug: 'openai/gpt-4.1-nano',
         name: 'GPT-4.1 Nano',
         provider: 'openai',
         features: ['image', 'tools'],
@@ -33,6 +36,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-4o-mini',
+        gatewaySlug: 'openai/gpt-4o-mini',
         name: 'GPT-4o Mini',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -43,6 +47,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-5-mini',
+        gatewaySlug: 'openai/gpt-5-mini',
         name: 'GPT-5 Mini',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -53,6 +58,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-4.1-mini',
+        gatewaySlug: 'openai/gpt-4.1-mini',
         name: 'GPT-4.1 Mini',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -63,6 +69,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'o4-mini',
+        gatewaySlug: 'openai/o4-mini',
         name: 'o4 Mini',
         provider: 'openai',
         features: ['pdf', 'image', 'tools', 'reasoning'],
@@ -73,6 +80,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-5',
+        gatewaySlug: 'openai/gpt-5',
         name: 'GPT-5',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -83,6 +91,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-5.4-nano',
+        gatewaySlug: 'openai/gpt-5.4-nano',
         name: 'GPT-5.4 Nano',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -93,6 +102,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-5.4-mini',
+        gatewaySlug: 'openai/gpt-5.4-mini',
         name: 'GPT-5.4 Mini',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -103,6 +113,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-5.4',
+        gatewaySlug: 'openai/gpt-5.4',
         name: 'GPT-5.4',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -113,6 +124,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-4.1',
+        gatewaySlug: 'openai/gpt-4.1',
         name: 'GPT-4.1',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -123,6 +135,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gpt-4o',
+        gatewaySlug: 'openai/gpt-4o',
         name: 'GPT-4o',
         provider: 'openai',
         features: ['pdf', 'image', 'tools'],
@@ -136,6 +149,7 @@ exports.AI_MODELS = [
     // ═══════════════════════════════════════════════════════════════
     {
         id: 'claude-haiku-4-5-20251001',
+        gatewaySlug: 'anthropic/claude-haiku-4.5',
         name: 'Claude Haiku 4.5',
         provider: 'anthropic',
         features: ['pdf', 'image', 'tools'],
@@ -146,6 +160,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'claude-sonnet-4-5-20250929',
+        gatewaySlug: 'anthropic/claude-sonnet-4.5',
         name: 'Claude Sonnet 4.5',
         provider: 'anthropic',
         features: ['pdf', 'image', 'tools'],
@@ -156,6 +171,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'claude-opus-4-5-20251101',
+        gatewaySlug: 'anthropic/claude-opus-4.5',
         name: 'Claude Opus 4.5',
         provider: 'anthropic',
         features: ['pdf', 'image', 'tools'],
@@ -169,6 +185,7 @@ exports.AI_MODELS = [
     // ═══════════════════════════════════════════════════════════════
     {
         id: 'gemini-2.5-flash-lite',
+        gatewaySlug: 'google/gemini-2.5-flash-lite',
         name: 'Gemini 2.5 Flash Lite',
         provider: 'google',
         features: ['pdf', 'image', 'tools'],
@@ -179,6 +196,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gemini-2.5-flash',
+        gatewaySlug: 'google/gemini-2.5-flash',
         name: 'Gemini 2.5 Flash',
         provider: 'google',
         features: ['pdf', 'image', 'tools'],
@@ -189,6 +207,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'gemini-2.5-pro',
+        gatewaySlug: 'google/gemini-2.5-pro',
         name: 'Gemini 2.5 Pro',
         provider: 'google',
         features: ['pdf', 'image', 'tools'],
@@ -207,6 +226,7 @@ exports.AI_MODELS = [
     // ═══════════════════════════════════════════════════════════════
     {
         id: 'deepseek-v4-pro',
+        gatewaySlug: 'deepseek/deepseek-v4-pro',
         name: 'DeepSeek V4-Pro',
         provider: 'deepseek',
         features: ['tools'],
@@ -219,6 +239,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'deepseek-v4-flash',
+        gatewaySlug: 'deepseek/deepseek-v4-flash',
         name: 'DeepSeek V4-Flash',
         provider: 'deepseek',
         features: ['tools'],
@@ -297,6 +318,7 @@ exports.AI_MODELS = [
     // gpt-5-turbo removido em 2026-05-17 — não existe na API OpenAI (era ID inventado/obsoleto).
     {
         id: 'claude-sonnet-4-20250514',
+        gatewaySlug: 'anthropic/claude-sonnet-4',
         name: 'Claude Sonnet 4',
         provider: 'anthropic',
         features: ['pdf', 'image', 'tools'],
@@ -308,6 +330,7 @@ exports.AI_MODELS = [
     },
     {
         id: 'claude-opus-4-20250514',
+        gatewaySlug: 'anthropic/claude-opus-4',
         name: 'Claude Opus 4',
         provider: 'anthropic',
         features: ['pdf', 'image', 'tools'],
@@ -319,6 +342,42 @@ exports.AI_MODELS = [
     },
     // claude-3-5-sonnet-latest e claude-3-5-haiku-latest removidos em 2026-05-17
     // — IDs com sufixo `-latest` não são aceitos pela API atual da Anthropic.
+    // ─── Verificação de conformidade ─────────────────────────────────────────
+    // Peso aberto da OpenAI, treinado para ler uma política escrita em texto
+    // livre e dar veredito — que é exatamente o formato do MessageGuard.
+    //
+    // Medido em 25/08/2026 sobre 80 atendimentos reais: 11 apontamentos com 36%
+    // de alarme falso, contra 74% do gpt-4.1-mini e 97% do gemini-2.5-flash-lite
+    // nos MESMOS dados — sendo o mais barato dos três. Fora da conta uma regra
+    // mal escrita, fez 1 apontamento em 80 turnos: é um juiz quieto, que é o que
+    // se quer num portão que bloqueia.
+    //
+    // `purpose: 'judge'` o mantém fora do seletor de agente: ele não atende
+    // cliente. E SÓ existe pelo gateway — a API da OpenAI não serve peso aberto.
+    {
+        id: 'gpt-oss-safeguard-20b',
+        gatewaySlug: 'openai/gpt-oss-safeguard-20b',
+        name: 'GPT-OSS Safeguard 20B',
+        provider: 'openai',
+        purpose: 'judge',
+        features: ['tools', 'reasoning'],
+        highlight: 'Verificação de conformidade — o mais preciso e o mais barato (só via gateway)',
+        pricing: { input: 0.07, output: 0.20 },
+        contextWindow: 128_000,
+        maxOutputTokens: 32_768,
+    },
+    {
+        id: 'gpt-oss-safeguard-120b',
+        gatewaySlug: 'openai/gpt-oss-safeguard-120b',
+        name: 'GPT-OSS Safeguard 120B',
+        provider: 'openai',
+        purpose: 'judge',
+        features: ['tools', 'reasoning'],
+        highlight: 'Irmão maior do Safeguard 20B — mais caro, ainda não medido aqui',
+        pricing: { input: 0.15, output: 0.60 },
+        contextWindow: 128_000,
+        maxOutputTokens: 32_768,
+    },
 ];
 // ============================================================================
 // AI MODEL HELPERS
@@ -333,6 +392,9 @@ function getViableModels(maxCostBRL = 0.40, usdToBRL = 5.80) {
     const OUTPUT_TOKENS = 2_000;
     return exports.AI_MODELS.filter(model => {
         if (model.deprecated)
+            return false;
+        // Modelo de julgamento não conversa com cliente — fora do seletor do agente.
+        if (model.purpose === 'judge')
             return false;
         const cost = (INPUT_TOKENS / 1_000_000 * model.pricing.input
             + OUTPUT_TOKENS / 1_000_000 * model.pricing.output) * usdToBRL;
@@ -366,4 +428,29 @@ function getModelDefinition(modelId) {
 function modelSupports(modelId, feature) {
     const def = getModelDefinition(modelId);
     return def?.features.includes(feature) ?? false;
+}
+/**
+ * Slug deste modelo no Vercel AI Gateway, ou `undefined` quando o modelo
+ * não existe lá.
+ *
+ * `undefined` NÃO é erro: significa "este modelo continua sendo servido pela
+ * integração direta do provider de origem". O caller deve tratar isso como
+ * fallback silencioso, nunca como falha.
+ *
+ * @example
+ *   getGatewaySlug('gpt-4.1-mini')               // 'openai/gpt-4.1-mini'
+ *   getGatewaySlug('claude-haiku-4-5-20251001')  // 'anthropic/claude-haiku-4.5'
+ *   getGatewaySlug('deepseek-reasoner')          // undefined — só na API da DeepSeek
+ */
+function getGatewaySlug(modelId) {
+    return getModelDefinition(modelId)?.gatewaySlug;
+}
+/**
+ * `true` quando o modelo pode ser servido pelo Vercel AI Gateway.
+ *
+ * Atalho de leitura para decidir se vale tentar o transporte alternativo
+ * antes de cair na integração direta do provider.
+ */
+function isGatewayCapable(modelId) {
+    return getGatewaySlug(modelId) !== undefined;
 }

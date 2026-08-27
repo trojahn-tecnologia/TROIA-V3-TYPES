@@ -237,6 +237,19 @@ export declare enum ProviderId {
     AI_DEEPSEEK = "ai-deepseek",
     AI_ELEVENLABS = "ai-elevenlabs",
     AI_COHERE = "ai-cohere",
+    /**
+     * Vercel AI Gateway — **transporte**, não origem de modelo.
+     *
+     * Serve modelos de vários providers (OpenAI, Anthropic, Google, DeepSeek…)
+     * por um endpoint único com uma chave só. O campo `provider` de cada
+     * modelo em `AI_MODELS` continua sendo a ORIGEM (`openai`, `google`…) —
+     * o gateway só troca por onde a chamada passa.
+     *
+     * Cobre apenas geração de texto e embeddings. **Nunca** declarar
+     * capabilities de áudio (STT/TTS) ou rerank aqui: elas são resolvidas por
+     * capability e o gateway sequestraria o Whisper e o Cohere.
+     */
+    AI_VERCEL_GATEWAY = "ai-vercel-gateway",
     DATABASE_JETIMOB = "database-jetimob",
     DATABASE_DWV = "database-dwv",
     DATABASE_KENLO = "database-kenlo",
@@ -393,7 +406,24 @@ export declare enum ProviderCapability {
     VECTOR_STORAGE = "vector_storage",
     AI_TEXT_GENERATION = "ai_text_generation",// LLM text generation (GPT, Claude, etc.)
     AI_CHAT_COMPLETION = "ai_chat_completion",// Chat completion with conversation history
-    AI_INTERNAL_JUDGE = "ai_internal_judge",// LlmJudgeService (10 evaluators), judge-llm tool, quality-test, ab-test
+    AI_INTERNAL_JUDGE = "ai_internal_judge",// LlmJudgeService (10 evaluators), quality-test, ab-test — dão NOTA 0-1
+    /**
+     * Verificação de conformidade da mensagem ANTES de enviar (MessageGuard:
+     * regras baseline + rubrica do agente; regra semântica de pré-condição de
+     * tool).
+     *
+     * Separada de `AI_INTERNAL_JUDGE` em 25/08/2026 porque são tarefas
+     * diferentes e o melhor modelo de cada uma é outro. Medido sobre os mesmos
+     * dados: aqui a saída é **veredito binário** (violou ou não), e o
+     * `gpt-oss-safeguard-20b` — treinado exatamente para ler política e dar
+     * veredito — teve 36% de alarme falso contra 74% do `gpt-4.1-mini` e 97%
+     * do `gemini-2.5-flash-lite`, sendo o mais barato dos três. Já nos
+     * evaluators, que pedem NOTA de 0 a 1, o mesmo Safeguard **não devolveu
+     * nota** e levou 9 segundos: ele é classificador, não pontuador.
+     *
+     * Ausente ⇒ cai em `AI_INTERNAL_JUDGE` (retrocompatível).
+     */
+    AI_INTERNAL_COMPLIANCE = "ai_internal_compliance",
     AI_INTERNAL_PROCESSING = "ai_internal_processing",// narration-cleaner, summarizer, wizard draft, workflow modifier; fallback do lead import
     AI_INTERNAL_ANALYTICS = "ai_internal_analytics",// gap classifier/resolution, insights, topic-tagger, prompt coach/migration/rewriter, training
     AI_INTERNAL_IMPORTING = "ai_internal_importing",// lead import (mapeamento de colunas CSV + extração por lotes); ausente → fallback AI_INTERNAL_PROCESSING

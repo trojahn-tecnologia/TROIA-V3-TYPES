@@ -113,7 +113,7 @@ export interface GatewayEventData {
   to?: string;  // Recipient (empresa/bot number)
   fromMe?: boolean;  // ✅ Message direction: true = sent by us, false = received
   message?: string;
-  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'buttons' | 'list' | 'unknown';
+  messageType?: 'text' | 'image' | 'audio' | 'video' | 'document' | 'sticker' | 'location' | 'contact' | 'reaction' | 'edit' | 'delete' | 'poll' | 'poll-vote' | 'buttons' | 'list' | 'unknown';
 
   // ✅ Structured sender information (NUNCA string)
   from?: MessageSender;
@@ -156,6 +156,20 @@ export interface GatewayEventData {
   // Delete data (cliente apagou mensagem "para todos" no WhatsApp — revoke)
   delete?: {
     targetMessageId: string;  // providerMessageId da mensagem apagada
+  };
+
+  // Enquete recebida (criação) — `options` é o que permite traduzir votos depois
+  poll?: {
+    name: string;
+    options: string[];
+    selectableCount?: number;
+  };
+
+  // Voto em enquete. O worker entrega os HASHES (hex) das opções escolhidas;
+  // quem traduz para texto é o backend, cruzando com a enquete original.
+  pollVote?: {
+    pollMessageId: string;
+    selectedOptionHashes: string[];
   };
 
   // ✅ Flag de mensagem encaminhada (WhatsApp ContextInfo.isForwarded)

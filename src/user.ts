@@ -10,6 +10,14 @@ export interface User extends FullTenantDocument {
   lastName: string;
   avatar?: string;
   phone?: string;
+  /** Código do usuário no sistema externo (ex.: código do vendedor no ERP). Texto livre. */
+  code?: string;
+  /**
+   * CPF do usuário, SÓ DÍGITOS (sem máscara) — é assim que o índice único parcial
+   * `(appId, companyId, document)` compara. É a chave que liga este usuário ao
+   * cadastro de vendedor de uma fonte externa (ERP).
+   */
+  document?: string;
   status: ActiveStatus;
   levelId?: ObjectId; // Referência para o nível do usuário (hierarquia)
   preferences: UserPreferences;
@@ -351,6 +359,9 @@ export interface CreateUserRequest {
   lastName: string;
   password?: string;
   phone?: string;
+  code?: string;
+  /** CPF. Aceita com ou sem máscara — o backend normaliza para dígitos. */
+  document?: string;
   levelId?: string; // ID do nível (será convertido para ObjectId no backend)
   preferences?: Partial<UserPreferences>;
   sendInvite?: boolean;
@@ -360,6 +371,10 @@ export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  /** `null` = LIMPAR o campo (o backend traduz para `$unset`). */
+  code?: string | null;
+  /** `null` = LIMPAR o campo. Aceita com ou sem máscara — o backend normaliza. */
+  document?: string | null;
   avatar?: string;
   status?: ActiveStatus;
   levelId?: string; // ID do nível (será convertido para ObjectId no backend)
@@ -501,6 +516,9 @@ export interface UserResponse {
   lastName: string;
   avatar?: string;
   phone?: string;
+  code?: string;
+  /** CPF, só dígitos. */
+  document?: string;
   companyId: string;
   appId: string;
   status: ActiveStatus;

@@ -50,6 +50,19 @@ var ProviderId;
     ProviderId["AI_DEEPSEEK"] = "ai-deepseek";
     ProviderId["AI_ELEVENLABS"] = "ai-elevenlabs";
     ProviderId["AI_COHERE"] = "ai-cohere";
+    /**
+     * Vercel AI Gateway — **transporte**, não origem de modelo.
+     *
+     * Serve modelos de vários providers (OpenAI, Anthropic, Google, DeepSeek…)
+     * por um endpoint único com uma chave só. O campo `provider` de cada
+     * modelo em `AI_MODELS` continua sendo a ORIGEM (`openai`, `google`…) —
+     * o gateway só troca por onde a chamada passa.
+     *
+     * Cobre apenas geração de texto e embeddings. **Nunca** declarar
+     * capabilities de áudio (STT/TTS) ou rerank aqui: elas são resolvidas por
+     * capability e o gateway sequestraria o Whisper e o Cohere.
+     */
+    ProviderId["AI_VERCEL_GATEWAY"] = "ai-vercel-gateway";
     // Database Providers (Properties, Real Estate, etc.)
     ProviderId["DATABASE_JETIMOB"] = "database-jetimob";
     ProviderId["DATABASE_DWV"] = "database-dwv";
@@ -109,6 +122,7 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.AI_DEEPSEEK]: 'ai',
     [ProviderId.AI_ELEVENLABS]: 'ai',
     [ProviderId.AI_COHERE]: 'ai',
+    [ProviderId.AI_VERCEL_GATEWAY]: 'ai',
     // Database
     [ProviderId.DATABASE_JETIMOB]: 'database',
     [ProviderId.DATABASE_DWV]: 'database',
@@ -305,6 +319,23 @@ var ProviderCapability;
     // Internal subagents (services da plataforma TROIA que usam LLM, agrupados por afinidade funcional).
     // Cada tenant marca essas capabilities na integration que quer usar para cada grupo.
     ProviderCapability["AI_INTERNAL_JUDGE"] = "ai_internal_judge";
+    /**
+     * Verificação de conformidade da mensagem ANTES de enviar (MessageGuard:
+     * regras baseline + rubrica do agente; regra semântica de pré-condição de
+     * tool).
+     *
+     * Separada de `AI_INTERNAL_JUDGE` em 25/08/2026 porque são tarefas
+     * diferentes e o melhor modelo de cada uma é outro. Medido sobre os mesmos
+     * dados: aqui a saída é **veredito binário** (violou ou não), e o
+     * `gpt-oss-safeguard-20b` — treinado exatamente para ler política e dar
+     * veredito — teve 36% de alarme falso contra 74% do `gpt-4.1-mini` e 97%
+     * do `gemini-2.5-flash-lite`, sendo o mais barato dos três. Já nos
+     * evaluators, que pedem NOTA de 0 a 1, o mesmo Safeguard **não devolveu
+     * nota** e levou 9 segundos: ele é classificador, não pontuador.
+     *
+     * Ausente ⇒ cai em `AI_INTERNAL_JUDGE` (retrocompatível).
+     */
+    ProviderCapability["AI_INTERNAL_COMPLIANCE"] = "ai_internal_compliance";
     ProviderCapability["AI_INTERNAL_PROCESSING"] = "ai_internal_processing";
     ProviderCapability["AI_INTERNAL_ANALYTICS"] = "ai_internal_analytics";
     ProviderCapability["AI_INTERNAL_IMPORTING"] = "ai_internal_importing";

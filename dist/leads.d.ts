@@ -33,20 +33,36 @@ export interface StepHistoryEntry {
     duration?: number;
 }
 /**
- * Bloco persistido no lead capturado por QR Code (spec §4.1) — histórico e
- * gamificação. NÃO usa `lead.teamId` (que significa "fila da equipe" na
- * distribuição): a equipe/unidade da captura vivem aqui.
+ * Bloco persistido no lead com a "foto" de onde a venda/captura aconteceu —
+ * histórico e gamificação. NÃO usa `lead.teamId` (que significa "fila da
+ * equipe" na distribuição): a equipe/unidade da captura vivem aqui.
+ *
+ * Dois fluxos preenchem este bloco de formas diferentes:
+ *  - `origin: 'qrcode'` (captura por QR Code, spec §4.1): fluxo completo —
+ *    `sessionUuid`, `code` (formato `CAT-XXXX`) e `capturedBy` são
+ *    obrigatórios nesse caminho (validados por `LeadCaptureInfoSchema` no
+ *    backend, que continua exigindo os três).
+ *  - `origin: 'erp'` (venda importada de ERP via node de workflow): fluxo
+ *    parcial — só `unitId`/`teamId` são preenchidos; não existe sessão de QR
+ *    nem código, por isso `sessionUuid`, `code` e `capturedBy` são opcionais
+ *    aqui. `filledAt` também é opcional: quando a venda do ERP reaproveita um
+ *    lead que ainda não tinha bloco `capture`, só unidade/origem são gravadas
+ *    (não houve preenchimento de formulário nenhum para datar).
  */
 export interface LeadCaptureInfo {
-    sessionUuid: string;
-    code: string;
-    /** Vendedor que gerou o QR. */
-    capturedBy: string;
+    sessionUuid?: string;
+    code?: string;
+    /** Vendedor que gerou o QR. Ausente no fluxo `origin: 'erp'`. */
+    capturedBy?: string;
     teamId?: string;
     unitId?: string;
-    filledAt: string;
+    /** Quando o formulário/captura foi preenchido. Ausente em lead que só
+     * recebeu unidade/origem por reaproveitamento de venda do ERP. */
+    filledAt?: string;
     confirmedAt?: string;
     conversationId?: string;
+    /** 'qrcode' (captura por QR, preenche tudo) | 'erp' (venda do ERP: unitId/teamId, e filledAt só quando o lead é criado do zero). */
+    origin?: 'qrcode' | 'erp';
 }
 export interface Lead {
     id: string;
@@ -205,6 +221,20 @@ export interface UpdateLeadRequest {
     externalLeadId?: string;
     pageId?: string;
     pageName?: string;
+    /**
+     * Atualização parcial da foto de captura (merge por campo). Usado pelo
+     * workflow ao reatribuir uma venda do ERP.
+     *
+     * `teamId: null` REMOVE a equipe da foto (`$unset` de `capture.teamId`) — a
+     * gamificação passa a usar a equipe atual do responsável, e não a equipe de
+     * quem capturou o lead originalmente. É o que acontece quando a venda troca
+     * de vendedor no reaproveitamento.
+     */
+    capture?: {
+        unitId?: string;
+        teamId?: string | null;
+        origin?: 'qrcode' | 'erp';
+    };
 }
 export interface LeadResponse extends Lead {
     contact?: {

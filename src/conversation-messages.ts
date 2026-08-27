@@ -58,6 +58,40 @@ export interface LocationContent {
   name?: string;
 }
 
+/**
+ * Enquete recebida do WhatsApp (criação). Guardar as `options` é o que torna
+ * possível traduzir um voto depois: o voto trafega como SHA-256 do texto da
+ * opção, então sem a enquete original o hash é irreversível.
+ */
+export interface PollContent {
+  type: 'poll';
+  /** Pergunta da enquete. */
+  name: string;
+  /** Opções, na ordem em que o autor criou. */
+  options: string[];
+  /** Quantas opções o votante pode marcar (1 = escolha única). */
+  selectableCount?: number;
+}
+
+/**
+ * Voto em enquete. O WhatsApp entrega apenas os HASHES das opções escolhidas
+ * (SHA-256 do texto); o backend resolve para o texto cruzando com a
+ * `PollContent` da enquete original — ver `resolvePollVoteOptions`.
+ */
+export interface PollVoteContent {
+  type: 'poll-vote';
+  /** providerMessageId da enquete votada. */
+  pollMessageId: string;
+  /** Pergunta da enquete (preenchida na resolução, para exibir sem novo fetch). */
+  pollTitle?: string;
+  /** Opções votadas em TEXTO. Vazio = hash não resolvido (enquete não encontrada). */
+  options: string[];
+  /** Hashes crus (hex) — auditoria e reprocessamento se a enquete chegar depois. */
+  optionHashes?: string[];
+  /** Voto vazio = o votante DESMARCOU a escolha anterior (protocolo do WhatsApp). */
+  isRetraction?: boolean;
+}
+
 export interface ContactContent {
   type: 'contact';
   name: string;
@@ -139,6 +173,8 @@ export type MessageContent =
   | DocumentContent
   | LocationContent
   | ContactContent
+  | PollContent
+  | PollVoteContent
   | LinkContent
   | ReactionContent
   | SystemContent
@@ -339,7 +375,7 @@ export interface ConversationMessageQuery extends PaginationQuery {
     senderType?: 'contact' | 'user' | 'system' | 'ai' | 'automation' | 'automation-follow';
     senderId?: string;
     status?: 'sent' | 'delivered' | 'read' | 'failed' | 'pending';
-    contentType?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'link' | 'reaction' | 'system' | 'buttons' | 'list' | 'template';
+    contentType?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'poll' | 'poll-vote' | 'link' | 'reaction' | 'system' | 'buttons' | 'list' | 'template';
     isInternal?: boolean;
     isEdited?: boolean;
     isDeleted?: boolean;

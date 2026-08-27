@@ -29,7 +29,7 @@ export interface MessageData {
     message?: string;
     messageId?: string;
     replyToMessageId?: string;
-    type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'reaction' | 'edit' | 'delete';
+    type?: 'text' | 'media' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'contacts' | 'poll' | 'reaction' | 'edit' | 'delete';
     media?: MediaData;
     /** @deprecated Use media.url instead */
     mediaUrl?: string;
@@ -42,6 +42,11 @@ export interface MessageData {
         longitude: number;
         name?: string;
         address?: string;
+    };
+    poll?: {
+        name: string;
+        options: string[];
+        selectableCount?: number;
     };
     contactData?: {
         name: string;

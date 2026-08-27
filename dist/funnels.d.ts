@@ -192,11 +192,62 @@ export interface ReorderFunnelStepsRequest {
  */
 export interface FunnelDeleteValidation {
     canDelete: boolean;
+    /**
+     * Nome histórico do contador de leads vinculados ao funil. Mantido para
+     * compatibilidade com os consumidores antigos de
+     * `GET /funnels/validate-delete/:id`.
+     */
     linkedLeadsCount: number;
+    /**
+     * Mesmo número de `linkedLeadsCount`, com o nome que a modal de exclusão do
+     * CRM consome (`GET /funnels/:id/can-delete` — RD1/RD2 da Fase C2).
+     */
+    leadCount: number;
     message: string;
 }
 export interface FunnelStepDeleteValidation {
     canDelete: boolean;
     linkedLeadsCount: number;
     message: string;
+}
+/**
+ * Destino dos leads na exclusão de um funil (Fase C2 — RD1).
+ *
+ * - `delete`   → soft delete de TODOS os leads do funil (em lote).
+ * - `transfer` → leads passam a viver no funil/etapa informados, com entrada
+ *   nova em `stepsHistory` (a etapa anterior é fechada com `exitedAt`).
+ */
+export type FunnelLeadsDisposition = {
+    action: 'delete';
+} | {
+    action: 'transfer';
+    funnelId: string;
+    stepId: string;
+};
+/**
+ * Corpo OPCIONAL de `DELETE /api/funnels/:id`.
+ *
+ * Sem corpo (ou sem `leads`) o comportamento antigo é preservado: funil com
+ * leads vinculados é recusado com 400. Com `leads`, o destino escolhido é
+ * aplicado antes de excluir o funil.
+ */
+export interface DeleteFunnelRequest {
+    leads?: FunnelLeadsDisposition;
+}
+/** Resultado auditável da exclusão de um funil (`DELETE /api/funnels/:id`). */
+export interface DeleteFunnelResult {
+    funnelId: string;
+    /** O que foi feito com os leads: `none` = o funil não tinha leads. */
+    leadsAction: 'none' | 'delete' | 'transfer';
+    /** Quantos leads foram soft-deletados ou transferidos. */
+    leadsAffected: number;
+    /** Etapas do funil soft-deletadas em cascata. */
+    stepsDeleted: number;
+    /** Vínculos em `funnels-users` soft-deletados em cascata. */
+    usersUnlinked: number;
+    /** Destino, quando `leadsAction === 'transfer'`. */
+    transferredTo?: {
+        funnelId: string;
+        stepId: string;
+    };
 }

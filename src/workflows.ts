@@ -48,6 +48,11 @@ export const WORKFLOW_NODE_TYPES = [
   'action_voice_tts',
   'action_voice_clone_delete',
   'action_create_checklist',
+  'action_find_unit',
+  'action_find_user',
+  'action_find_contact',
+  'action_url_to_pdf',
+  'action_nfe_pdf',
   // Controls
   'control_if',
   'control_switch',
@@ -369,8 +374,9 @@ export interface SendMessageActionConfig {
    *    criado sob demanda quando o comentarista/mentionador ainda não existe
    *    na base. Nesse modo, o canal cai para `triggerData.channelId` quando
    *    `channelId` não é configurado.
+   *  - `variable`: contactId vem de `{{variável}}` do fluxo (ex.: saída de um node de busca)
    */
-  contactSource?: 'context' | 'specific' | 'trigger_author';
+  contactSource?: 'context' | 'specific' | 'trigger_author' | 'variable';
   contactId?: string;
 
   // Conteúdo
@@ -542,9 +548,12 @@ export interface CreateLeadActionConfig {
    * Source type for the contact ID.
    * - 'context': extract from workflow context (contact, conversation, event)
    * - 'specific': use the `contactId` configured in the node
+   * - `variable`: o `contactId` vem de uma `{{variável}}` do fluxo — ex.: a
+   *   saída de um node de busca de contato (`{{variables.clienteContato.contact.id}}`).
+   *   Mesmo padrão do `SendMessageActionConfig.contactSource`.
    * @default 'context'
    */
-  contactSource?: 'context' | 'specific';
+  contactSource?: 'context' | 'specific' | 'variable';
   contactId?: string;
   funnelId?: string;
   step?: string;
@@ -556,6 +565,16 @@ export interface CreateLeadActionConfig {
   userId?: string;
   /** Target team when assignTo === 'team' */
   teamId?: string;
+  /** Reaproveita lead aberto (não won/lost) do contato no funil em vez de criar. */
+  reuseOpenLead?: boolean;
+  /** Onde procurar lead aberto ao reaproveitar: só no funil do node (default) ou em qualquer funil. */
+  reuseScope?: 'funnel' | 'all';
+  /** Unidade onde a venda/captura aconteceu — gravada em lead.capture.unitId (aceita {{variável}}). */
+  unitId?: string;
+  /** Origem do lead (ex.: 'erp'). Aceita {{variável}}. */
+  origin?: string;
+  /** Nome em variables onde a saída { lead, reused } é gravada. */
+  saveAs?: string;
 }
 
 /**
@@ -651,6 +670,81 @@ export interface CreateChecklistActionConfig {
   assignee: CreateChecklistAssignee;
   dueHours?: number;
   addCreatorAsFollower?: boolean;
+}
+
+/** Node de busca: unidade por CNPJ/CPF. Saída { found, unit } gravada em variables[saveAs]. */
+export interface FindUnitActionConfig {
+  document: string;
+  saveAs: string;
+}
+
+/** Node de busca: usuário por documento → código → email (cascata). Saída { found, user, matchedBy }. */
+export interface FindUserActionConfig {
+  document?: string;
+  code?: string;
+  email?: string;
+  saveAs: string;
+}
+
+/** Node de busca/criação: contato por telefone → email. Saída { found, contact, created }. */
+export interface FindContactActionConfig {
+  phone?: string;
+  email?: string;
+  name?: string;
+  createIfMissing?: boolean;
+  saveAs: string;
+}
+
+/**
+ * Url To Pdf Action Configuration (Task D2, 2026-08-26)
+ *
+ * Converte uma PÁGINA WEB em PDF (Gotenberg/Chromium) e hospeda o arquivo no
+ * S3, devolvendo a URL pública — é o que anexa a NOTA FISCAL na mensagem de
+ * pós-venda (a Linx devolve só o XML; o PDF sai da página pública da SEFAZ).
+ * O node é genérico de propósito: serve contrato, proposta, catálogo, recibo.
+ *
+ * Saída gravada em `variables[saveAs]` (CLAUDE.md NUNCA #91):
+ * `{ ok, url, filename, erro }` — `url`/`filename` vazios quando `ok: false`.
+ * O node é FAIL-SOFT: nenhuma falha sobe como erro de execução.
+ */
+export interface UrlToPdfActionConfig {
+  /** Página a converter. Aceita template: '{{triggerData.body.documentoFiscal.url}}'. */
+  url: string;
+  /** Nome do arquivo entregue no WhatsApp. Template. Default 'documento.pdf'. Extensão .pdf é garantida. */
+  filename?: string;
+  /** Espreme todo o conteúdo numa página só (bom para cupom/nota). Default false. */
+  singlePage?: boolean;
+  /** Nome da variável do fluxo onde o resultado é guardado (NUNCA #91). Obrigatório. */
+  saveAs: string;
+}
+
+/**
+ * Nfe Pdf Action Configuration (Task D8, 2026-08-26)
+ *
+ * Gera o PDF da NOTA FISCAL (DANFE NFC-e, modelo 65) a partir do XML
+ * autorizado que o coletor do ERP entrega no webhook, hospeda no S3 e devolve
+ * a URL pública — é o anexo que o cliente recebe no WhatsApp depois da compra.
+ *
+ * Diferente do `action_url_to_pdf`, que fotografa uma página de terceiro, aqui
+ * o documento é montado por nós a partir do XML: a URL de consulta da SEFAZ
+ * sai do próprio arquivo (`infNFeSupl/urlChave`), então uma nota do Rio Grande
+ * do Sul nunca imprime o endereço de outro estado.
+ *
+ * Saída gravada em `variables[saveAs]` (CLAUDE.md NUNCA #91):
+ * `{ ok, url, filename, numero, chave, erro }` — campos vazios quando
+ * `ok: false`. O node é FAIL-SOFT: nenhuma falha sobe como erro de execução,
+ * porque quando ele roda as mensagens de texto já foram entregues ao cliente.
+ *
+ * Modelo 55 (NF-e) é recusado com `ok: false` e motivo explícito: o DANFE dele
+ * tem leiaute próprio (A4, quadros, código de barras) e fica para depois.
+ */
+export interface NfePdfActionConfig {
+  /** XML completo da nota (`nfeProc`). Template: '{{triggerData.body.documentoFiscal.xml}}'. */
+  xml: string;
+  /** Nome do arquivo entregue no WhatsApp. Template. Default 'Nota fiscal {nNF}.pdf'. */
+  filename?: string;
+  /** Nome da variável do fluxo onde o resultado é guardado (NUNCA #91). Obrigatório. */
+  saveAs: string;
 }
 
 /**
@@ -949,6 +1043,11 @@ export type NodeConfig =
   | QueryDatabaseActionConfig
   | CreateLeadActionConfig
   | UpdateLeadActionConfig
+  | FindUnitActionConfig
+  | FindUserActionConfig
+  | FindContactActionConfig
+  | UrlToPdfActionConfig
+  | NfePdfActionConfig
   | SendTemplateActionConfig
   | CreateTicketActionConfig
   | UpdateContactActionConfig
