@@ -18,6 +18,43 @@ export interface Campaign extends TenantAwareDocument {
   recurringConfig?: RecurringConfig; // Config de recorrência
   status: CampaignStatus;
   stats: CampaignStats;
+  /** Preenchido quando a campanha se pausa sozinha; limpo ao retomar. */
+  autoPause?: CampaignAutoPauseInfo;
+}
+
+/**
+ * Pausa automática (2026-08-27): uma campanha em andamento vira `paused`
+ * sozinha quando o canal que ela usa não está utilizável — desconectado, ou
+ * excluído no meio do disparo.
+ *
+ * Existe porque em 26–27/08/2026 duas campanhas queimaram 105 tentativas de
+ * envio contra canais fora do ar (um nunca conectou, o outro foi excluído
+ * depois do início) e ficaram travadas em "em andamento", com 86 mensagens
+ * paradas — o dono via "rodando" e nada era entregue.
+ */
+export const CAMPAIGN_AUTO_PAUSE_REASONS = ['channel_disconnected', 'channel_missing'] as const;
+export type CampaignAutoPauseReason = (typeof CAMPAIGN_AUTO_PAUSE_REASONS)[number];
+
+export interface CampaignAutoPauseDetails {
+  channelId?: string;
+  channelName?: string;
+  /** Erro do provider que motivou a pausa (ex.: 409 instância desconectada). */
+  providerError?: string;
+  /** Mensagem da campanha em que a falha apareceu — âncora para investigar. */
+  campaignMessageId?: string;
+}
+
+export interface CampaignAutoPauseInfo {
+  reason: CampaignAutoPauseReason;
+  at: Date;
+  details: CampaignAutoPauseDetails;
+}
+
+/** Forma na API (`at` em ISO). */
+export interface CampaignAutoPauseResponse {
+  reason: CampaignAutoPauseReason;
+  at: string;
+  details: CampaignAutoPauseDetails;
 }
 
 /**
@@ -143,8 +180,10 @@ export interface CampaignStats {
 /**
  * Campaign Response - Response type sem _id
  */
-export interface CampaignResponse extends Omit<Campaign, '_id'> {
+export interface CampaignResponse extends Omit<Campaign, '_id' | 'autoPause'> {
   id: string;
+  /** `at` chega em ISO na API — mesmo padrão de `WorkflowResponse.autoPause`. */
+  autoPause?: CampaignAutoPauseResponse;
 }
 
 /**

@@ -1121,6 +1121,14 @@ export interface WorkflowExecution {
     duration?: number;
     /** Indicates if this execution was triggered via test mode (for tracking/audit purposes only) */
     isTest?: boolean;
+    /**
+     * Falha parcial (2026-08-27): pelo menos um galho de um leque paralelo
+     * falhou E pelo menos um galho irmão entregou. O `status` continua
+     * `'failed'` — o histórico não mente —, mas execuções assim ficam FORA do
+     * contador de pausa automática (`getLastNExecutionStatuses`): telefone
+     * errado de um contato não pode desligar o fluxo de vendas.
+     */
+    partialFailure?: boolean;
     appId: ObjectId;
     companyId: ObjectId;
     /**
@@ -1374,6 +1382,27 @@ export interface WorkflowValidationResult {
         message: string;
         severity: 'error' | 'warning';
     }>;
+}
+/**
+ * Validação estrutural de workflow (2026-08-27).
+ *
+ * O backend é a única fonte de verdade das regras estruturais; o editor as
+ * consome por `POST /api/workflows/validate`. `nodeIds` é o que permite ao
+ * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
+ * essa informação (o errorHandler só serializa `fieldErrors`).
+ */
+export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO"];
+export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];
+export interface ValidationIssue {
+    code: WorkflowValidationCode;
+    /** Texto pronto para a tela, em português. */
+    message: string;
+    /** Nós que o editor deve destacar. Vazio quando o problema não é de um nó. */
+    nodeIds: string[];
+}
+export interface WorkflowValidationResponse {
+    isValid: boolean;
+    issues: ValidationIssue[];
 }
 /**
  * `template` = template de MENSAGEM. `checklistTemplate` = modelo de checklist

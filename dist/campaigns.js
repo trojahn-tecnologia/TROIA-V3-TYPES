@@ -1,6 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CampaignMessageStatus = exports.SCHEDULING_TYPE_LABELS = exports.SchedulingType = exports.AUDIENCE_TYPE_LABELS = exports.AudienceType = exports.CampaignStatus = void 0;
+exports.CampaignMessageStatus = exports.SCHEDULING_TYPE_LABELS = exports.SchedulingType = exports.AUDIENCE_TYPE_LABELS = exports.AudienceType = exports.CampaignStatus = exports.CAMPAIGN_AUTO_PAUSE_REASONS = void 0;
+/**
+ * Pausa automática (2026-08-27): uma campanha em andamento vira `paused`
+ * sozinha quando o canal que ela usa não está utilizável — desconectado, ou
+ * excluído no meio do disparo.
+ *
+ * Existe porque em 26–27/08/2026 duas campanhas queimaram 105 tentativas de
+ * envio contra canais fora do ar (um nunca conectou, o outro foi excluído
+ * depois do início) e ficaram travadas em "em andamento", com 86 mensagens
+ * paradas — o dono via "rodando" e nada era entregue.
+ */
+exports.CAMPAIGN_AUTO_PAUSE_REASONS = ['channel_disconnected', 'channel_missing'];
 /**
  * Campaign Status
  */

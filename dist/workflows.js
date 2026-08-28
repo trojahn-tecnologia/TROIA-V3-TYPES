@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -131,3 +131,43 @@ exports.BUSINESS_HOURS_NODE_TYPES = [
 ];
 /** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
 exports.WAIT_UNTIL_MAX_DURATION_MS = 72 * 60 * 60 * 1000;
+/**
+ * Validação estrutural de workflow (2026-08-27).
+ *
+ * O backend é a única fonte de verdade das regras estruturais; o editor as
+ * consome por `POST /api/workflows/validate`. `nodeIds` é o que permite ao
+ * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
+ * essa informação (o errorHandler só serializa `fieldErrors`).
+ */
+exports.WORKFLOW_VALIDATION_CODES = [
+    'NODE_TYPE_DESCONHECIDO',
+    'ARESTA_ORFA',
+    'SEM_ENTRADA',
+    'MULTIPLAS_ENTRADAS',
+    'CICLO',
+    'IF_SEM_CAMINHO',
+    'IF_HANDLE_INVALIDO',
+    'SWITCH_SEM_HANDLE',
+    'SPLIT_HANDLE_INVALIDO',
+    'LOOP_SAIDAS',
+    'WAIT_FOR_SAIDAS',
+    'FANOUT_JUNCAO',
+    'FANOUT_ESPERA',
+    'FANOUT_HORARIO',
+    'SWITCH_HANDLE_NAO_COMPILAVEL',
+    'CONTROL_FLOW_EM_LOOP',
+    // 2026-08-27 (conserto final)
+    /** "Tentar novamente" com nenhum/vários trechos a repetir, ou vários "Depois". */
+    'RETRY_SAIDAS',
+    /** Nó de controle dentro do trecho repetido por "Tentar novamente". */
+    'CONTROL_FLOW_EM_RETRY',
+    /** Requisição HTTP com "aguardar retorno" dentro de um leque (dorme igual à espera). */
+    'FANOUT_HTTP_AGUARDA',
+    /** Desenho sem nenhum gatilho (nem `skill_input`). */
+    'SEM_GATILHO',
+    /** Nó sem nenhuma ligação — nem entrando, nem saindo. */
+    'NO_SOLTO',
+    /** Campo obrigatório faltando ou fora do formato na configuração de um nó. */
+    'CONFIG_INVALIDA',
+    'LEGADO',
+];

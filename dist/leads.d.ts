@@ -202,7 +202,13 @@ export interface UpdateLeadRequest {
     movedByName?: string;
     assigneeId?: string;
     teamId?: string;
-    budget?: number;
+    /**
+     * `null` LIMPA o orçamento (vira `$unset` no repositório) — nunca é
+     * gravado como null. A tela do CRM devolve null quando o usuário esvazia
+     * o campo, e leads antigos já têm null no banco; recusar o null fazia
+     * "abrir e salvar" um lead antigo devolver 422 (incidente 27/08/2026).
+     */
+    budget?: number | null;
     wonValue?: number;
     businessStatus?: 'pending' | 'won' | 'lost';
     wonDate?: string;

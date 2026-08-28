@@ -92,6 +92,9 @@ export enum NotificationType {
   // Automação (2026-08-22)
   WORKFLOW_AUTO_PAUSED = 'workflow_auto_paused', // Workflow pausado sozinho (10 falhas seguidas ou canal excluído)
 
+  // Campanhas e integrações (2026-08-27)
+  CAMPAIGN_AUTO_PAUSED = 'campaign_auto_paused', // Campanha pausada sozinha (canal desconectado ou excluído)
+
   // Custom notifications
   CUSTOM_NOTIFICATION = 'custom_notification',
 }
@@ -296,6 +299,10 @@ export const DEFAULT_NOTIFICATION_TYPES: readonly NotificationType[] = [
   NotificationType.AGENDA_DAILY_SUMMARY,
   // Automação — nasce marcado para usuário NOVO; usuário existente marca na tela (decisão do dono 22/08)
   NotificationType.WORKFLOW_AUTO_PAUSED,
+  // Campanha — mesma regra: marcado para usuário NOVO, existente marca na tela
+  // (decisão do dono 27/08). Avisa sobre campanha que PAROU sozinha e que
+  // ninguém descobria sem olhar o log.
+  NotificationType.CAMPAIGN_AUTO_PAUSED,
   // Custom
   NotificationType.CUSTOM_NOTIFICATION,
 ];
