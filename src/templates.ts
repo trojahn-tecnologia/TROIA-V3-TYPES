@@ -42,6 +42,25 @@ export interface TemplateVariable {
 }
 
 /**
+ * Mídia do cabeçalho de um template (2026-08-29).
+ *
+ * Duas coisas diferentes usam esta informação, e confundi-las custa caro:
+ *  - APROVAR o template exige um identificador de upload da Meta
+ *    (`example.header_handle`), gerado uma única vez a partir de um arquivo
+ *    de exemplo.
+ *  - ENVIAR exige apenas uma URL pública, que pode mudar a cada disparo —
+ *    é o caso da nota fiscal gerada dentro do workflow.
+ *
+ * Este campo guarda a URL usada no ENVIO. O identificador de aprovação vive
+ * em `WhatsAppTemplateComponent.example.header_handle`.
+ */
+export interface TemplateHeaderMedia {
+  type: 'image' | 'video' | 'document';
+  url: string;
+  filename?: string;
+}
+
+/**
  * WhatsApp Template Component (Meta format)
  */
 export interface WhatsAppTemplateComponent {
@@ -53,6 +72,12 @@ export interface WhatsAppTemplateComponent {
   example?: {
     header_text?: string[];
     body_text?: string[][];  // Array de arrays (variáveis por linha)
+    /**
+     * Identificador devolvido pelo upload da Meta. OBRIGATÓRIO para aprovar
+     * cabeçalho de mídia — sem ele a Meta responde 400 (code 100,
+     * subcode 2388043). Medido em 2026-08-29.
+     */
+    header_handle?: string[];
   };
 
   // Buttons (Call-to-action ou Quick Reply)
@@ -79,6 +104,13 @@ export interface WhatsAppOfficialTemplateConfig {
 
   // Components (Meta format)
   components: WhatsAppTemplateComponent[];
+
+  /**
+   * Mídia do cabeçalho usada no ENVIO. Três lugares do backend já leem este
+   * campo há tempos; até 2026-08-29 nenhum caminho conseguia gravá-lo, porque
+   * o Zod o descartava em silêncio.
+   */
+  headerMedia?: TemplateHeaderMedia;
 
   // Approval metadata
   approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';

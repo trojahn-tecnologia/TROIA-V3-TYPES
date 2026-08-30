@@ -87,6 +87,7 @@ __exportStar(require("./group-participants"), exports);
 __exportStar(require("./message-chunks"), exports);
 // Marketing modules
 __exportStar(require("./templates"), exports);
+__exportStar(require("./template-render"), exports);
 __exportStar(require("./campaigns"), exports);
 __exportStar(require("./audiences"), exports);
 // Quick Messages (canned responses for the chat composer)

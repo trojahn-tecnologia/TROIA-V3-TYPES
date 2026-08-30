@@ -88,6 +88,7 @@ export * from './message-chunks';
 
 // Marketing modules
 export * from './templates';
+export * from './template-render';
 export * from './campaigns';
 export * from './audiences';
 

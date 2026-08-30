@@ -469,6 +469,14 @@ export interface SendTemplateActionConfig {
     contactId?: string;
     /** Janela de horário comercial — fora dela o run suspende até o próximo horário válido. */
     businessHours?: WorkflowBusinessHoursConfig;
+    /**
+     * URL do arquivo do cabeçalho, no ENVIO. Aceita interpolação do fluxo
+     * (ex.: `{{variables.notaPdf.url}}`), porque no caso de uso o PDF é gerado
+     * em tempo de execução pelo node de nota fiscal.
+     */
+    headerMediaUrl?: string;
+    /** Nome do arquivo mostrado ao cliente. Também aceita interpolação. */
+    headerMediaFilename?: string;
 }
 /**
  * Create Ticket Action Configuration

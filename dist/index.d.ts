@@ -49,6 +49,7 @@ export * from './groups';
 export * from './group-participants';
 export * from './message-chunks';
 export * from './templates';
+export * from './template-render';
 export * from './campaigns';
 export * from './audiences';
 export * from './quick-messages';
