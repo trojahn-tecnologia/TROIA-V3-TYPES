@@ -166,7 +166,12 @@ export interface LeadCaptureInfo {
   origin?: 'qrcode' | 'erp';
 }
 
-export interface Lead {
+/**
+ * Carrega o carimbo de autoria (`createdBy` + `createdByType`) desde
+ * 2026-08-30. Os dois são opcionais: registro anterior a essa data não tem a
+ * informação, e ausente é a verdade. Ver `CreatorStamp` em `common.ts`.
+ */
+export interface Lead extends CreatorStamp {
   id: string;
   appId: string;
   companyId: string;
@@ -508,7 +513,7 @@ export interface AddLeadInterestsRequest {
 }
 
 // Import types
-import { PaginationQuery, ListResponse } from './common';
+import { CreatorStamp, ListResponse, PaginationQuery } from './common';
 
 // ============================================================================
 // KANBAN EM ESCALA (SP1 — 2026-07-16)

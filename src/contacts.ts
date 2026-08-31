@@ -39,7 +39,12 @@ export interface ContactIdentifiers {
   telegram: string[];
 }
 
-export interface Contact {
+/**
+ * Carrega o carimbo de autoria (`createdBy` + `createdByType`) desde
+ * 2026-08-30. Os dois são opcionais: registro anterior a essa data não tem a
+ * informação, e ausente é a verdade. Ver `CreatorStamp` em `common.ts`.
+ */
+export interface Contact extends CreatorStamp {
   id: string;
   appId: string;
   companyId: string;
@@ -124,4 +129,4 @@ export interface ContactQuery extends PaginationQuery {
 export interface ContactListResponse extends ListResponse<ContactResponse> {}
 
 // Import types
-import { PaginationQuery, ListResponse } from './common';
+import { CreatorStamp, ListResponse, PaginationQuery } from './common';

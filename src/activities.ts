@@ -1,5 +1,7 @@
 // Activity Types - Sistema de atividades e logs do sistema
 
+import type { ActorType } from './common';
+
 export interface Activity {
   id: string;
   appId: string;
@@ -110,14 +112,11 @@ export type EntityType =
   | 'report'
   | 'checklist';
 
-export type ActorType =
-  | 'user'      // Human user
-  | 'system'    // System action
-  | 'bot'       // Bot action
-  | 'webhook'   // Webhook triggered
-  | 'cron'      // Scheduled task
-  | 'api'       // API call
-  | 'integration'; // External integration
+// `ActorType` mudou de casa em 2026-08-30 (foi para `common.ts`, ao lado de
+// `Auditable`) porque deixou de ser só de Atividades — o carimbo de autoria
+// das entidades usa o mesmo vocabulário. Re-exportado para não quebrar
+// importadores.
+export type { ActorType };
 
 export interface RelatedEntity {
   id: string;

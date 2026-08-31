@@ -1,3 +1,4 @@
+import type { ActorType } from './common';
 export interface Activity {
     id: string;
     appId: string;
@@ -44,7 +45,7 @@ export interface ActivityAttachment {
 export type ActivityType = 'creation' | 'modification' | 'deletion' | 'assignment' | 'status_change' | 'communication' | 'interaction' | 'system' | 'integration' | 'workflow';
 export type ActivityCategory = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'assignment' | 'payment' | 'integration' | 'system' | 'workflow' | 'report' | 'checklist';
 export type EntityType = 'contact' | 'customer' | 'lead' | 'ticket' | 'conversation' | 'message' | 'user' | 'team' | 'assignment' | 'plan' | 'integration' | 'workflow' | 'report' | 'checklist';
-export type ActorType = 'user' | 'system' | 'bot' | 'webhook' | 'cron' | 'api' | 'integration';
+export type { ActorType };
 export interface RelatedEntity {
     id: string;
     type: EntityType;

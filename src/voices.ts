@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 
 // ============================================================================
 // VOICE STATUS
@@ -22,6 +23,11 @@ export interface Voice {
   audioSampleUrl?: string;
   status: VoiceStatus;
   createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -43,6 +49,11 @@ export interface VoiceResponse {
   audioSampleUrl?: string;
   status: VoiceStatus;
   createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;

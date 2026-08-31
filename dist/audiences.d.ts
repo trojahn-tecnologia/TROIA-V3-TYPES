@@ -1,4 +1,5 @@
 import type { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 export type AudienceIdentifierType = 'phone' | 'email';
 export type AudienceProcessingStatus = 'idle' | 'processing' | 'failed';
 export type AudienceEntrySource = 'import' | 'manual';
@@ -33,6 +34,11 @@ export interface Audience {
     processingStatus: AudienceProcessingStatus;
     lastImport?: AudienceImportReport;
     createdBy: ObjectId;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -46,6 +52,11 @@ export interface AudienceResponse {
     processingStatus: AudienceProcessingStatus;
     lastImport?: AudienceImportReportResponse;
     createdBy: string;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
     createdAt: string;
     updatedAt: string;
 }

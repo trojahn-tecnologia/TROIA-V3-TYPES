@@ -9,7 +9,7 @@
  * - Relationship: databases ↔ databases-documents via databaseId
  * - Multi-opportunity business model: Items can have multiple simultaneous business opportunities
  */
-import { PaginationQuery, ListResponse } from './common';
+import { ActorType, PaginationQuery, ListResponse } from './common';
 export declare enum BusinessOpportunityType {
     SALE = "sale",
     RENT = "rent",
@@ -637,6 +637,11 @@ export interface DatabaseDocument<T = Record<string, unknown>> {
     /** Document metadata */
     metadata?: {
         createdBy?: string;
+        /**
+         * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+         * Ausente = documento anterior a 2026-08-30.
+         */
+        createdByType?: ActorType;
         updatedBy?: string;
         source?: 'manual' | 'integration' | 'import' | 'api';
         lastSyncedAt?: Date;

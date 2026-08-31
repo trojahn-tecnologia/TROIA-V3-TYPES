@@ -1,4 +1,5 @@
 import type { FormField, FormAnswer, FormType, ChecklistSettings } from './forms';
+import type { ActorType } from './common';
 import type { AssignmentContext } from './assignment-context';
 export type ChecklistStatus = 'pending' | 'in_progress' | 'completed' | 'approved' | 'rejected' | 'expired';
 export type ChecklistLinkedEntityType = 'lead' | 'ticket';
@@ -38,6 +39,11 @@ export interface Checklist {
     status: ChecklistStatus;
     assigneeId: string;
     createdBy: string;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
     followerIds: string[];
     unitId?: string;
     /**

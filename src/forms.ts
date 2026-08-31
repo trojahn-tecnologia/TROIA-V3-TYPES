@@ -1,4 +1,4 @@
-import { TenantAwareDocument, PaginationQuery, ListResponse } from './common';
+import { ActorType, ListResponse, PaginationQuery, TenantAwareDocument } from './common';
 
 // ============================================================
 // FORM FIELD TYPES
@@ -197,7 +197,20 @@ export interface Form extends TenantAwareDocument {
   expiresAt?: Date;
   responsesCount: number;
   viewsCount: number;
-  createdBy: string;
+  /**
+   * Quem criou o formulário. OPCIONAL desde 2026-08-30.
+   *
+   * Era declarado obrigatório e NENHUM caminho gravava; o mapper usava
+   * `toIdRequired`, que devolve `''` quando o campo não existe — a API
+   * respondia string vazia como se fosse um id. Mentir no tipo foi o que
+   * produziu o `""`.
+   */
+  createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
 }
 
 /**

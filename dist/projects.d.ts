@@ -1,4 +1,4 @@
-import { AppAwareDocument, PaginationQuery, GenericQueryOptions, ListResponse } from './common';
+import { ActorType, AppAwareDocument, GenericQueryOptions, ListResponse, PaginationQuery } from './common';
 export type ProjectStatus = 'active' | 'completed' | 'archived';
 /** Modo de enforcement de uma dependência Finish-to-Start (decisão D2) */
 export type DependencyMode = 'inform' | 'warn' | 'block';
@@ -43,6 +43,11 @@ export interface Project extends AppAwareDocument {
     internalNotifyConfig: ProjectInternalNotifyConfig;
     attachments?: ProjectAttachment[];
     createdBy?: string;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
 }
 /** Arquivo anexado ao projeto (aba "Arquivos" do workspace). */
 export interface ProjectAttachment {

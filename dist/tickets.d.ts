@@ -9,7 +9,12 @@ import type { SlaState } from './sla';
  * Ordem semântica (menor → maior urgência): low < medium < high < urgent.
  */
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
-export interface Ticket {
+/**
+ * Carrega o carimbo de autoria (`createdBy` + `createdByType`) desde
+ * 2026-08-30. Os dois são opcionais: registro anterior a essa data não tem a
+ * informação, e ausente é a verdade. Ver `CreatorStamp` em `common.ts`.
+ */
+export interface Ticket extends CreatorStamp {
     id: string;
     appId: string;
     companyId: string;
@@ -249,7 +254,7 @@ export interface TicketExportQuery {
     resolvedTo?: string;
     search?: string;
 }
-import { PaginationQuery, ListResponse } from './common';
+import { CreatorStamp, ListResponse, PaginationQuery } from './common';
 /** Projeção enxuta do ticket para o card do kanban (SP3) — só o que o TicketCard renderiza. */
 export interface TicketKanbanCard {
     id: string;

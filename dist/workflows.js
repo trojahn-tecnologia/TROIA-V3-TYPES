@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.readWaitCancelEvents = readWaitCancelEvents;
 // ============================================================
 // WORKFLOW TYPES
 // ============================================================
@@ -129,6 +130,51 @@ exports.BUSINESS_HOURS_NODE_TYPES = [
     'ai_agent',
     'ai_agent_inline',
 ];
+/**
+ * Quem originou um evento observado pelo node "Aguardar".
+ *
+ * - `user`       — atendente humano
+ * - `ai`         — agente de IA
+ * - `automation` — workflow / automação do sistema
+ * - `api`        — integração externa via API pública
+ *
+ * `api` já existe no vocabulário porque o catálogo foi desenhado para crescer
+ * (ex.: "Lead criado → por API"), mas HOJE nenhum evento do
+ * `WAIT_CANCEL_EVENT_ACTORS` o oferece: mensagem é o único evento com a origem
+ * gravada no dado (`ConversationMessage.senderType`), e lá não existe API.
+ * Ligar um evento novo exige antes gravar o autor na entidade — lead e contato
+ * não guardam quem os criou.
+ */
+exports.WORKFLOW_EVENT_ACTORS = ['user', 'ai', 'automation', 'api'];
+/**
+ * FONTE ÚNICA dos eventos aceitos como cancelamento do node "Aguardar" e das
+ * origens que cada um distingue. Lista vazia = o evento não distingue origem
+ * (a UI não mostra o sub-select e o motor ignora `actors`).
+ *
+ * A UI (`WaitForConfig`) e o motor (`WaitForStepFactory`) leem daqui — evento
+ * novo com origens é uma linha neste objeto, nos dois lados de uma vez.
+ */
+exports.WAIT_CANCEL_EVENT_ACTORS = {
+    'message.received': [], // quem manda é sempre o contato
+    'message.sent': ['user', 'ai', 'automation'],
+    'lead.updated': [],
+    'contact.updated': [],
+};
+/**
+ * Lê a lista de eventos de cancelamento de um `cancelEvent`, aceitando o
+ * formato novo (`events`) e o legado (`eventType`). Ponto ÚNICO da compat —
+ * motor, validação e UI passam por aqui em vez de cada um reimplementar o
+ * fallback e divergir.
+ */
+function readWaitCancelEvents(cancelEvent) {
+    if (!cancelEvent)
+        return [];
+    if (Array.isArray(cancelEvent.events)) {
+        return cancelEvent.events.filter((event) => typeof event?.type === 'string' && event.type.trim().length > 0);
+    }
+    const legado = cancelEvent.eventType;
+    return typeof legado === 'string' && legado.trim().length > 0 ? [{ type: legado }] : [];
+}
 /** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
 exports.WAIT_UNTIL_MAX_DURATION_MS = 72 * 60 * 60 * 1000;
 /**

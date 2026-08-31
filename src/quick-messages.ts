@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 import type {
   TextContent,
   ImageContent,
@@ -61,6 +62,11 @@ export interface QuickMessage {
 
   // Audit
   createdBy: ObjectId; // userId
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -76,6 +82,11 @@ export interface QuickMessageResponse
   companyId: string;
   userId?: string;
   createdBy: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
 }
 
 /**

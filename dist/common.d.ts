@@ -22,6 +22,41 @@ export interface Auditable {
     createdAt: Date;
     updatedAt?: Date;
 }
+/**
+ * Quem realizou uma ação no sistema.
+ *
+ * Nasceu em `activities.ts` e foi promovido para cá em 2026-08-30, quando o
+ * carimbo de autoria (`CreatorStamp`) passou a valer para várias entidades.
+ * `activities.ts` re-exporta para não quebrar quem já importava de lá.
+ *
+ * ⚠️ Nem todo valor é escrito. `cron` e `integration` estão declarados desde a
+ * versão original e NENHUM caminho os grava. A lista do que é realmente
+ * gravado é `WRITTEN_ACTOR_TYPES`, e existe um teste que trava a diferença —
+ * a doença "declarado mas nunca escrito" já custou caro aqui.
+ */
+export type ActorType = 'user' | 'mcp' | 'api' | 'bot' | 'automation' | 'webhook' | 'cron' | 'integration' | 'system';
+/** Os valores que algum caminho REALMENTE grava hoje. Travado por teste. */
+export declare const WRITTEN_ACTOR_TYPES: readonly ActorType[];
+/**
+ * Carimbo de autoria de um registro.
+ *
+ * `createdBy` guarda o id do ATOR, seja ele quem for — pessoa, agente,
+ * workflow ou chave de API —, e `createdByType` diz de que coleção esse id é.
+ * Mesmo desenho que `ConversationMessage` já usa com `senderId`/`senderType`
+ * (quando é IA, o `senderId` é o id do agente).
+ *
+ * ⚠️ NUNCA fazer `$lookup` de `createdBy` contra `users` sem antes filtrar
+ * `createdByType` em `'user' | 'mcp' | 'api'`. Nos demais tipos o id é de
+ * outra coleção e o join volta vazio em silêncio.
+ *
+ * Os dois são OPCIONAIS de propósito: registro anterior a 2026-08-30 não tem
+ * a informação, e ausente é a verdade. Carimbar `system` no passado seria
+ * inventar um fato.
+ */
+export interface CreatorStamp {
+    createdByType?: ActorType;
+    createdBy?: string;
+}
 export interface Address {
     street: string;
     number: string;

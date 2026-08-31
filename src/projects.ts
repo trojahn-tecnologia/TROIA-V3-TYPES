@@ -1,4 +1,4 @@
-import { AppAwareDocument, PaginationQuery, GenericQueryOptions, ListResponse } from './common';
+import { ActorType, AppAwareDocument, GenericQueryOptions, ListResponse, PaginationQuery } from './common';
 
 // ============================================================================
 // PROJECTS — Gestão de projetos (Gantt de tickets do helpdesk)
@@ -56,6 +56,11 @@ export interface Project extends AppAwareDocument {
   internalNotifyConfig: ProjectInternalNotifyConfig;
   attachments?: ProjectAttachment[]; // arquivos do projeto (aba "Arquivos")
   createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
 }
 
 /** Arquivo anexado ao projeto (aba "Arquivos" do workspace). */

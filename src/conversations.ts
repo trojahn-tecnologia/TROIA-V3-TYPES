@@ -94,7 +94,12 @@ export interface ConversationSlaThresholdsResponse {
   source: 'policy' | 'fallback';
 }
 
-export interface Conversation {
+/**
+ * Carrega o carimbo de autoria (`createdBy` + `createdByType`) desde
+ * 2026-08-30. Os dois são opcionais: registro anterior a essa data não tem a
+ * informação, e ausente é a verdade. Ver `CreatorStamp` em `common.ts`.
+ */
+export interface Conversation extends CreatorStamp {
   id: string;
   appId: string;
   companyId: string;
@@ -651,6 +656,6 @@ export interface ConversationKanbanColumnQuery extends ConversationKanbanQuery {
 }
 
 // Import types
-import { PaginationQuery, ListResponse } from './common';
+import { CreatorStamp, ListResponse, PaginationQuery } from './common';
 import type { KanbanSortMode, ConversationKanbanLaneId } from './kanban';
 import type { SlaClockKey, SlaClockState, SlaState } from './sla';

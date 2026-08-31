@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 
 /**
  * Template Status Lifecycle
@@ -273,7 +274,16 @@ export interface Template {
   lastUsedAt?: Date;
 
   // Audit
-  createdBy: ObjectId;       // userId
+  /**
+   * Quem criou o template. OPCIONAL desde 2026-08-30 — era declarado
+   * obrigatório e NENHUM caminho gravava (o mapper devolvia `''`).
+   */
+  createdBy?: ObjectId;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -288,7 +298,12 @@ export interface TemplateResponse extends Omit<Template, '_id' | 'appId' | 'comp
   companyId: string;
   providerId: string;
   channelId: string;
-  createdBy: string;
+  createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
 }
 
 /**

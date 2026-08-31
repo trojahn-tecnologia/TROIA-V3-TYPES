@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 
 import type { DatabaseType } from './databases';
 
@@ -169,6 +170,40 @@ export interface FilterCondition {
   operator: WorkflowConditionOperator;
   /** Value to compare against */
   value: string | number | boolean | null | string[] | number[];
+}
+
+/**
+ * Bloco `system` do contexto de execução — injetado pelo `WorkflowRunner` em
+ * TODA execução, independente do gatilho, e RECALCULADO quando o fluxo acorda
+ * de uma espera (senão um workflow suspenso por 12h decidiria com a hora
+ * antiga).
+ *
+ * Serve para condições de tempo sem node dedicado: o `control_if` já resolve
+ * qualquer caminho do contexto, então "fora do horário comercial" é
+ * `{{system.isBusinessHours}}` igual a `false`.
+ *
+ * A janela vem de `company.businessCalendar` — o MESMO calendário do motor de
+ * SLA, com feriados nacionais/próprios e os intervalos do dia (o padrão
+ * semeado é 08:00–12:00 e 13:00–18:00, então o almoço conta como FORA).
+ * Empresa sem calendário configurado, ou com ele desligado, responde
+ * `isBusinessHours: true` — fail-open, para não mudar o comportamento de quem
+ * nunca configurou nada.
+ */
+export interface WorkflowSystemContext {
+  /** Estamos dentro de um intervalo de atendimento agora? */
+  isBusinessHours: boolean;
+  /** Hoje é feriado no calendário da empresa? */
+  isHoliday: boolean;
+  /** Nome do feriado, quando `isHoliday`. */
+  holidayName?: string;
+  /** Dia da semana no fuso da empresa (0=Domingo … 6=Sábado). */
+  weekday: number;
+  /** Hora local no fuso da empresa, 'HH:mm'. */
+  time: string;
+  /** Data local no fuso da empresa, 'YYYY-MM-DD'. */
+  date: string;
+  /** Fuso usado no cálculo (IANA). */
+  timezone: string;
 }
 
 /**
@@ -559,9 +594,17 @@ export interface CreateLeadActionConfig {
   step?: string;
   description?: string;
   value?: number;
-  /** Assignment mode — 'auto' uses the funnel's distribution, 'user'/'team' are direct */
-  assignTo?: 'auto' | 'user' | 'team';
-  /** Target user when assignTo === 'user' */
+  /**
+   * Assignment mode — 'auto' uses the funnel's distribution, 'user'/'team' are direct.
+   *
+   * - `variable`: o responsável vem de uma `{{variável}}` do fluxo, gravada no
+   *   MESMO campo `userId` — ex.: `{{event.userId}}` para atribuir ao criador do
+   *   evento de agenda que disparou o workflow. Mesmo padrão do `contactSource`
+   *   acima. O motor trata igual a `'user'`: a única diferença é qual controle
+   *   a UI mostra (dropdown de usuários vs. campo de variável).
+   */
+  assignTo?: 'auto' | 'user' | 'team' | 'variable';
+  /** Target user when assignTo === 'user' | 'variable' (aceita {{variável}}) */
   userId?: string;
   /** Target team when assignTo === 'team' */
   teamId?: string;
@@ -868,6 +911,54 @@ export type WaitUntilConfig =
   | { mode: 'business_hours'; businessHours: WorkflowBusinessHoursConfig };
 
 /**
+ * Quem originou um evento observado pelo node "Aguardar".
+ *
+ * - `user`       — atendente humano
+ * - `ai`         — agente de IA
+ * - `automation` — workflow / automação do sistema
+ * - `api`        — integração externa via API pública
+ *
+ * `api` já existe no vocabulário porque o catálogo foi desenhado para crescer
+ * (ex.: "Lead criado → por API"), mas HOJE nenhum evento do
+ * `WAIT_CANCEL_EVENT_ACTORS` o oferece: mensagem é o único evento com a origem
+ * gravada no dado (`ConversationMessage.senderType`), e lá não existe API.
+ * Ligar um evento novo exige antes gravar o autor na entidade — lead e contato
+ * não guardam quem os criou.
+ */
+export const WORKFLOW_EVENT_ACTORS = ['user', 'ai', 'automation', 'api'] as const;
+
+export type WorkflowEventActor = typeof WORKFLOW_EVENT_ACTORS[number];
+
+/**
+ * Um evento que cancela a espera do node "Aguardar", com o "quem fez" opcional.
+ */
+export interface WaitCancelEvent {
+  /** Tipo do evento — chave de `WAIT_CANCEL_EVENT_ACTORS`. */
+  type: string;
+  /**
+   * Origens aceitas. Vazio/ausente = QUALQUER origem.
+   * Só tem efeito nos eventos que o catálogo declara com origens; nos demais
+   * o motor ignora.
+   */
+  actors?: WorkflowEventActor[];
+}
+
+/**
+ * FONTE ÚNICA dos eventos aceitos como cancelamento do node "Aguardar" e das
+ * origens que cada um distingue. Lista vazia = o evento não distingue origem
+ * (a UI não mostra o sub-select e o motor ignora `actors`).
+ *
+ * A UI (`WaitForConfig`) e o motor (`WaitForStepFactory`) leem daqui — evento
+ * novo com origens é uma linha neste objeto, nos dois lados de uma vez.
+ */
+export const WAIT_CANCEL_EVENT_ACTORS: Readonly<Record<string, readonly WorkflowEventActor[]>> = {
+  'message.received': [],                              // quem manda é sempre o contato
+  'message.sent': ['user', 'ai', 'automation'],
+  'lead.updated': [],
+  'contact.updated': [],
+};
+
+/**
  * Wait For Control Configuration (control_wait_for)
  * Espera até `until` OU até o evento de cancelamento — duas saídas: 'timeout' | 'event'.
  */
@@ -878,11 +969,43 @@ export interface WaitForControlConfig {
   until?: WaitUntilConfig;
   /** Cancelamento opcional — vale para os TRÊS modos de `until`. */
   cancelEvent?: {
-    eventType: string;      // ex: 'message.received'
+    /**
+     * Lista canônica de eventos que cancelam (é um OU: basta um acontecer).
+     * Ausente/vazia sem `eventType` legado = sem cancelamento.
+     */
+    events?: WaitCancelEvent[];
+    /**
+     * @deprecated Formato antigo (um evento só), gravado pela UI até 2026-08-30.
+     * Continua sendo LIDO como `[{ type: eventType }]` — workflow já salvo não
+     * muda de comportamento. A UI nova grava `events`.
+     */
+    eventType?: string;
     entityType?: string;    // informativo — o significado do matchValue é fixo por eventType
     matchField?: string;    // informativo (não usado pelo motor)
     matchValue?: string;    // template, ex: '{{conversation.id}}'
   };
+}
+
+/**
+ * Lê a lista de eventos de cancelamento de um `cancelEvent`, aceitando o
+ * formato novo (`events`) e o legado (`eventType`). Ponto ÚNICO da compat —
+ * motor, validação e UI passam por aqui em vez de cada um reimplementar o
+ * fallback e divergir.
+ */
+export function readWaitCancelEvents(
+  cancelEvent: WaitForControlConfig['cancelEvent'],
+): WaitCancelEvent[] {
+  if (!cancelEvent) return [];
+
+  if (Array.isArray(cancelEvent.events)) {
+    return cancelEvent.events.filter(
+      (event): event is WaitCancelEvent =>
+        typeof event?.type === 'string' && event.type.trim().length > 0,
+    );
+  }
+
+  const legado = cancelEvent.eventType;
+  return typeof legado === 'string' && legado.trim().length > 0 ? [{ type: legado }] : [];
 }
 
 /** Teto de espera do modo `duration` (72h). Aplicado no save e em runtime. */
@@ -1198,6 +1321,11 @@ export interface WorkflowFolder {
   appId: ObjectId;
   companyId: ObjectId;
   createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -1292,6 +1420,11 @@ export interface Workflow {
   appId: ObjectId;
   companyId: ObjectId;
   createdBy?: string;
+  /**
+   * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+   * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+   */
+  createdByType?: ActorType;
   updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;

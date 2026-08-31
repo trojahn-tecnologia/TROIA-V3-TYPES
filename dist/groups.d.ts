@@ -1,4 +1,4 @@
-import { PaginationQuery, ListResponse } from './common';
+import { ActorType, PaginationQuery, ListResponse } from './common';
 export interface Group {
     id: string;
     appId: string;
@@ -8,7 +8,19 @@ export interface Group {
     description?: string;
     providerGroupId?: string;
     channelId: string;
-    createdBy: string;
+    /**
+     * Quem criou o grupo. OPCIONAL desde 2026-08-30.
+     *
+     * Era obrigatório e valia `'system'` para TODO grupo: o `preprocessCreate`
+     * do repository montava um objeto novo e cravava a palavra, descartando o id
+     * que o service passava. As três checagens "admin OU o criador" comparavam
+     * um id com a palavra `'system'` e nunca abriam pelo lado do criador.
+     *
+     * Grupo anterior a essa data não tem a informação — e ausente é a verdade.
+     * Ver `CreatorStamp` em `common.ts`.
+     */
+    createdBy?: string;
+    createdByType?: ActorType;
     participantsCount: number;
     messagesCount: number;
     settings?: {

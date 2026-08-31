@@ -64,7 +64,12 @@ export interface LeadCaptureInfo {
     /** 'qrcode' (captura por QR, preenche tudo) | 'erp' (venda do ERP: unitId/teamId, e filledAt só quando o lead é criado do zero). */
     origin?: 'qrcode' | 'erp';
 }
-export interface Lead {
+/**
+ * Carrega o carimbo de autoria (`createdBy` + `createdByType`) desde
+ * 2026-08-30. Os dois são opcionais: registro anterior a essa data não tem a
+ * informação, e ausente é a verdade. Ver `CreatorStamp` em `common.ts`.
+ */
+export interface Lead extends CreatorStamp {
     id: string;
     appId: string;
     companyId: string;
@@ -350,7 +355,7 @@ export interface LeadInterest {
 export interface AddLeadInterestsRequest {
     documentIds: string[];
 }
-import { PaginationQuery, ListResponse } from './common';
+import { CreatorStamp, ListResponse, PaginationQuery } from './common';
 export interface LeadKanbanCardContact {
     id: string;
     name?: string;

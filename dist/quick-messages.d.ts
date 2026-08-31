@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import type { ActorType } from './common';
 import type { TextContent, ImageContent, VideoContent, AudioContent, DocumentContent } from './conversation-messages';
 /**
  * Quick Messages ("Mensagens Rápidas") — canned responses reusable in the chat.
@@ -36,6 +37,11 @@ export interface QuickMessage {
     usageCount: number;
     lastUsedAt?: Date;
     createdBy: ObjectId;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -49,6 +55,11 @@ export interface QuickMessageResponse extends Omit<QuickMessage, '_id' | 'appId'
     companyId: string;
     userId?: string;
     createdBy: string;
+    /**
+     * De que coleção é o id em `createdBy`. Ver `CreatorStamp` em `common.ts`.
+     * Ausente = registro anterior a 2026-08-30 (a informação não existia).
+     */
+    createdByType?: ActorType;
 }
 /**
  * Create Quick Message Request
