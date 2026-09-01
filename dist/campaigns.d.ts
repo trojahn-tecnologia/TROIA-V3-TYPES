@@ -149,6 +149,10 @@ export interface CampaignStats {
     messagesRead: number;
     startedAt?: string;
     completedAt?: string;
+    /** Quando a PRIMEIRA mensagem da campanha está agendada para sair. ISO string. */
+    firstDispatchAt?: string;
+    /** Quando a ÚLTIMA mensagem está agendada, no ritmo atual do canal. ISO string. */
+    estimatedCompletionAt?: string;
 }
 /**
  * Campaign Response - Response type sem _id

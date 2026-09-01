@@ -895,18 +895,46 @@ export interface LoopControlConfig {
 }
 
 /**
+ * Unidade de tempo das esperas por duração.
+ *
+ * `seconds` existe por causa do disparo em lote: o coletor do ERP entrega N vendas
+ * a cada 5 minutos e todos os workflows executam juntos. Espalhar em passos de 1
+ * minuto ainda agrupa — a menor unidade útil é o segundo.
+ */
+export type WaitDurationUnit = 'seconds' | 'minutes' | 'hours' | 'days';
+
+/**
  * Até quando o node "Aguardar" espera. União discriminada por `mode` —
- * exatamente um dos três formatos.
+ * exatamente um dos quatro formatos.
  *
  * - `duration`: espera um tempo corrido. Teto de 72h (rejeitado no save,
  *   saturado em runtime).
+ * - `random_duration`: espera um tempo sorteado entre `min` e `max`. Mesmo teto de 72h,
+ *   aplicado ao `max`. Sorteia uma vez, na primeira execução.
  * - `time`: espera até o próximo HH:mm, no fuso resolvido. `weekdays` (0=Dom..6=Sáb)
  *   restringe os dias aceitos; ausente = qualquer dia.
  * - `business_hours`: espera até a próxima abertura da janela. Se já estiver
  *   DENTRO da janela, o node não suspende — segue na hora.
  */
 export type WaitUntilConfig =
-  | { mode: 'duration'; duration: number; unit: 'minutes' | 'hours' | 'days' }
+  | { mode: 'duration'; duration: number; unit: WaitDurationUnit }
+  | {
+      /**
+       * Espera um tempo SORTEADO entre `min` e `max`, inclusive.
+       *
+       * Existe para quebrar rajada: workflows disparados no mesmo instante saem
+       * espalhados no tempo, em vez de baterem juntos no provedor (o que já causou
+       * bloqueio de canal de WhatsApp em 30/08/2026).
+       *
+       * O sorteio acontece UMA vez, na primeira execução do nó, e o horário de volta
+       * é gravado no snapshot. A retomada obedece ao gravado — se sorteasse de novo,
+       * a espera poderia nunca terminar.
+       */
+      mode: 'random_duration';
+      min: number;
+      max: number;
+      unit: WaitDurationUnit;
+    }
   | { mode: 'time'; time: string; weekdays?: number[]; timezone?: string }
   | { mode: 'business_hours'; businessHours: WorkflowBusinessHoursConfig };
 
@@ -1507,6 +1535,15 @@ export interface WorkflowExecution {
    * errado de um contato não pode desligar o fluxo de vendas.
    */
   partialFailure?: boolean;
+  /**
+   * Falha causada pelo ESTADO DO CLIENTE, não por defeito nosso (2026-09-01):
+   * janela de 24h fechada, número sem WhatsApp, contato em experimento da Meta,
+   * limite de marketing por usuário. O `status` continua `'failed'` — o
+   * histórico não mente —, mas execuções assim ficam FORA do contador de pausa
+   * automática (`getLastNExecutionStatuses`): cliente que não respondeu não
+   * pode desligar o fluxo. Mesmo molde de `partialFailure`.
+   */
+  customerStateFailure?: boolean;
   appId: ObjectId;
   companyId: ObjectId;
   /**

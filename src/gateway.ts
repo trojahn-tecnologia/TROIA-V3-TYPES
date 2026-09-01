@@ -96,7 +96,7 @@ export interface MessageGroup {
  */
 export interface GatewayWebhookPayload {
   instanceKey: string;
-  event: 'message' | 'status' | 'connect' | 'disconnect' | 'error' | 'account.updated';
+  event: 'message' | 'status' | 'connect' | 'disconnect' | 'error' | 'account.updated' | 'account.restricted';
   data: GatewayEventData;
 }
 
@@ -106,7 +106,30 @@ export interface GatewayWebhookPayload {
  *
  * @since v2.2.0 - Updated with structured sender and group support
  */
+/**
+ * Trava de alcance ("reachout timelock") aplicada pelo WhatsApp À CONTA.
+ *
+ * Enquanto vale, abrir conversa NOVA a partir de um aparelho VINCULADO é
+ * recusado com o erro 463; responder conversa existente continua funcionando, e
+ * o celular do dono não é afetado — por isso o defeito parece do sistema.
+ *
+ * Publicado pelos dois motores com o mesmo formato: worker Go (whatsmeow,
+ * evento NotifyAccountReachoutTimelock) e worker Baileys (nó cru
+ * `CB:notification,type:mex`).
+ */
+export interface GatewayAccountRestriction {
+  /** `enforcement_type` do servidor, verbatim — traduzir esconderia tipo novo. */
+  type: string;
+  /** `false` é a LIBERAÇÃO: o mesmo aviso informa quando a trava sai. */
+  active: boolean;
+  /** ISO 8601 UTC; AUSENTE quando o servidor não declarou prazo. */
+  endsAt?: string;
+}
+
 export interface GatewayEventData {
+  /** Presente em `account.restricted`. */
+  restriction?: GatewayAccountRestriction;
+
   // Message identification
   messageId?: string;  // MongoDB message ID
   providerMessageId?: string;  // ✅ WhatsApp provider message ID (for correlation)

@@ -172,5 +172,11 @@ export interface SendTemplateResult {
   success: boolean;
   providerMessageId?: string;
   error?: string;
+  /**
+   * Código numérico do erro do provider (ex.: 131047 da Meta), quando houver.
+   * O texto de `error` é para humano; a decisão de máquina lê ESTE campo —
+   * classificar por substring de mensagem é frágil (NUNCA #103).
+   */
+  errorCode?: number;
 }
 
