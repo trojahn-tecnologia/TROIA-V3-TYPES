@@ -157,6 +157,8 @@ export interface Conversation extends CreatorStamp {
      * for alterado, o cliente aparece de forma intermitente conforme a rota.
      */
     customer?: { id: string; name: string };
+    /** Contato bloqueado nesta empresa (2026-09-01). Ver contacts.ts. */
+    blocked?: boolean;
   };
 
   // ✅ Populated via aggregation (not stored in database)
@@ -627,7 +629,8 @@ export interface ConversationKanbanCard {
   unreadCount?: number;
   createdAt: string;
   updatedAt: string;
-  contact?: { id: string; name: string; picture?: string; phone?: string };
+  /** `blocked` presente e `true` só quando o contato está bloqueado (2026-09-01). Ver contacts.ts. */
+  contact?: { id: string; name: string; picture?: string; phone?: string; blocked?: boolean };
   assignee?: { id: string; name: string; picture?: string };
   /** Derivado da hidratação channel→integration (mesma que `enrichConversations` já faz). */
   providerType?: string;

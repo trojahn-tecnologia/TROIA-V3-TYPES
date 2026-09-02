@@ -82,9 +82,7 @@ export type ValidModuleId =
   | 'dashboards-commercial'
   | 'dashboards-support'
   | 'dashboards-marketing'
-  | 'dashboards-analytics'
-
-  | 'quality';
+  | 'dashboards-analytics';
 
 export interface Module extends AppAwareDocument {
   name: string; // "users", "crm", "teams", "chat", "reports"

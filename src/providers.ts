@@ -342,6 +342,13 @@ export enum ProviderId {
   AI_GOOGLE = 'ai-google',
   AI_MISTRAL = 'ai-mistral',
   AI_DEEPSEEK = 'ai-deepseek',
+  /**
+   * Z.ai (GLM) — hoje sem provider direto registrado no backend (sem entry
+   * no ProviderRegistry, de propósito): os modelos GLM chegam SÓ pelo
+   * AI_VERCEL_GATEWAY. O id existe para o `AIProviderType 'zai'` ter um
+   * ProviderId no mapa do ModelResolverService, como mistral/xai.
+   */
+  AI_ZAI = 'ai-zai',
   AI_ELEVENLABS = 'ai-elevenlabs',
   AI_COHERE = 'ai-cohere',
   /**
@@ -432,6 +439,7 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   [ProviderId.AI_GOOGLE]: 'ai',
   [ProviderId.AI_MISTRAL]: 'ai',
   [ProviderId.AI_DEEPSEEK]: 'ai',
+  [ProviderId.AI_ZAI]: 'ai',
   [ProviderId.AI_ELEVENLABS]: 'ai',
   [ProviderId.AI_COHERE]: 'ai',
   [ProviderId.AI_VERCEL_GATEWAY]: 'ai',
@@ -492,6 +500,9 @@ export const MESSAGING_WINDOW_WARNING_HOURS = 2;
  * constante quebra o frontend em silêncio.
  */
 export const MESSAGING_WINDOW_CLOSED_CODE = 'MessagingWindowClosedError';
+
+/** `code` devolvido pela API quando o envio é recusado por contato bloqueado. */
+export const CONTACT_BLOCKED_CODE = 'ContactBlockedError';
 
 /**
  * `ConversationMessage.failedCode` — WhatsApp Cloud API "Re-engagement message"

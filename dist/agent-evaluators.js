@@ -33,9 +33,6 @@ exports.EVALUATOR_LABELS = {
     latencyBudget: 'Tempo de resposta',
     transparency: 'Honestidade',
     presentTense: 'Fala no presente',
-    precision: 'Precisão factual',
-    resolution: 'Resolução do problema',
-    clarityEmpathy: 'Clareza e empatia',
 };
 exports.EVALUATOR_DESCRIPTIONS = {
     faithfulness: 'Quando o agente afirma um preço, prazo ou característica, ele está se baseando em informação real (base de conhecimento) ou inventou? Quanto maior, mais confiável.',
@@ -47,15 +44,11 @@ exports.EVALUATOR_DESCRIPTIONS = {
     latencyBudget: 'Mede o tempo total de resposta comparado ao tempo aceitável (SLA padrão: 10s). 100% quando responde abaixo do SLA, cai linearmente até 0% quando demora o dobro. A latência inclui o tempo do modelo de IA + chamadas de ferramentas (busca, RAG, etc.).',
     transparency: 'Quando o agente não sabe a resposta, ele admite (e oferece transferir, buscar, etc.) ou inventa? Penaliza afirmar fatos sem ter base.',
     presentTense: 'O agente fala apenas no presente, sem prometer ações futuras que não pode cumprir. Frases como "vou confirmar", "só um instante", "te falo já já", "te dou retorno" são falsas — o agente só responde quando o cliente envia uma nova mensagem, então qualquer promessa de retorno futuro engana o cliente.',
-    precision: 'Em conversas reais que foram fechadas: as informações que o agente passou ao cliente estavam corretas?',
-    resolution: 'Em conversas reais que foram fechadas: o problema do cliente foi resolvido ou avançou pro destino certo (transferido, agendado, qualificado)?',
-    clarityEmpathy: 'Em conversas reais que foram fechadas: o agente foi claro nas explicações e demonstrou empatia ao longo da conversa?',
 };
 /**
  * Métricas que SEMPRE pontuam num snapshot de quality test
  * (`agent_training` trace). Tier 1 LLM em cima, Tier 2 determinístico
- * embaixo. Tier 3 (`precision`/`resolution`/`clarityEmpathy`) NÃO entra
- * aqui — só pontua em conversas reais fechadas.
+ * embaixo.
  */
 exports.QUALITY_TEST_EVALUATORS = [
     'faithfulness',
@@ -70,7 +63,7 @@ exports.QUALITY_TEST_EVALUATORS = [
 ];
 /**
  * Tier por evaluator — Tier 1 (LLM judge) tem peso 60% no health score,
- * Tier 2 (determinístico) 25%, Tier 3 (LLM em conversa fechada) 15%.
+ * Tier 2 (determinístico) 25%.
  * Renormalização aplicada quando faltam scores de algum tier.
  */
 exports.EVALUATOR_TIER = {
@@ -83,9 +76,6 @@ exports.EVALUATOR_TIER = {
     transparency: 1,
     humanization: 2,
     latencyBudget: 2,
-    precision: 3,
-    resolution: 3,
-    clarityEmpathy: 3,
 };
 /**
  * Aliases snake_case e legacy → chave canônica camelCase.
@@ -102,7 +92,6 @@ const EVALUATOR_ALIASES = {
     action_completeness: 'actionCompleteness',
     latency_budget: 'latencyBudget',
     present_tense: 'presentTense',
-    clarity_empathy: 'clarityEmpathy',
 };
 /**
  * Normaliza nome de evaluator (snake_case, alias legacy) → chave canônica

@@ -111,10 +111,6 @@ export interface Company extends FullTenantDocument {
     creditSubscription?: CreditSubscription;
     creditAlerts: CreditAlert[];
     invoices: CreditInvoice[];
-    qualityInsights?: {
-        enabled: boolean;
-        sampleRate: number;
-    };
     /** Horário de atendimento — base do cálculo de tempo útil do SLA. */
     businessCalendar?: BusinessCalendarConfig;
     /** Estreia do motor de SLA nesta empresa (decisão 10). `undefined` = motor nunca ligado. */
@@ -230,10 +226,6 @@ export interface CompanyResponse {
     creditSubscription?: CreditSubscription;
     creditAlerts: CreditAlert[];
     invoices: CreditInvoice[];
-    qualityInsights?: {
-        enabled: boolean;
-        sampleRate: number;
-    };
     /** Estreia do motor de SLA nesta empresa (decisão 10). `undefined` = motor nunca ligado. */
     sla?: CompanySlaActivation;
     createdAt: string;

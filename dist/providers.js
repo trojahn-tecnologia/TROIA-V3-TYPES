@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProviderCapability = exports.isOfficialMetaMessagingProvider = exports.META_WINDOW_CLOSED_FAILED_CODES = exports.META_WINDOW_CLOSED_CUSTOMER_ONLY_CODE = exports.WHATSAPP_WINDOW_CODE = exports.MESSAGING_WINDOW_CLOSED_CODE = exports.MESSAGING_WINDOW_WARNING_HOURS = exports.MESSAGING_WINDOW_HOURS = exports.OFFICIAL_META_MESSAGING_PROVIDERS = exports.isProviderCategory = exports.PROVIDER_CATEGORY = exports.ProviderId = void 0;
+exports.ProviderCapability = exports.isOfficialMetaMessagingProvider = exports.META_WINDOW_CLOSED_FAILED_CODES = exports.META_WINDOW_CLOSED_CUSTOMER_ONLY_CODE = exports.WHATSAPP_WINDOW_CODE = exports.CONTACT_BLOCKED_CODE = exports.MESSAGING_WINDOW_CLOSED_CODE = exports.MESSAGING_WINDOW_WARNING_HOURS = exports.MESSAGING_WINDOW_HOURS = exports.OFFICIAL_META_MESSAGING_PROVIDERS = exports.isProviderCategory = exports.PROVIDER_CATEGORY = exports.ProviderId = void 0;
 // ============================================================================
 // PROVIDER ENUM (Centralized)
 // ============================================================================
@@ -48,6 +48,13 @@ var ProviderId;
     ProviderId["AI_GOOGLE"] = "ai-google";
     ProviderId["AI_MISTRAL"] = "ai-mistral";
     ProviderId["AI_DEEPSEEK"] = "ai-deepseek";
+    /**
+     * Z.ai (GLM) — hoje sem provider direto registrado no backend (sem entry
+     * no ProviderRegistry, de propósito): os modelos GLM chegam SÓ pelo
+     * AI_VERCEL_GATEWAY. O id existe para o `AIProviderType 'zai'` ter um
+     * ProviderId no mapa do ModelResolverService, como mistral/xai.
+     */
+    ProviderId["AI_ZAI"] = "ai-zai";
     ProviderId["AI_ELEVENLABS"] = "ai-elevenlabs";
     ProviderId["AI_COHERE"] = "ai-cohere";
     /**
@@ -120,6 +127,7 @@ exports.PROVIDER_CATEGORY = {
     [ProviderId.AI_GOOGLE]: 'ai',
     [ProviderId.AI_MISTRAL]: 'ai',
     [ProviderId.AI_DEEPSEEK]: 'ai',
+    [ProviderId.AI_ZAI]: 'ai',
     [ProviderId.AI_ELEVENLABS]: 'ai',
     [ProviderId.AI_COHERE]: 'ai',
     [ProviderId.AI_VERCEL_GATEWAY]: 'ai',
@@ -170,6 +178,8 @@ exports.MESSAGING_WINDOW_WARNING_HOURS = 2;
  * constante quebra o frontend em silêncio.
  */
 exports.MESSAGING_WINDOW_CLOSED_CODE = 'MessagingWindowClosedError';
+/** `code` devolvido pela API quando o envio é recusado por contato bloqueado. */
+exports.CONTACT_BLOCKED_CODE = 'ContactBlockedError';
 /**
  * `ConversationMessage.failedCode` — WhatsApp Cloud API "Re-engagement message"
  * (código real do Graph). Fonte: developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes.

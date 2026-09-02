@@ -2,7 +2,7 @@
  * Supported AI providers for agent execution
  * These are the providers that support AI_TEXT_GENERATION and AI_CHAT_COMPLETION capabilities
  */
-export type AIProviderType = 'openai' | 'anthropic' | 'xai' | 'google' | 'mistral' | 'deepseek';
+export type AIProviderType = 'openai' | 'anthropic' | 'xai' | 'google' | 'mistral' | 'deepseek' | 'zai';
 /**
  * OpenAI Provider Config - APENAS API Key necessário
  * Modelo e dimensions são fixados dentro do OpenAIProvider

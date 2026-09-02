@@ -135,6 +135,8 @@ export interface Conversation extends CreatorStamp {
             id: string;
             name: string;
         };
+        /** Contato bloqueado nesta empresa (2026-09-01). Ver contacts.ts. */
+        blocked?: boolean;
     };
     group?: {
         id: string;
@@ -502,11 +504,13 @@ export interface ConversationKanbanCard {
     unreadCount?: number;
     createdAt: string;
     updatedAt: string;
+    /** `blocked` presente e `true` só quando o contato está bloqueado (2026-09-01). Ver contacts.ts. */
     contact?: {
         id: string;
         name: string;
         picture?: string;
         phone?: string;
+        blocked?: boolean;
     };
     assignee?: {
         id: string;

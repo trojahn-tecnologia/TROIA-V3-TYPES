@@ -17,22 +17,21 @@
  *     "Latência (vs SLA)".
  *   • Descrições explicam o QUE mede e POR QUE importa, não COMO mede.
  */
-export type EvaluatorName = 'faithfulness' | 'goalAccuracy' | 'toolUsage' | 'scopeAdherence' | 'humanization' | 'actionCompleteness' | 'latencyBudget' | 'transparency' | 'presentTense' | 'precision' | 'resolution' | 'clarityEmpathy';
+export type EvaluatorName = 'faithfulness' | 'goalAccuracy' | 'toolUsage' | 'scopeAdherence' | 'humanization' | 'actionCompleteness' | 'latencyBudget' | 'transparency' | 'presentTense';
 export declare const EVALUATOR_LABELS: Record<EvaluatorName, string>;
 export declare const EVALUATOR_DESCRIPTIONS: Record<EvaluatorName, string>;
 /**
  * Métricas que SEMPRE pontuam num snapshot de quality test
  * (`agent_training` trace). Tier 1 LLM em cima, Tier 2 determinístico
- * embaixo. Tier 3 (`precision`/`resolution`/`clarityEmpathy`) NÃO entra
- * aqui — só pontua em conversas reais fechadas.
+ * embaixo.
  */
 export declare const QUALITY_TEST_EVALUATORS: ReadonlyArray<EvaluatorName>;
 /**
  * Tier por evaluator — Tier 1 (LLM judge) tem peso 60% no health score,
- * Tier 2 (determinístico) 25%, Tier 3 (LLM em conversa fechada) 15%.
+ * Tier 2 (determinístico) 25%.
  * Renormalização aplicada quando faltam scores de algum tier.
  */
-export declare const EVALUATOR_TIER: Record<EvaluatorName, 1 | 2 | 3>;
+export declare const EVALUATOR_TIER: Record<EvaluatorName, 1 | 2>;
 /**
  * Normaliza nome de evaluator (snake_case, alias legacy) → chave canônica
  * camelCase. Retorna `null` se desconhecido — caller decide fallback.

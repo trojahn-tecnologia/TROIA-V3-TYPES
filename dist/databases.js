@@ -11,7 +11,8 @@
  * - Multi-opportunity business model: Items can have multiple simultaneous business opportunities
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DocumentItemStatus = exports.DocumentCategory = exports.ServiceItemStatus = exports.ServiceDeliveryMethod = exports.ServiceType = exports.ProductItemStatus = exports.ProductCategory = exports.VehicleItemStatus = exports.VehicleCondition = exports.TransmissionType = exports.FuelType = exports.VehicleType = exports.PropertyItemStatus = exports.PropertyType = exports.DatabaseStatus = exports.DatabaseType = exports.OpportunityStatus = exports.BusinessOpportunityType = void 0;
+exports.DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS = exports.DocumentItemStatus = exports.DocumentCategory = exports.ServiceItemStatus = exports.ServiceDeliveryMethod = exports.ServiceType = exports.ProductItemStatus = exports.ProductCategory = exports.VehicleItemStatus = exports.VehicleCondition = exports.TransmissionType = exports.FuelType = exports.VehicleType = exports.PropertyItemStatus = exports.PropertyType = exports.DatabaseStatus = exports.DatabaseType = exports.OpportunityStatus = exports.BusinessOpportunityType = void 0;
+exports.isDocumentIntegrationLinked = isDocumentIntegrationLinked;
 // ============================================================================
 // BUSINESS OPPORTUNITY TYPES (Core Reusable Types)
 // ============================================================================
@@ -200,3 +201,37 @@ var DocumentItemStatus;
     DocumentItemStatus["DRAFT"] = "draft";
     DocumentItemStatus["ARCHIVED"] = "archived";
 })(DocumentItemStatus || (exports.DocumentItemStatus = DocumentItemStatus = {}));
+/**
+ * Teto de itens por pedido: o backend recusa com 422 acima disso e a tela usa o
+ * mesmo número para não mandar mais do que a rota aceita. A seleção da tela
+ * alcança só a página visível (12 itens), então o teto sobra de propósito.
+ */
+exports.DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS = 50;
+/**
+ * `true` quando o registro está preso a um sistema externo (ERP): carimbo de
+ * origem `integration` OU `data.externalId` preenchido.
+ *
+ * UMA regra, UM lugar: o backend recusa o MOVER com isso e o frontend
+ * desabilita o item do menu com o MESMO booleano. Duas cópias divergem e a tela
+ * passa a oferecer o que a API recusa.
+ *
+ * NÃO olha `providerSync`: o campo existe em `DatabaseDocument`, mas
+ * `src/modules/databases` do backend não tem NENHUMA escrita nele — é campo
+ * morto (o `providerSync` que o backend usa de verdade é o do calendário, campo
+ * de mesmo nome em outra coleção).
+ *
+ * COPIAR registro de ERP continua liberado: a cópia nasce com
+ * `metadata.source: 'manual'` e sem `externalId`, então esta função devolve
+ * `false` para ela.
+ */
+function isDocumentIntegrationLinked(doc) {
+    if (!doc)
+        return false;
+    if (doc.metadata?.source === 'integration')
+        return true;
+    const data = doc.data;
+    if (typeof data !== 'object' || data === null)
+        return false;
+    const externalId = data.externalId;
+    return typeof externalId === 'string' && externalId.trim().length > 0;
+}

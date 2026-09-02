@@ -269,6 +269,26 @@ exports.AI_MODELS = [
         maxOutputTokens: 8_192,
     },
     // ═══════════════════════════════════════════════════════════════
+    // Z.ai (GLM)
+    // Fabricante sem integração direta cadastrada — chega SÓ pelo Vercel
+    // AI Gateway (mesmo caso do Safeguard). Slug, preço, contexto e
+    // modalidades conferidos contra https://ai-gateway.vercel.sh/v1/models
+    // em 02/09/2026. Reasoning é por effort (low/high/max), SEM toggle de
+    // desligar — por isso a feature 'reasoning' (pula temperature e dá 4x
+    // de budget de saída no AgentRuntime).
+    // ═══════════════════════════════════════════════════════════════
+    {
+        id: 'glm-5.3-flash',
+        gatewaySlug: 'zai/glm-5.3-flash',
+        name: 'GLM 5.3 Flash',
+        provider: 'zai',
+        features: ['image', 'tools', 'reasoning'],
+        highlight: 'Ultra econômico com visão e 1M contexto (só via gateway)',
+        pricing: { input: 0.15, output: 0.50 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 131_000,
+    },
+    // ═══════════════════════════════════════════════════════════════
     // Legados (deprecated — retrocompatibilidade)
     // ═══════════════════════════════════════════════════════════════
     {

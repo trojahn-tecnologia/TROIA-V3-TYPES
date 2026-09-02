@@ -10,8 +10,21 @@ exports.CampaignMessageStatus = exports.SCHEDULING_TYPE_LABELS = exports.Schedul
  * envio contra canais fora do ar (um nunca conectou, o outro foi excluído
  * depois do início) e ficaram travadas em "em andamento", com 86 mensagens
  * paradas — o dono via "rodando" e nada era entregue.
+ *
+ * `rate_limit_horizon` (31/08/2026): o teto de 30 dias de reserva do relógio
+ * de disparo (`RateLimitHorizonError`) NÃO é passageiro como as falhas de
+ * Redis — só some se o dono aumentar a velocidade do canal ou dividir a
+ * campanha. Sem pausar com esse motivo, a campanha ficava piscando
+ * `in_progress`/`scheduled` a cada minuto pra sempre, sem nenhum aviso.
+ *
+ * `insufficient_credits` (31/08/2026, rodada 3): a falta de crédito durante o
+ * disparo (`CampaignHandler.pauseCampaignForInsufficientCredits`) já pausava
+ * a campanha, mas só gravava `stats.pauseReason` — campo write-only, sem tipo
+ * de resposta e sem nenhum leitor. O dono via "pausada" e mais nada; foi o
+ * primeiro elo do incidente de 31/08/2026 (a madrugada inteira sem saber por
+ * quê). Passa a usar o mesmo mecanismo de `autoPause`.
  */
-exports.CAMPAIGN_AUTO_PAUSE_REASONS = ['channel_disconnected', 'channel_missing'];
+exports.CAMPAIGN_AUTO_PAUSE_REASONS = ['channel_disconnected', 'channel_missing', 'rate_limit_horizon', 'insufficient_credits'];
 /**
  * Campaign Status
  */

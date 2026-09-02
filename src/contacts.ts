@@ -82,6 +82,16 @@ export interface Contact extends CreatorStamp {
   // (primeiro e-mail sempre passa por retenção manual até decisão).
   emailTicketAuthorization?: 'approved' | 'blocked';
 
+  // Bloqueio do contato nesta empresa (2026-09-01). Ligado: mensagem recebida
+  // dele é DESCARTADA e nada é enviado a ele, em todos os canais. Não vale em
+  // conversa de grupo. Ausente = não bloqueado.
+  // NÃO confundir com `emailTicketAuthorization: 'blocked'`, que é outra coisa
+  // (autorização de e-mail virar ticket) e continua existindo em paralelo.
+  // Ver DOCS/superpowers/specs/2026-09-01-bloqueio-de-contato-design.md
+  blocked?: boolean;
+  blockedAt?: string;
+  blockedBy?: string;
+
   createdAt: string;
   updatedAt: string;
 }
@@ -123,6 +133,8 @@ export interface ContactQuery extends PaginationQuery {
     tags?: string[];
     assigneeId?: string;
     teamId?: string;
+    // `true` = só bloqueados, `false` = só não bloqueados, ausente = todos.
+    blocked?: boolean;
   };
 }
 

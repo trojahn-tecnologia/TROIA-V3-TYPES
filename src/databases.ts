@@ -209,6 +209,20 @@ export interface DatabasePropertyData {
   /** Property title */
   title: string;
 
+  /**
+   * Endereço da ficha na URL pública do site.
+   *
+   * Gerado pelo backend na criação quando chega vazio
+   * (`documents-repository.ts:115`) e resolvido depois por um `findOne` SEM
+   * base e SEM ordenação (`documents-repository.ts:953`) — por isso a CÓPIA de
+   * um registro nasce sem slug: dois registros com o mesmo slug fazem o site
+   * servir um dos dois por sorteio.
+   *
+   * A tela nunca manda este campo. Ele existe no tipo porque o dado existe no
+   * banco e porque quem apaga um campo precisa que o tipo diga que ele existe.
+   */
+  slug?: string;
+
   /** Detailed description */
   description: string;
 
@@ -334,6 +348,9 @@ export enum VehicleItemStatus {
 export interface DatabaseVehicleData {
   /** Vehicle brand */
   brand: string;
+
+  /** Endereço da ficha na URL pública. Gerado pelo backend — ver `DatabasePropertyData.slug`. */
+  slug?: string;
 
   /** Vehicle model */
   model: string;
@@ -464,6 +481,9 @@ export interface DatabaseProductData {
   /** Product name */
   name: string;
 
+  /** Endereço da ficha na URL pública. Gerado pelo backend — ver `DatabasePropertyData.slug`. */
+  slug?: string;
+
   /** Detailed description */
   description: string;
 
@@ -556,6 +576,9 @@ export interface DatabaseServiceData {
   /** Service name */
   name: string;
 
+  /** Endereço da ficha na URL pública. Gerado pelo backend — ver `DatabasePropertyData.slug`. */
+  slug?: string;
+
   /** Detailed description */
   description: string;
 
@@ -632,6 +655,13 @@ export enum DocumentItemStatus {
 export interface DatabaseDocumentData {
   /** Document title */
   title: string;
+
+  /**
+   * Endereço do artigo na URL pública do site (blog). Gerado pelo backend a
+   * partir do título (`documents-repository.ts:58-64`) — ver
+   * `DatabasePropertyData.slug`.
+   */
+  slug?: string;
 
   /** Full content (markdown supported) */
   content: string;
@@ -980,4 +1010,157 @@ export interface DatabaseSyncResult {
     successCount: number;
     errorCount: number;
   };
+}
+
+// ============================================================================
+// DOCUMENT TRANSFER (COPIAR / MOVER ENTRE BASES)
+// ============================================================================
+
+/**
+ * Corpo das DUAS rotas de lote:
+ *   POST /api/databases/documents/copy  → permissão `databases:create`
+ *   POST /api/databases/documents/move  → permissão `databases:update`
+ *
+ * NÃO existe campo de operação: o modo é a ROTA. O middleware de permissão
+ * aceita uma ação por rota — com um campo `operation` no corpo, quem só tem
+ * `databases:create` conseguiria disfarçar um mover.
+ *
+ * "Duplicar aqui" é a rota de CÓPIA com `targetDatabaseId` = a base atual.
+ * `appId`/`companyId` NUNCA vêm daqui — saem de `res.locals`.
+ */
+export interface DatabaseDocumentTransferRequest {
+  /**
+   * De 1 a `DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS` ids. Ids repetidos no mesmo
+   * pedido são reduzidos a um pelo backend, em silêncio.
+   */
+  documentIds: string[];
+
+  /**
+   * Base de destino. Tem que ser do MESMO tipo da base de origem, e quem
+   * confere é o backend — o filtro do dropdown é conveniência, não é a
+   * garantia.
+   */
+  targetDatabaseId: string;
+}
+
+/** Desfecho de UM item do lote. */
+export type DatabaseDocumentTransferItemStatus = 'copied' | 'moved' | 'rejected';
+
+/**
+ * Motivo da recusa como CÓDIGO, nunca frase livre — é o que deixa a tela
+ * escrever o texto em português sem interpretar mensagem do servidor.
+ */
+export type DatabaseDocumentTransferRejectionCode =
+  | 'not_found'           // id inexistente, de outra empresa, apagado ou de página velha
+  | 'wrong_type'          // base de destino é de outro tipo (imóvel só vai para base de imóveis)
+  | 'inactive_target'     // base de destino inativa ou arquivada
+  | 'integration_target'  // base de destino é espelho de ERP — recebe cópia, não recebe mover
+  | 'integration_linked'  // registro veio de ERP — não pode ser movido (isDocumentIntegrationLinked)
+  | 'same_database'       // destino igual à base atual
+  | 'write_failed';       // a escrita no Mongo não confirmou
+
+/** Desfecho de UM item, na mesma ordem em que os ids foram lidos. */
+export interface DatabaseDocumentTransferItemResult {
+  /** Id pedido, sempre ecoado — é por ele que a tela casa o desfecho com a linha. */
+  documentId: string;
+
+  status: DatabaseDocumentTransferItemStatus;
+
+  /** Só em `copied`: o id do registro que nasceu. */
+  newDocumentId?: string;
+
+  /** Só em `rejected`. */
+  reasonCode?: DatabaseDocumentTransferRejectionCode;
+
+  /**
+   * Só em `copied`: nomes dos campos que a cópia nasceu SEM — `slug`,
+   * `externalId`, `externalMetadata` e, quando a base de destino tem
+   * integração, o código de identidade do tipo (`reference`, `sku` ou
+   * `licensePlate`). Sem integração no destino, o código de identidade é
+   * mantido. É informativo: serve para a tela avisar que a referência ficou
+   * em branco. QUAL campo some em cada tipo é regra do backend e não vem
+   * para o pacote.
+   */
+  clearedFields?: string[];
+
+  /**
+   * Só em `moved`: `true` quando o reapontamento do vetor falhou. O registro
+   * ESTÁ na base nova (o Mongo é a verdade), mas pode demorar a aparecer nas
+   * buscas do agente. Repetir a mesma ação conserta — reapontar é idempotente.
+   */
+  indexPending?: boolean;
+}
+
+/**
+ * Resultado do lote. A rota devolve 200 mesmo com falha parcial: resultado de
+ * lote não é erro. Molde do `ViewIngestResult` (`views.ts`) — e NÃO do
+ * `{ affected: N }` dos módulos de lote, que engole quem falhou.
+ *
+ * Invariantes: `results.length === summary.requested` e
+ * `summary.succeeded + summary.rejected === summary.requested`.
+ */
+export interface DatabaseDocumentTransferResult {
+  summary: {
+    /** Ids processados DEPOIS de tirar os repetidos. */
+    requested: number;
+    /** Itens com status `copied` ou `moved`. */
+    succeeded: number;
+    /** Itens com status `rejected`. */
+    rejected: number;
+  };
+  results: DatabaseDocumentTransferItemResult[];
+}
+
+/**
+ * Teto de itens por pedido: o backend recusa com 422 acima disso e a tela usa o
+ * mesmo número para não mandar mais do que a rota aceita. A seleção da tela
+ * alcança só a página visível (12 itens), então o teto sobra de propósito.
+ */
+export const DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS = 50;
+
+/**
+ * Forma mínima aceita por `isDocumentIntegrationLinked`.
+ *
+ * `data` é `unknown` de propósito: no backend a repository devolve
+ * `DatabaseDocumentResponse<unknown>` quando ninguém passa o genérico
+ * (`documents-repository.ts` declara `findById<T = unknown>` /
+ * `findByIds<T = unknown>`), e o documento cru do Mongo também chega sem forma.
+ * No frontend o mesmo objeto chega como
+ * `DatabaseDocumentResponse<DatabasePropertyData>` e satisfaz este contrato sem
+ * nenhum cast.
+ */
+export interface DatabaseDocumentIntegrationLinkInput {
+  metadata?: { source?: string | null } | null;
+  data?: unknown;
+}
+
+/**
+ * `true` quando o registro está preso a um sistema externo (ERP): carimbo de
+ * origem `integration` OU `data.externalId` preenchido.
+ *
+ * UMA regra, UM lugar: o backend recusa o MOVER com isso e o frontend
+ * desabilita o item do menu com o MESMO booleano. Duas cópias divergem e a tela
+ * passa a oferecer o que a API recusa.
+ *
+ * NÃO olha `providerSync`: o campo existe em `DatabaseDocument`, mas
+ * `src/modules/databases` do backend não tem NENHUMA escrita nele — é campo
+ * morto (o `providerSync` que o backend usa de verdade é o do calendário, campo
+ * de mesmo nome em outra coleção).
+ *
+ * COPIAR registro de ERP continua liberado: a cópia nasce com
+ * `metadata.source: 'manual'` e sem `externalId`, então esta função devolve
+ * `false` para ela.
+ */
+export function isDocumentIntegrationLinked(
+  doc: DatabaseDocumentIntegrationLinkInput | null | undefined
+): boolean {
+  if (!doc) return false;
+
+  if (doc.metadata?.source === 'integration') return true;
+
+  const data: unknown = doc.data;
+  if (typeof data !== 'object' || data === null) return false;
+
+  const externalId: unknown = (data as { externalId?: unknown }).externalId;
+  return typeof externalId === 'string' && externalId.trim().length > 0;
 }

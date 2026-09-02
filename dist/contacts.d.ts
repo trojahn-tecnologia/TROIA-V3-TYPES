@@ -40,6 +40,9 @@ export interface Contact extends CreatorStamp {
     lastInteractionAt?: string;
     mutedBy?: string[];
     emailTicketAuthorization?: 'approved' | 'blocked';
+    blocked?: boolean;
+    blockedAt?: string;
+    blockedBy?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -77,6 +80,7 @@ export interface ContactQuery extends PaginationQuery {
         tags?: string[];
         assigneeId?: string;
         teamId?: string;
+        blocked?: boolean;
     };
 }
 export interface ContactListResponse extends ListResponse<ContactResponse> {
