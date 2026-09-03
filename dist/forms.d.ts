@@ -62,7 +62,8 @@ export type FormType = 'form' | 'checklist';
  */
 export interface ChecklistSettings {
     requiresApproval: boolean;
-    defaultDueHours?: number;
+    /** Prazo padrão das aplicações deste modelo, em MINUTOS. */
+    defaultDueMinutes?: number;
     scoreEnabled: boolean;
     captureGps: boolean;
 }

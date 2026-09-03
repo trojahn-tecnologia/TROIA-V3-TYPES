@@ -719,7 +719,8 @@ export interface CreateChecklistActionConfig {
   templateId: string;
   target: CreateChecklistTarget;
   assignee: CreateChecklistAssignee;
-  dueHours?: number;
+  /** Prazo do checklist criado, em MINUTOS. Ausente = usa o padrão do modelo. */
+  dueMinutes?: number;
   addCreatorAsFollower?: boolean;
 }
 

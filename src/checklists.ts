@@ -68,16 +68,13 @@ export interface Checklist {
   linkedEntity?: ChecklistLinkedEntity;
   expiresAt?: string;
   /**
-   * Janela de prazo ORIGINAL em horas (`dueHours` da criação ?? `defaultDueHours`
-   * do modelo). Ausente = checklist sem prazo.
-   *
-   * Persistida porque `reopen` precisa recriar a MESMA janela ("novo expiresAt =
-   * agora + dueHours originais", spec §5.2) e derivá-la de `expiresAt − createdAt`
-   * infla o prazo a cada reabertura — o próprio reopen move o `expiresAt` para
-   * `agora + janela`, então na 2ª reabertura o span passa a incluir todo o tempo
-   * que o checklist ficou parado.
+   * Janela de prazo ORIGINAL em MINUTOS (`dueMinutes` da criação ??
+   * `defaultDueMinutes` do modelo). Persistida na criação porque o `reopen`
+   * recria a MESMA janela ("novo `expiresAt` = agora + a janela original") e
+   * derivá-la de `expiresAt − createdAt` infla o prazo a cada reabertura.
+   * Ausente = checklist sem prazo.
    */
-  dueHours?: number;
+  dueMinutes?: number;
   dueSoonAlertSentFor?: string;
   creditDebitedAt?: string;
   startedAt?: string;
@@ -104,7 +101,7 @@ export interface CreateChecklistRequest {
   assigneeId: string;
   unitId?: string;
   linkedEntity?: ChecklistLinkedEntity;
-  dueHours?: number;
+  dueMinutes?: number;
   followerIds?: string[];
 }
 
