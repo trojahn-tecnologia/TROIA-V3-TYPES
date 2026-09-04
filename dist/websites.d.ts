@@ -66,7 +66,7 @@ export interface BlockInstance {
      */
     addedByUser?: boolean;
 }
-export type TemplateSegment = 'real_estate' | 'automotive' | 'ecommerce' | 'portfolio' | 'blog' | 'landing_page';
+export type TemplateSegment = 'real_estate' | 'automotive' | 'ecommerce' | 'portfolio' | 'blog' | 'landing_page' | 'academy';
 export interface TemplatePageDefinition {
     id: string;
     name: string;
@@ -79,6 +79,38 @@ export interface TemplatePageDefinition {
     isDynamic?: boolean;
     /** Padrão de rota com placeholder, ex: '/imoveis/:slug'. Só para isDynamic. */
     routePattern?: string;
+}
+/**
+ * Layout pronto de UMA página: blocos já com `style` e `order` preenchidos.
+ * Aplicar substitui os blocos da página (o painel confirma antes). Opcional —
+ * blog e imobiliário não declaram.
+ */
+export interface TemplatePagePreset {
+    /** 'home-stage', 'home-cinema', ... */
+    id: string;
+    /** Página do template a que o preset se aplica ('home'). */
+    pageId: string;
+    name: string;
+    description?: string;
+    /** '/templates/academy/presets/home-stage.jpg' */
+    thumbnail?: string;
+    blocks: BlockInstance[];
+    /**
+     * Valores de `globalConfig` que o preset sugere (ex.: cores claras do layout
+     * "Claro"). O painel só aplica com confirmação explícita do usuário.
+     */
+    suggestedGlobalConfig?: Record<string, unknown>;
+}
+/** Item de `GET /websites/public/series` — uma trilha com o que a home precisa. */
+export interface WebsitePublicSeriesItem {
+    name: string;
+    /** `slugifyText(name)` — usado em `/series/:slug`. */
+    slug: string;
+    count: number;
+    /** Soma de `data.duration` das aulas publicadas, em segundos. */
+    totalDuration: number;
+    /** Capa da aula de menor `seriesOrder` que tiver capa. */
+    coverImage?: string;
 }
 export interface TemplateModel {
     id: string;
@@ -101,6 +133,8 @@ export interface TemplateModel {
         weights: number[];
         source: 'google' | 'custom';
     }>;
+    /** Layouts prontos por página (ver `TemplatePagePreset`). */
+    presets?: TemplatePagePreset[];
 }
 /**
  * Posição da marca d'água aplicada às fotos dos imóveis.

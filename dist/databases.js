@@ -11,7 +11,7 @@
  * - Multi-opportunity business model: Items can have multiple simultaneous business opportunities
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS = exports.DocumentItemStatus = exports.DocumentCategory = exports.ServiceItemStatus = exports.ServiceDeliveryMethod = exports.ServiceType = exports.ProductItemStatus = exports.ProductCategory = exports.VehicleItemStatus = exports.VehicleCondition = exports.TransmissionType = exports.FuelType = exports.VehicleType = exports.PropertyItemStatus = exports.PropertyType = exports.DatabaseStatus = exports.DatabaseType = exports.OpportunityStatus = exports.BusinessOpportunityType = void 0;
+exports.DATABASE_DOCUMENT_TRANSFER_MAX_ITEMS = exports.DOCUMENT_MEDIA_TYPES = exports.DocumentItemStatus = exports.DocumentCategory = exports.ServiceItemStatus = exports.ServiceDeliveryMethod = exports.ServiceType = exports.ProductItemStatus = exports.ProductCategory = exports.VehicleItemStatus = exports.VehicleCondition = exports.TransmissionType = exports.FuelType = exports.VehicleType = exports.PropertyItemStatus = exports.PropertyType = exports.DatabaseStatus = exports.DatabaseType = exports.OpportunityStatus = exports.BusinessOpportunityType = void 0;
 exports.isDocumentIntegrationLinked = isDocumentIntegrationLinked;
 // ============================================================================
 // BUSINESS OPPORTUNITY TYPES (Core Reusable Types)
@@ -201,6 +201,13 @@ var DocumentItemStatus;
     DocumentItemStatus["DRAFT"] = "draft";
     DocumentItemStatus["ARCHIVED"] = "archived";
 })(DocumentItemStatus || (exports.DocumentItemStatus = DocumentItemStatus = {}));
+/**
+ * Tipo da mídia principal de um documento (aula do Academy, post do blog).
+ * `video`/`audio` = arquivo tocado por <video>/<audio>; `frame` = URL de embed
+ * (YouTube, Vimeo, Loom...) montada em <iframe> pelo site. Tupla exportada para
+ * o Zod do backend derivar o enum (CLAUDE.md NUNCA #94: nunca lista manual).
+ */
+exports.DOCUMENT_MEDIA_TYPES = ['video', 'audio', 'frame'];
 /**
  * Teto de itens por pedido: o backend recusa com 422 acima disso e a tela usa o
  * mesmo número para não mandar mais do que a rota aceita. A seleção da tela

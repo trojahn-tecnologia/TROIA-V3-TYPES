@@ -504,6 +504,14 @@ export declare enum DocumentItemStatus {
     DRAFT = "draft",
     ARCHIVED = "archived"
 }
+/**
+ * Tipo da mídia principal de um documento (aula do Academy, post do blog).
+ * `video`/`audio` = arquivo tocado por <video>/<audio>; `frame` = URL de embed
+ * (YouTube, Vimeo, Loom...) montada em <iframe> pelo site. Tupla exportada para
+ * o Zod do backend derivar o enum (CLAUDE.md NUNCA #94: nunca lista manual).
+ */
+export declare const DOCUMENT_MEDIA_TYPES: readonly ["video", "audio", "frame"];
+export type DocumentMediaType = (typeof DOCUMENT_MEDIA_TYPES)[number];
 export interface DatabaseDocumentData {
     /** Document title */
     title: string;
@@ -538,6 +546,18 @@ export interface DatabaseDocumentData {
         type: string;
         size: number;
     }>;
+    /** Tipo da mídia principal. Exige `mediaUrl`. */
+    mediaType?: DocumentMediaType;
+    /** URL https do arquivo (video/audio) ou do embed (frame). Exige `mediaType`. */
+    mediaUrl?: string;
+    /** Capa (URL https). Substitui a heurística "primeiro anexo de imagem" do blog. */
+    coverImage?: string;
+    /** Trilha/curso. Texto livre; agrupa as fileiras da home do Academy. */
+    series?: string;
+    /** Posição da aula dentro da trilha (1, 2, 3...). */
+    seriesOrder?: number;
+    /** Duração em segundos. O formulário preenche ao carregar o vídeo/áudio. */
+    duration?: number;
     /** External system ID */
     externalId?: string;
     /** External system metadata */
