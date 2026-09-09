@@ -74,6 +74,12 @@ var PropertyItemStatus;
     PropertyItemStatus["AVAILABLE"] = "available";
     PropertyItemStatus["UNAVAILABLE"] = "unavailable";
     PropertyItemStatus["UNDER_CONSTRUCTION"] = "under_construction";
+    /**
+     * Empreendimento em lançamento. Como `available` e `under_construction`, é um
+     * estado PÚBLICO — o imóvel aparece no site (ver
+     * `PROPERTY_PUBLIC_ITEM_STATUSES` no backend, ponto único de verdade).
+     */
+    PropertyItemStatus["LAUNCH"] = "launch";
     PropertyItemStatus["RESERVED"] = "reserved";
     PropertyItemStatus["ARCHIVED"] = "archived";
 })(PropertyItemStatus || (exports.PropertyItemStatus = PropertyItemStatus = {}));

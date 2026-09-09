@@ -43,9 +43,15 @@ export interface ComponentFieldDefinition {
   options?: Array<{ label: string; value: string | number }>;
 
   referenceConfig?: {
-    entity: 'database' | 'funnelStep' | 'team' | 'user';
+    entity: 'database' | 'funnelStep' | 'team' | 'user' | 'channel';
     multiple?: boolean;
     displayField?: string;
+    /**
+     * Filtro de igualdade aplicado no seletor do editor sobre os campos que a
+     * rota de listagem já devolve (ex.: `{ providerId: 'website-widget' }`
+     * mostra só canais de widget). Evita rota nova só para estreitar a lista.
+     */
+    filter?: Record<string, string>;
   };
 
   subFields?: ComponentFieldDefinition[];
@@ -274,6 +280,13 @@ export interface WebsitePublicData {
    * O que separa um site do outro é o header `Origin`, checado no backend.
    */
   views?: { key: string; endpoint: string; scriptUrl: string };
+  /**
+   * Widget de chat da plataforma, quando o site escolhe um canal de widget.
+   * `scriptUrl` vem de `app.widgetUrl` (por tenant) — assim o endereço do
+   * widget muda em um lugar só, sem reeditar site por site. Omitido quando o
+   * site não escolheu canal ou o tenant não tem `widgetUrl`.
+   */
+  chatWidget?: { scriptUrl: string; channelId: string; token: string; apiUrl: string };
 }
 
 // ============================================================

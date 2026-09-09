@@ -186,6 +186,12 @@ export enum PropertyItemStatus {
   AVAILABLE = 'available',
   UNAVAILABLE = 'unavailable',
   UNDER_CONSTRUCTION = 'under_construction',
+  /**
+   * Empreendimento em lançamento. Como `available` e `under_construction`, é um
+   * estado PÚBLICO — o imóvel aparece no site (ver
+   * `PROPERTY_PUBLIC_ITEM_STATUSES` no backend, ponto único de verdade).
+   */
+  LAUNCH = 'launch',
   RESERVED = 'reserved',
   ARCHIVED = 'archived'
 }
@@ -284,6 +290,17 @@ export interface DatabasePropertyData {
     videos?: string[];
     virtualTour?: string;
     floorPlan?: string[];
+  /**
+   * Ordem das fotos definida À MÃO no painel (a primeira é a capa do site).
+   *
+   * A sincronização com sistema externo sobrescreve o cadastro inteiro a cada
+   * rodada; sem esta marca, quem reordenou perderia o trabalho na próxima
+   * sincronização, em silêncio. Com ela ligada, o backend reaplica a ordem
+   * salva sobre as fotos que vierem do provedor (as novas entram no fim, as
+   * que o provedor apagou somem). Nunca é ligada por sincronização — só por
+   * quem arrasta ou usa os botões da grade de fotos.
+   */
+  photosManualOrder?: boolean;
   };
 
   /** External system ID (for integration sync) */
@@ -524,6 +541,17 @@ export interface DatabaseProductData {
   media?: {
     photos?: string[];
     videos?: string[];
+  /**
+   * Ordem das fotos definida À MÃO no painel (a primeira é a capa do site).
+   *
+   * A sincronização com sistema externo sobrescreve o cadastro inteiro a cada
+   * rodada; sem esta marca, quem reordenou perderia o trabalho na próxima
+   * sincronização, em silêncio. Com ela ligada, o backend reaplica a ordem
+   * salva sobre as fotos que vierem do provedor (as novas entram no fim, as
+   * que o provedor apagou somem). Nunca é ligada por sincronização — só por
+   * quem arrasta ou usa os botões da grade de fotos.
+   */
+  photosManualOrder?: boolean;
   };
 
   /** External system ID */
