@@ -235,6 +235,11 @@ export interface CreateConversationMessageRequest {
     internalNote?: string;
     isInternal?: boolean;
     sentAt?: string;
+    /**
+     * Só uso INTERNO (nunca chega por HTTP — o Zod de create não expõe):
+     * `pending` = gravada para sair pela fila de saída; ausente = `sent`.
+     */
+    status?: 'sent' | 'pending';
     toolCall?: {
         id: string;
         name: string;
@@ -261,6 +266,8 @@ export interface UpdateConversationMessageRequest {
     content?: MessageContent[];
     plainText?: string;
     status?: 'sent' | 'delivered' | 'read' | 'failed' | 'pending';
+    /** Carimbado no DESPACHO para mensagem que saiu pela fila (nasceu `pending`). */
+    sentAt?: string;
     deliveredAt?: string;
     readAt?: string;
     failedReason?: string;

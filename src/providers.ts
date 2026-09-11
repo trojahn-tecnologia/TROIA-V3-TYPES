@@ -252,6 +252,12 @@ export interface ProviderRateLimits {
   messagesPerHour: number;          // Ex: 288000
   messagesPerDay: number;           // Ex: 1000 for tier_1
 
+  // Faixa "conversa" da fila de saída (workflow, follow-up, gatilho de agente).
+  // Campanha continua nos limites acima. Ausente = padrão do backend
+  // (3000 ms entre envios; 300 por hora). Ver spec 2026-09-11.
+  conversationMinDelayMs?: number;
+  conversationMessagesPerHour?: number;
+
   // WhatsApp-specific fields
   tier?: WhatsAppTier;              // WhatsApp messaging tier
   qualityRating?: QualityRating;    // Quality rating (green, yellow, red)

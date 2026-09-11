@@ -172,6 +172,8 @@ export interface ProviderRateLimits {
     messagesPerMinute: number;
     messagesPerHour: number;
     messagesPerDay: number;
+    conversationMinDelayMs?: number;
+    conversationMessagesPerHour?: number;
     tier?: WhatsAppTier;
     qualityRating?: QualityRating;
     source: RateLimitSource;

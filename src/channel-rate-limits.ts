@@ -36,4 +36,8 @@ export interface ChannelRateLimitsResponse {
 export interface UpdateChannelRateLimitsRequest {
   intervalSeconds?: number;
   messagesPerDay?: number;
+  /** Faixa conversa: 1..3600 s entre envios de workflow/follow-up/gatilho. */
+  conversationIntervalSeconds?: number;
+  /** Faixa conversa: 1..100_000 mensagens por hora. */
+  conversationMessagesPerHour?: number;
 }

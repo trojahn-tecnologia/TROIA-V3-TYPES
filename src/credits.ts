@@ -472,6 +472,8 @@ export interface OutboundMessageJob {
   messageContent?: string;
   targetContactIds?: string[];
   targetConversationId?: string;
+  /** Mensagem já gravada com status `pending` que o WorkflowHandler despacha. */
+  messageId?: string;
 }
 
 // === Channel Warmup ===
