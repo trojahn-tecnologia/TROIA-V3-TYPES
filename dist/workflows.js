@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
 exports.readWaitCancelEvents = readWaitCancelEvents;
 // ============================================================
 // WORKFLOW TYPES
@@ -77,11 +77,31 @@ exports.WORKFLOW_STATUSES = ['active', 'inactive', 'draft', 'archived'];
  * limpo ao reativar.
  */
 exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = 10;
+/**
+ * Aviso de falha frequente (2026-09-15). A pausa automática ignora falha
+ * PARCIAL (galho paralelo quebrado com o irmão entregando) — e foi assim que o
+ * workflow "AUTOMAÇÃO PÓS VENDA" falhou 3.790 vezes em 13 dias sem ninguém
+ * saber. O aviso tem contagem PRÓPRIA: entre as últimas `WINDOW` execuções
+ * finalizadas (fora teste, cancelada e falha por estado do cliente — falha
+ * parcial CONTA), `THRESHOLD` ou mais falharam → avisa quem pode editar
+ * workflows, no máximo 1 vez a cada `INTERVAL_HOURS` por workflow. Só avisa;
+ * pausar pararia também o galho que funciona.
+ */
+exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = 20;
+exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = 5;
+exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = 24;
 exports.WORKFLOW_AUTO_PAUSE_REASONS = ['consecutive_failures', 'channel_deleted'];
 /**
  * Execution Statuses — runtime constant + derived type.
  */
 exports.WORKFLOW_EXECUTION_STATUSES = ['pending', 'running', 'completed', 'failed', 'cancelled', 'suspended'];
+/**
+ * Status em que a execução ainda está VIVA e pode mudar. Tudo fora daqui
+ * (`completed`, `failed`, `cancelled`) é final e NUNCA é sobrescrito — é o que
+ * impede o fim normal de um run (ou uma retomada atrasada) de transformar um
+ * "cancelado" em "concluído" (spec 2026-09-14, invariante I2).
+ */
+exports.WORKFLOW_EXECUTION_OPEN_STATUSES = ['pending', 'running', 'suspended'];
 // ============================================================
 // NODE CONFIGURATION INTERFACES
 // ============================================================
@@ -115,6 +135,8 @@ exports.WORKFLOW_CONDITION_OPERATORS = [
     'not_in',
     'matches_regex',
 ];
+/** Tamanho máximo do `identifier` aceito pelo gatilho de webhook. */
+exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = 200;
 /**
  * Node types de saída que suportam `businessHours` (UI + validação backend).
  * `action_send_media` e `action_internal_notification` não têm interface de
@@ -147,18 +169,45 @@ exports.BUSINESS_HOURS_NODE_TYPES = [
  */
 exports.WORKFLOW_EVENT_ACTORS = ['user', 'ai', 'automation', 'api'];
 /**
- * FONTE ÚNICA dos eventos aceitos como cancelamento do node "Aguardar" e das
- * origens que cada um distingue. Lista vazia = o evento não distingue origem
- * (a UI não mostra o sub-select e o motor ignora `actors`).
- *
- * A UI (`WaitForConfig`) e o motor (`WaitForStepFactory`) leem daqui — evento
- * novo com origens é uma linha neste objeto, nos dois lados de uma vez.
+ * FONTE ÚNICA dos eventos da aba Cancelamento (spec 2026-09-14 §1.2): UI,
+ * validação e motor leem daqui. Só entram eventos que apontam para alguém.
+ * `calendar_event.cancelled` entra porque o publisher carrega `eventId` e
+ * `contactId` antes de apagar (o vigia casa pelo id, não precisa da entidade).
+ */
+exports.WORKFLOW_CANCELLATION_EVENTS = {
+    'message.received': { entity: 'conversation', idField: 'conversationId', actors: [] },
+    'message.sent': { entity: 'conversation', idField: 'conversationId', actors: ['user', 'ai', 'automation'] },
+    'conversation.created': { entity: 'conversation', idField: 'conversationId', actors: [] },
+    'conversation.updated': { entity: 'conversation', idField: 'conversationId', actors: [] },
+    'conversation.closed': { entity: 'conversation', idField: 'conversationId', actors: [] },
+    'conversation.assigned': { entity: 'conversation', idField: 'conversationId', actors: [] },
+    'contact.created': { entity: 'contact', idField: 'contactId', actors: [] },
+    'contact.updated': { entity: 'contact', idField: 'contactId', actors: [] },
+    'lead.created': { entity: 'lead', idField: 'leadId', actors: [] },
+    'lead.updated': { entity: 'lead', idField: 'leadId', actors: [] },
+    'lead.stage_changed': { entity: 'lead', idField: 'leadId', actors: [] },
+    'lead.won': { entity: 'lead', idField: 'leadId', actors: [] },
+    'lead.lost': { entity: 'lead', idField: 'leadId', actors: [] },
+    'ticket.created': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'ticket.updated': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'ticket.status_changed': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'ticket.assigned': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'ticket.resolved': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'ticket.closed': { entity: 'ticket', idField: 'ticketId', actors: [] },
+    'calendar_event.created': { entity: 'event', idField: 'eventId', actors: [] },
+    'calendar_event.updated': { entity: 'event', idField: 'eventId', actors: [] },
+    'calendar_event.cancelled': { entity: 'event', idField: 'eventId', actors: [] },
+};
+exports.WORKFLOW_CANCELLATION_EVENT_TYPES = Object.keys(exports.WORKFLOW_CANCELLATION_EVENTS);
+/**
+ * @deprecated recorte do catálogo novo com os 4 eventos que o Aguardar antigo
+ * aceitava. Some junto com `WaitCancelEvent`.
  */
 exports.WAIT_CANCEL_EVENT_ACTORS = {
-    'message.received': [], // quem manda é sempre o contato
-    'message.sent': ['user', 'ai', 'automation'],
-    'lead.updated': [],
-    'contact.updated': [],
+    'message.received': exports.WORKFLOW_CANCELLATION_EVENTS['message.received'].actors,
+    'message.sent': exports.WORKFLOW_CANCELLATION_EVENTS['message.sent'].actors,
+    'lead.updated': exports.WORKFLOW_CANCELLATION_EVENTS['lead.updated'].actors,
+    'contact.updated': exports.WORKFLOW_CANCELLATION_EVENTS['contact.updated'].actors,
 };
 /**
  * Lê a lista de eventos de cancelamento de um `cancelEvent`, aceitando o
@@ -216,4 +265,15 @@ exports.WORKFLOW_VALIDATION_CODES = [
     /** Campo obrigatório faltando ou fora do formato na configuração de um nó. */
     'CONFIG_INVALIDA',
     'LEGADO',
+    /**
+     * Regra da aba Cancelamento inválida (spec 2026-09-14, Fase 2): evento fora
+     * do catálogo, origem que o evento não distingue/não oferece, "A quem se
+     * refere" que não é template nem id, ou regra repetida para o mesmo alvo.
+     */
+    'CANCELAMENTO_INVALIDO',
+    /**
+     * Aresta que ainda sai pela saída "Cancelado" (aposentada) do node Aguardar
+     * (D2, spec 2026-09-14) — o desenho precisa ser refeito sem essa saída.
+     */
+    'WAIT_FOR_SAIDA_ANTIGA',
 ];

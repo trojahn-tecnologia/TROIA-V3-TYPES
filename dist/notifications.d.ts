@@ -54,6 +54,7 @@ export declare enum NotificationType {
     AGENDA_DAILY_SUMMARY = "agenda_daily_summary",// Resumo diário da agenda às 08:00
     WORKFLOW_AUTO_PAUSED = "workflow_auto_paused",// Workflow pausado sozinho (10 falhas seguidas ou canal excluído)
     CAMPAIGN_AUTO_PAUSED = "campaign_auto_paused",// Campanha pausada sozinha (canal desconectado ou excluído)
+    WORKFLOW_FREQUENT_FAILURES = "workflow_frequent_failures",// Workflow falhando com frequência (sem chegar a pausar)
     CUSTOM_NOTIFICATION = "custom_notification"
 }
 /**

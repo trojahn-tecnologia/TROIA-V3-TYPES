@@ -85,6 +85,7 @@ var NotificationType;
     NotificationType["WORKFLOW_AUTO_PAUSED"] = "workflow_auto_paused";
     // Campanhas e integrações (2026-08-27)
     NotificationType["CAMPAIGN_AUTO_PAUSED"] = "campaign_auto_paused";
+    NotificationType["WORKFLOW_FREQUENT_FAILURES"] = "workflow_frequent_failures";
     // Custom notifications
     NotificationType["CUSTOM_NOTIFICATION"] = "custom_notification";
 })(NotificationType || (exports.NotificationType = NotificationType = {}));
@@ -260,8 +261,12 @@ exports.DEFAULT_NOTIFICATION_TYPES = [
     // Calendar / agenda
     NotificationType.EVENT_REMINDER,
     NotificationType.AGENDA_DAILY_SUMMARY,
-    // Automação — nasce marcado para usuário NOVO; usuário existente marca na tela (decisão do dono 22/08)
+    // Automação — nasce marcado para usuário NOVO (decisão do dono 22/08). EXCEÇÃO
+    // em 15/09/2026: a migração 2026-09-15-001 marcou estes dois em quem já
+    // existe e tem `workflows:update` (pausa de 01/09 passou calada e virou
+    // 2.525 leads duplicados). Ver CLAUDE.md NUNCA #87.
     NotificationType.WORKFLOW_AUTO_PAUSED,
+    NotificationType.WORKFLOW_FREQUENT_FAILURES,
     // Campanha — mesma regra: marcado para usuário NOVO, existente marca na tela
     // (decisão do dono 27/08). Avisa sobre campanha que PAROU sozinha e que
     // ninguém descobria sem olhar o log.
