@@ -73,6 +73,19 @@ export const WORKFLOW_NODE_TYPES = [
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 
 /**
+ * Nós que têm a aba Filtros em `data.filters` (spec 2026-09-14 §5.3): os que "fazem algo".
+ * Gatilhos guardam os seus em `config.filters` (aplicados no DISPARO); Se/Selecionar/leque/
+ * Repetir/Tentar de novo e skill_output já são a condição ou o fim, não filtram.
+ */
+export const WORKFLOW_FILTERABLE_NODE_TYPES: readonly WorkflowNodeType[] = WORKFLOW_NODE_TYPES.filter(
+  (t) => t.startsWith('action_') || t === 'ai_agent' || t === 'ai_agent_inline' || t === 'control_wait_for' || t === 'skill_input',
+);
+
+export function nodeTypeAcceptsFilters(type: string): boolean {
+  return (WORKFLOW_FILTERABLE_NODE_TYPES as readonly string[]).includes(type);
+}
+
+/**
  * Workflow Statuses — runtime constant + derived type.
  */
 export const WORKFLOW_STATUSES = ['active', 'inactive', 'draft', 'archived'] as const;
@@ -2066,6 +2079,12 @@ export const WORKFLOW_VALIDATION_CODES = [
    * (D2, spec 2026-09-14) — o desenho precisa ser refeito sem essa saída.
    */
   'WAIT_FOR_SAIDA_ANTIGA',
+  /**
+   * Filtro inválido na aba Filtros de um nó (spec 2026-09-16, Fase 3): condição
+   * mal formada, campo/operador incompatível, ou nó que não aceita filtros mas
+   * tem `data.filters` preenchido.
+   */
+  'FILTRO_INVALIDO',
 ] as const;
 
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];

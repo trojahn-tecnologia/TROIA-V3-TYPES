@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.nodeTypeAcceptsFilters = nodeTypeAcceptsFilters;
 exports.readWaitCancelEvents = readWaitCancelEvents;
 // ============================================================
 // WORKFLOW TYPES
@@ -66,6 +67,15 @@ exports.WORKFLOW_NODE_TYPES = [
     'skill_input',
     'skill_output',
 ];
+/**
+ * Nós que têm a aba Filtros em `data.filters` (spec 2026-09-14 §5.3): os que "fazem algo".
+ * Gatilhos guardam os seus em `config.filters` (aplicados no DISPARO); Se/Selecionar/leque/
+ * Repetir/Tentar de novo e skill_output já são a condição ou o fim, não filtram.
+ */
+exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES.filter((t) => t.startsWith('action_') || t === 'ai_agent' || t === 'ai_agent_inline' || t === 'control_wait_for' || t === 'skill_input');
+function nodeTypeAcceptsFilters(type) {
+    return exports.WORKFLOW_FILTERABLE_NODE_TYPES.includes(type);
+}
 /**
  * Workflow Statuses — runtime constant + derived type.
  */
@@ -276,4 +286,10 @@ exports.WORKFLOW_VALIDATION_CODES = [
      * (D2, spec 2026-09-14) — o desenho precisa ser refeito sem essa saída.
      */
     'WAIT_FOR_SAIDA_ANTIGA',
+    /**
+     * Filtro inválido na aba Filtros de um nó (spec 2026-09-16, Fase 3): condição
+     * mal formada, campo/operador incompatível, ou nó que não aceita filtros mas
+     * tem `data.filters` preenchido.
+     */
+    'FILTRO_INVALIDO',
 ];

@@ -13,6 +13,13 @@ export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
+ * Nós que têm a aba Filtros em `data.filters` (spec 2026-09-14 §5.3): os que "fazem algo".
+ * Gatilhos guardam os seus em `config.filters` (aplicados no DISPARO); Se/Selecionar/leque/
+ * Repetir/Tentar de novo e skill_output já são a condição ou o fim, não filtram.
+ */
+export declare const WORKFLOW_FILTERABLE_NODE_TYPES: readonly WorkflowNodeType[];
+export declare function nodeTypeAcceptsFilters(type: string): boolean;
+/**
  * Workflow Statuses — runtime constant + derived type.
  */
 export declare const WORKFLOW_STATUSES: readonly ["active", "inactive", "draft", "archived"];
@@ -1744,7 +1751,7 @@ export interface WorkflowValidationResult {
  * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
  * essa informação (o errorHandler só serializa `fieldErrors`).
  */
-export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA"];
+export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO"];
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];
 export interface ValidationIssue {
     code: WorkflowValidationCode;
