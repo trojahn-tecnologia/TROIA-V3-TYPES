@@ -4,12 +4,14 @@
 // ============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AI_MODELS = void 0;
+exports.getAgentModels = getAgentModels;
 exports.getViableModels = getViableModels;
 exports.getProviderFromModel = getProviderFromModel;
 exports.getModelDefinition = getModelDefinition;
 exports.modelSupports = modelSupports;
 exports.getGatewaySlug = getGatewaySlug;
 exports.isGatewayCapable = isGatewayCapable;
+exports.canonicalModelId = canonicalModelId;
 /**
  * Catálogo completo de modelos de IA suportados
  *
@@ -289,6 +291,540 @@ exports.AI_MODELS = [
         maxOutputTokens: 131_000,
     },
     // ═══════════════════════════════════════════════════════════════
+    // Ampliação do catálogo (18/09/2026) — 41 modelos de texto novos.
+    //
+    // Preço, contexto e teto de saída NÃO foram escritos à mão: saíram de
+    // `https://ai-gateway.vercel.sh/v1/models`, o mesmo endereço que serve as
+    // chamadas. O que é decisão nossa é a curadoria (quais entram), o nome e a
+    // frase de destaque.
+    //
+    // Sobre a feature `reasoning`: aqui ela NÃO é o tag `reasoning` do
+    // gateway — é "o raciocínio não desliga", porque é isso que o
+    // `AgentRuntime` usa para pular a temperatura e dar 4× de teto de saída.
+    // A regra aplicada (conferida contra as 30 entradas antigas, bate em
+    // todas): sem `toggle` e sem valor de esforço que desligue (`none` /
+    // `minimal`). Por isso `gpt-5.4` fica de fora e `o4-mini` fica dentro.
+    // ═══════════════════════════════════════════════════════════════
+    {
+        id: 'gpt-5.5',
+        gatewaySlug: 'openai/gpt-5.5',
+        name: 'GPT-5.5',
+        provider: 'openai',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Topo de linha da OpenAI, 1M de contexto',
+        pricing: { input: 5.0, output: 30.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'gpt-5.6-luna',
+        gatewaySlug: 'openai/gpt-5.6-luna',
+        name: 'GPT-5.6 Luna',
+        provider: 'openai',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Barato e rápido com 1M de contexto',
+        pricing: { input: 0.2, output: 1.2 },
+        contextWindow: 1_050_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'gpt-5.6-sol',
+        gatewaySlug: 'openai/gpt-5.6-sol',
+        name: 'GPT-5.6 Sol',
+        provider: 'openai',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Equilíbrio entre custo e qualidade',
+        pricing: { input: 2.0, output: 10.0 },
+        contextWindow: 1_050_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'gpt-6-astra',
+        gatewaySlug: 'openai/gpt-6-astra',
+        name: 'GPT-6 Astra',
+        provider: 'openai',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Geração mais nova da OpenAI',
+        pricing: { input: 10.0, output: 50.0 },
+        contextWindow: 1_050_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'claude-sonnet-5',
+        gatewaySlug: 'anthropic/claude-sonnet-5',
+        name: 'Claude Sonnet 5',
+        provider: 'anthropic',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Sonnet atual: 1M de contexto',
+        pricing: { input: 2.0, output: 10.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'claude-opus-5',
+        gatewaySlug: 'anthropic/claude-opus-5',
+        name: 'Claude Opus 5',
+        provider: 'anthropic',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'O mais capaz da Anthropic',
+        pricing: { input: 5.0, output: 25.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'claude-sonnet-4-6',
+        gatewaySlug: 'anthropic/claude-sonnet-4.6',
+        name: 'Claude Sonnet 4.6',
+        provider: 'anthropic',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Sonnet da geração anterior',
+        pricing: { input: 3.0, output: 15.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'claude-opus-4-8',
+        gatewaySlug: 'anthropic/claude-opus-4.8',
+        name: 'Claude Opus 4.8',
+        provider: 'anthropic',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Opus da geração anterior',
+        pricing: { input: 5.0, output: 25.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'gemini-3-flash',
+        gatewaySlug: 'google/gemini-3-flash',
+        name: 'Gemini 3 Flash',
+        provider: 'google',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Gemini 3 rápido, 1M de contexto',
+        pricing: { input: 0.5, output: 3.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 65_000,
+    },
+    {
+        id: 'gemini-3.1-flash-lite',
+        gatewaySlug: 'google/gemini-3.1-flash-lite',
+        name: 'Gemini 3.1 Flash Lite',
+        provider: 'google',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'O mais barato do Gemini 3',
+        pricing: { input: 0.25, output: 1.5 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 65_000,
+    },
+    {
+        id: 'gemini-3.5-flash',
+        gatewaySlug: 'google/gemini-3.5-flash',
+        name: 'Gemini 3.5 Flash',
+        provider: 'google',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Geração 3.5, rápido',
+        pricing: { input: 1.5, output: 9.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 64_000,
+    },
+    {
+        id: 'gemini-3.8-flash',
+        gatewaySlug: 'google/gemini-3.8-flash',
+        name: 'Gemini 3.8 Flash',
+        provider: 'google',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Gemini mais recente',
+        pricing: { input: 0.75, output: 3.75 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 65_536,
+    },
+    {
+        id: 'gemini-3.1-pro',
+        gatewaySlug: 'google/gemini-3.1-pro-preview',
+        name: 'Gemini 3.1 Pro',
+        provider: 'google',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Gemini Pro para tarefas difíceis',
+        pricing: { input: 2.0, output: 12.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 64_000,
+    },
+    {
+        id: 'deepseek-v4.1-flash',
+        gatewaySlug: 'deepseek/deepseek-v4.1-flash',
+        name: 'DeepSeek V4.1 Flash',
+        provider: 'deepseek',
+        features: ['image', 'tools'],
+        highlight: 'Geração 4.1, 1M de contexto',
+        pricing: { input: 0.3, output: 1.2 },
+        contextWindow: 1_048_576,
+        maxOutputTokens: 32_768,
+    },
+    {
+        id: 'deepseek-v3.2',
+        gatewaySlug: 'deepseek/deepseek-v3.2',
+        name: 'DeepSeek V3.2',
+        provider: 'deepseek',
+        features: ['tools'],
+        highlight: 'Geração 3.2 estável',
+        pricing: { input: 0.62, output: 1.85 },
+        contextWindow: 128_000,
+        maxOutputTokens: 8_000,
+    },
+    {
+        id: 'deepseek-r1',
+        gatewaySlug: 'deepseek/deepseek-r1',
+        name: 'DeepSeek R1',
+        provider: 'deepseek',
+        features: ['tools', 'reasoning'],
+        highlight: 'Raciocínio sempre ligado',
+        pricing: { input: 1.35, output: 5.4 },
+        contextWindow: 128_000,
+        maxOutputTokens: 8_192,
+    },
+    {
+        id: 'glm-5.3',
+        gatewaySlug: 'zai/glm-5.3',
+        name: 'GLM 5.3',
+        provider: 'zai',
+        features: ['tools', 'reasoning'],
+        highlight: 'GLM completo, 1M de contexto',
+        pricing: { input: 1.4, output: 4.4 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 1_000_000,
+    },
+    {
+        id: 'glm-5.3-flashx',
+        gatewaySlug: 'zai/glm-5.3-flashx',
+        name: 'GLM 5.3 FlashX',
+        provider: 'zai',
+        features: ['image', 'tools'],
+        highlight: 'Meio-termo entre Flash e completo',
+        pricing: { input: 0.37, output: 1.25 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 131_072,
+    },
+    {
+        id: 'glm-4.7-flash',
+        gatewaySlug: 'zai/glm-4.7-flash',
+        name: 'GLM 4.7 Flash',
+        provider: 'zai',
+        features: ['tools'],
+        highlight: 'O mais barato da Z.ai',
+        pricing: { input: 0.07, output: 0.4 },
+        contextWindow: 200_000,
+        maxOutputTokens: 131_000,
+    },
+    {
+        id: 'glm-5.2',
+        gatewaySlug: 'zai/glm-5.2',
+        name: 'GLM 5.2',
+        provider: 'zai',
+        features: ['tools'],
+        highlight: 'Geração anterior do GLM',
+        pricing: { input: 0.8, output: 2.55 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'kimi-k2.5',
+        gatewaySlug: 'moonshotai/kimi-k2.5',
+        name: 'Kimi K2.5',
+        provider: 'moonshotai',
+        features: ['image', 'tools'],
+        highlight: 'Kimi econômico com 256k de contexto',
+        pricing: { input: 0.6, output: 3.0 },
+        contextWindow: 256_000,
+        maxOutputTokens: 256_000,
+    },
+    {
+        id: 'kimi-k2.6',
+        gatewaySlug: 'moonshotai/kimi-k2.6',
+        name: 'Kimi K2.6',
+        provider: 'moonshotai',
+        features: ['image', 'tools'],
+        highlight: 'Kimi da geração 2.6',
+        pricing: { input: 0.95, output: 4.0 },
+        contextWindow: 262_000,
+        maxOutputTokens: 262_000,
+    },
+    {
+        id: 'kimi-k3',
+        gatewaySlug: 'moonshotai/kimi-k3',
+        name: 'Kimi K3',
+        provider: 'moonshotai',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Kimi atual, 1M de contexto',
+        pricing: { input: 3.0, output: 15.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 131_072,
+    },
+    {
+        id: 'kimi-k3-fast',
+        gatewaySlug: 'moonshotai/kimi-k3-fast',
+        name: 'Kimi K3 Fast',
+        provider: 'moonshotai',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Kimi K3 com resposta mais rápida',
+        pricing: { input: 4.5, output: 22.5 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 131_072,
+    },
+    {
+        id: 'qwen3.7-flash',
+        gatewaySlug: 'alibaba/qwen3.7-flash',
+        name: 'Qwen 3.7 Flash',
+        provider: 'alibaba',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'O mais barato do catálogo',
+        pricing: { input: 0.03, output: 0.13 },
+        contextWindow: 991_000,
+        maxOutputTokens: 64_000,
+    },
+    {
+        id: 'qwen3.8-flash',
+        gatewaySlug: 'alibaba/qwen3.8-flash',
+        name: 'Qwen 3.8 Flash',
+        provider: 'alibaba',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Qwen atual, barato e com visão',
+        pricing: { input: 0.15, output: 0.47 },
+        contextWindow: 991_000,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'qwen3.8-27b',
+        gatewaySlug: 'alibaba/qwen3.8-27b',
+        name: 'Qwen 3.8 27B',
+        provider: 'alibaba',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Qwen médio, 1M de contexto',
+        pricing: { input: 0.5, output: 3.0 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 131_072,
+    },
+    {
+        id: 'qwen3.8-max',
+        gatewaySlug: 'alibaba/qwen3.8-max',
+        name: 'Qwen 3.8 Max',
+        provider: 'alibaba',
+        features: ['image', 'tools', 'reasoning'],
+        highlight: 'O mais capaz da Alibaba',
+        pricing: { input: 2.0, output: 6.0 },
+        contextWindow: 262_144,
+        maxOutputTokens: 128_000,
+    },
+    {
+        id: 'qwen3.7-plus',
+        gatewaySlug: 'alibaba/qwen3.7-plus',
+        name: 'Qwen 3.7 Plus',
+        provider: 'alibaba',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Equilíbrio de custo e qualidade',
+        pricing: { input: 0.4, output: 1.6 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 64_000,
+    },
+    {
+        id: 'minimax-m2.7',
+        gatewaySlug: 'minimax/minimax-m2.7',
+        name: 'MiniMax M2.7',
+        provider: 'minimax',
+        features: ['tools'],
+        highlight: 'Barato com 200k de contexto',
+        pricing: { input: 0.3, output: 1.2 },
+        contextWindow: 204_800,
+        maxOutputTokens: 131_000,
+    },
+    {
+        id: 'minimax-m3',
+        gatewaySlug: 'minimax/minimax-m3',
+        name: 'MiniMax M3',
+        provider: 'minimax',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'MiniMax atual, 512k de contexto',
+        pricing: { input: 0.3, output: 1.2 },
+        contextWindow: 512_000,
+        maxOutputTokens: 512_000,
+    },
+    {
+        id: 'llama-3.3-70b',
+        gatewaySlug: 'meta/llama-3.3-70b',
+        name: 'Llama 3.3 70B',
+        provider: 'meta',
+        features: ['tools'],
+        highlight: 'Llama aberto, 128k de contexto',
+        pricing: { input: 0.72, output: 0.72 },
+        contextWindow: 128_000,
+        maxOutputTokens: 8_192,
+    },
+    {
+        id: 'llama-4-maverick',
+        gatewaySlug: 'meta/llama-4-maverick',
+        name: 'Llama 4 Maverick',
+        provider: 'meta',
+        features: ['image', 'tools'],
+        highlight: 'Llama 4 com visão',
+        pricing: { input: 0.24, output: 0.97 },
+        contextWindow: 128_000,
+        maxOutputTokens: 8_192,
+    },
+    {
+        id: 'llama-4-scout',
+        gatewaySlug: 'meta/llama-4-scout',
+        name: 'Llama 4 Scout',
+        provider: 'meta',
+        features: ['image', 'tools'],
+        highlight: 'Llama 4 econômico',
+        pricing: { input: 0.17, output: 0.66 },
+        contextWindow: 128_000,
+        maxOutputTokens: 8_192,
+    },
+    {
+        id: 'mistral-large-3',
+        gatewaySlug: 'mistral/mistral-large-3',
+        name: 'Mistral Large 3',
+        provider: 'mistral',
+        features: ['image', 'tools'],
+        highlight: 'Topo de linha da Mistral',
+        pricing: { input: 0.5, output: 1.5 },
+        contextWindow: 262_144,
+        maxOutputTokens: 256_000,
+    },
+    {
+        id: 'mistral-small',
+        gatewaySlug: 'mistral/mistral-small',
+        name: 'Mistral Small',
+        provider: 'mistral',
+        features: ['image', 'tools'],
+        highlight: 'Mistral econômico',
+        pricing: { input: 0.15, output: 0.6 },
+        contextWindow: 262_144,
+        maxOutputTokens: 4_000,
+    },
+    {
+        id: 'ministral-8b',
+        gatewaySlug: 'mistral/ministral-8b',
+        name: 'Ministral 8B',
+        provider: 'mistral',
+        features: ['image', 'tools'],
+        highlight: 'Mistral mínimo, muito barato',
+        pricing: { input: 0.15, output: 0.15 },
+        contextWindow: 262_144,
+        maxOutputTokens: 4_000,
+    },
+    {
+        id: 'grok-4.1-fast',
+        gatewaySlug: 'spacexai/grok-4.1-fast-non-reasoning',
+        name: 'Grok 4.1 Fast',
+        provider: 'xai',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Grok rápido, 1M de contexto',
+        pricing: { input: 0.2, output: 0.5 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 1_000_000,
+    },
+    {
+        id: 'grok-4.1-fast-reasoning',
+        gatewaySlug: 'spacexai/grok-4.1-fast-reasoning',
+        name: 'Grok 4.1 Fast (raciocínio)',
+        provider: 'xai',
+        features: ['pdf', 'image', 'tools', 'reasoning'],
+        highlight: 'Grok rápido com raciocínio',
+        pricing: { input: 0.2, output: 0.5 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 1_000_000,
+    },
+    {
+        id: 'grok-4.3',
+        gatewaySlug: 'spacexai/grok-4.3',
+        name: 'Grok 4.3',
+        provider: 'xai',
+        features: ['pdf', 'image', 'tools'],
+        highlight: 'Grok da geração 4.3',
+        pricing: { input: 1.25, output: 2.5 },
+        contextWindow: 1_000_000,
+        maxOutputTokens: 1_000_000,
+    },
+    {
+        id: 'grok-4.6',
+        gatewaySlug: 'spacexai/grok-4.6',
+        name: 'Grok 4.6',
+        provider: 'xai',
+        features: ['image', 'tools'],
+        highlight: 'Grok mais recente',
+        pricing: { input: 2.0, output: 6.0 },
+        contextWindow: 500_000,
+        maxOutputTokens: 500_000,
+    },
+    // ═══════════════════════════════════════════════════════════════
+    // Áudio — transcrição e voz.
+    //
+    // Não são modelos de conversa e por isso têm `purpose` próprio: ficam fora
+    // do seletor "Modelo de IA" do agente e aparecem só na tela de custos, que
+    // é o motivo de existirem aqui. A cobrança deles não é por token (Whisper
+    // cobra por minuto, TTS por caractere) — ver `ai.transcription` e
+    // `ai.speech` em `credits.ts`.
+    // ═══════════════════════════════════════════════════════════════
+    {
+        id: 'whisper-1',
+        gatewaySlug: 'openai/whisper-1',
+        name: 'Whisper',
+        provider: 'openai',
+        purpose: 'stt',
+        features: [],
+        highlight: 'Transcrição de áudio (padrão do sistema)',
+        // US$ 0.0001 por segundo = US$ 0.006 por minuto. `pricing` fica zerado
+        // porque a interface exige as colunas de token, que aqui não se aplicam.
+        audioPricing: { perMinute: 0.006 },
+        pricing: { input: 0, output: 0 },
+        contextWindow: 0,
+        maxOutputTokens: 0,
+    },
+    {
+        id: 'gpt-4o-mini-transcribe',
+        gatewaySlug: 'openai/gpt-4o-mini-transcribe',
+        name: 'GPT-4o mini Transcribe',
+        provider: 'openai',
+        purpose: 'stt',
+        features: [],
+        highlight: 'Transcrição alternativa da OpenAI',
+        // US$ 0.00000125 por segundo = US$ 0.000075 por minuto — 80× mais barato
+        // que o Whisper, e era cobrado igual enquanto os dois caíam no preço
+        // genérico da categoria.
+        audioPricing: { perMinute: 0.000075 },
+        pricing: { input: 0, output: 0 },
+        contextWindow: 0,
+        maxOutputTokens: 0,
+    },
+    {
+        id: 'tts-1',
+        gatewaySlug: 'openai/tts-1',
+        name: 'TTS-1',
+        provider: 'openai',
+        purpose: 'tts',
+        features: [],
+        highlight: 'Voz sintetizada (padrão do sistema)',
+        // US$ 0.000015 por caractere = US$ 0.015 por 1.000 caracteres.
+        audioPricing: { per1kChars: 0.015 },
+        pricing: { input: 0, output: 0 },
+        contextWindow: 0,
+        maxOutputTokens: 0,
+    },
+    {
+        id: 'tts-1-hd',
+        gatewaySlug: 'openai/tts-1-hd',
+        name: 'TTS-1 HD',
+        provider: 'openai',
+        purpose: 'tts',
+        features: [],
+        highlight: 'Voz sintetizada em alta definição',
+        // US$ 0.00003 por caractere = o DOBRO do TTS-1, e era cobrado igual.
+        audioPricing: { per1kChars: 0.03 },
+        pricing: { input: 0, output: 0 },
+        contextWindow: 0,
+        maxOutputTokens: 0,
+    },
+    // ═══════════════════════════════════════════════════════════════
     // Legados (deprecated — retrocompatibilidade)
     // ═══════════════════════════════════════════════════════════════
     {
@@ -403,9 +939,27 @@ exports.AI_MODELS = [
 // AI MODEL HELPERS
 // ============================================================================
 /**
+ * Modelos que podem atender um cliente — o que o seletor do agente oferece.
+ *
+ * Exclui o que não é conversa (`purpose` de julgamento, transcrição ou voz) e
+ * os legados (`deprecated`). NÃO filtra por preço: desde 18/09/2026 quem
+ * informa o custo é o selo de créditos ao lado de cada modelo, com o preço
+ * REAL do app (ver `AiModelCreditPrice`). O filtro por custo estimado em
+ * reais que existia aqui escondia 20 modelos do catálogo — entre eles 7 que
+ * já estavam no sistema (gpt-5, gpt-4o, gpt-4.1, gpt-5.4, gemini-2.5-pro,
+ * claude-sonnet-4.5, claude-opus-4.5) — e ninguém na tela sabia por quê.
+ */
+function getAgentModels() {
+    return exports.AI_MODELS.filter((model) => !model.deprecated && (model.purpose === undefined || model.purpose === 'agent'));
+}
+/**
  * Filtra modelos viáveis por custo estimado por atendimento.
  * Cenário fixo: 40K input + 2K output tokens.
  * Exclui modelos deprecated.
+ *
+ * @deprecated Para o seletor do agente use `getAgentModels()`: o custo agora
+ * é mostrado em créditos por modelo, em vez de virar um corte invisível.
+ * Continua aqui para quem quiser a estimativa em reais.
  */
 function getViableModels(maxCostBRL = 0.40, usdToBRL = 5.80) {
     const INPUT_TOKENS = 40_000;
@@ -413,8 +967,11 @@ function getViableModels(maxCostBRL = 0.40, usdToBRL = 5.80) {
     return exports.AI_MODELS.filter(model => {
         if (model.deprecated)
             return false;
-        // Modelo de julgamento não conversa com cliente — fora do seletor do agente.
-        if (model.purpose === 'judge')
+        // Só modelo de CONVERSA entra no seletor do agente. Julgamento não
+        // conversa com cliente; transcrição e voz nem texto geram — e como o
+        // preço deles não é por token, `pricing` é zero e eles passariam no
+        // teste de custo abaixo sem essa guarda.
+        if (model.purpose !== undefined && model.purpose !== 'agent')
             return false;
         const cost = (INPUT_TOKENS / 1_000_000 * model.pricing.input
             + OUTPUT_TOKENS / 1_000_000 * model.pricing.output) * usdToBRL;
@@ -473,4 +1030,25 @@ function getGatewaySlug(modelId) {
  */
 function isGatewayCapable(modelId) {
     return getGatewaySlug(modelId) !== undefined;
+}
+/**
+ * Id do catálogo a partir de qualquer forma do modelo — o próprio id ou o
+ * slug do gateway.
+ *
+ * Existe por causa da cobrança. A tabela de preços por modelo é indexada
+ * pelo **id** (`glm-5.3-flash`), mas quem chama pelo gateway conhece o
+ * modelo pelo **slug** (`zai/glm-5.3-flash`). Sem converter, o preço por
+ * modelo não casa e o débito cai no preço genérico da categoria — em
+ * silêncio, porque preço genérico é um valor válido. Medido em produção
+ * (18/09/2026): lançamentos de `zai/glm-5.3-flash` saíram a 10 créditos
+ * quando a tabela dizia 21 para `glm-5.3-flash`.
+ *
+ * Desconhecido volta como veio: quem não está no catálogo continua sendo
+ * gravado com o nome que o provedor usou, que é melhor que perder o dado.
+ */
+function canonicalModelId(modelIdOrSlug) {
+    if (getModelDefinition(modelIdOrSlug))
+        return modelIdOrSlug;
+    const porSlug = exports.AI_MODELS.find((m) => m.gatewaySlug === modelIdOrSlug);
+    return porSlug ? porSlug.id : modelIdOrSlug;
 }

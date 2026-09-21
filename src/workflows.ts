@@ -1571,6 +1571,39 @@ export interface Workflow {
   deletedAt?: Date;
 }
 
+/** Janela, em dias, dos contadores de execução da listagem de workflows. */
+export const WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = 30;
+
+/** Baldes em que a listagem classifica uma execução (a régua da pausa automática). */
+export const WORKFLOW_EXECUTION_STATS_BUCKETS = ['completed', 'failed', 'customerFailed', 'cancelled', 'running', 'interrupted'] as const;
+export type WorkflowExecutionStatsBucket = (typeof WORKFLOW_EXECUTION_STATS_BUCKETS)[number];
+
+/**
+ * Contadores de execução de UM workflow na listagem (`GET /workflows?withStats=true`).
+ * Campo CALCULADO: existe só em `WorkflowResponse`, nunca no documento.
+ * `total` fecha com a soma: completed + failed + customerFailed + cancelled + running + interrupted.
+ */
+export interface WorkflowExecutionStats {
+  windowDays: number;
+  total: number;
+  completed: number;
+  failed: number;
+  customerFailed: number;
+  cancelled: number;
+  running: number;
+  interrupted: number;
+  lastExecutionAt?: string;
+  lastExecutionStatus?: WorkflowExecutionStatus;
+  /**
+   * Balde da ÚLTIMA execução, pela mesma régua que alimenta os contadores.
+   * É por ele que a tela rotula a última execução: sem isso o card diria
+   * "Falhou" ao lado de "0 falhas" (uma falha do cliente conta em
+   * `customerFailed`, não em `failed`).
+   * Ausente = backend anterior a esta versão; a tela cai no `lastExecutionStatus`.
+   */
+  lastExecutionBucket?: WorkflowExecutionStatsBucket;
+}
+
 /**
  * Workflow Response (API Response)
  */
@@ -1583,6 +1616,11 @@ export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'a
   updatedAt: string;
   deletedAt?: string;
   autoPause?: WorkflowAutoPauseResponse;
+  /**
+   * Contadores da janela. Só chega em `GET /workflows?withStats=true`;
+   * ausente = a listagem não pediu (e a tela não desenha nada novo).
+   */
+  executionStats?: WorkflowExecutionStats;
 }
 
 // ============================================================
@@ -1657,6 +1695,10 @@ export interface WorkflowExecution {
   startedAt: Date;
   completedAt?: Date;
   error?: string;
+  /** Nó em que a execução falhou, quando identificável. */
+  failedNodeId?: string;
+  /** Rótulo do nó em que a execução falhou, no momento da falha. */
+  failedNodeLabel?: string;
   duration?: number;
   /** Indicates if this execution was triggered via test mode (for tracking/audit purposes only) */
   isTest?: boolean;
@@ -1677,6 +1719,22 @@ export interface WorkflowExecution {
    * pode desligar o fluxo. Mesmo molde de `partialFailure`.
    */
   customerStateFailure?: boolean;
+  /**
+   * Execução que ninguém terminou (2026-09-18): o processo do servidor parou no
+   * meio — deploy, queda, OOM — e o run morreu junto, deixando o histórico em
+   * `running` para sempre. Quem fecha é o varredor de zumbis
+   * (`ScheduledResumeWorker.sweepZombieExecutions`), que grava `status:
+   * 'failed'` — o histórico não mente — com esta flag.
+   *
+   * A flag existe porque não foi o workflow que falhou: fica FORA dos DOIS
+   * contadores (`getLastNExecutionStatuses`, da pausa automática, e
+   * `getRecentExecutionOutcomes`, do aviso de falha frequente). Sem ela, um
+   * deploy que pegue execuções no meio inventa falha — o aviso dispara com 5
+   * nas últimas 20, e um workflow de baixa frequência acumularia zumbis de
+   * vários deploys dentro da própria janela. Mesmo molde de
+   * `customerStateFailure`.
+   */
+  interrupted?: boolean;
   /** Motivo do cancelamento. Só existe quando `status === 'cancelled'` (spec 2026-09-14). */
   cancelledBy?: WorkflowCancelReason;
   /** Chave única vinda do gatilho de webhook com "uma execução por identifier"
@@ -1865,6 +1923,8 @@ export interface WorkflowQuery {
   environment?: string | undefined;
   sortBy?: string | undefined;
   sortOrder?: 'asc' | 'desc' | undefined;
+  /** `?withStats=true` liga os contadores de execução de cada item da listagem. */
+  withStats?: boolean | undefined;
 }
 
 /**

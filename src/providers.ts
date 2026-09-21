@@ -355,6 +355,17 @@ export enum ProviderId {
    * ProviderId no mapa do ModelResolverService, como mistral/xai.
    */
   AI_ZAI = 'ai-zai',
+  /**
+   * Fabricantes servidos SÓ pelo Vercel AI Gateway (18/09/2026), mesmo
+   * desenho do `AI_ZAI` acima: sem entry no ProviderRegistry de propósito —
+   * não há integração direta para cadastrar no admin. O id existe para o
+   * `AIProviderType` correspondente ter um ProviderId nos mapas do
+   * `ModelResolverService`.
+   */
+  AI_MOONSHOTAI = 'ai-moonshotai',
+  AI_ALIBABA = 'ai-alibaba',
+  AI_MINIMAX = 'ai-minimax',
+  AI_META = 'ai-meta',
   AI_ELEVENLABS = 'ai-elevenlabs',
   AI_COHERE = 'ai-cohere',
   /**
@@ -446,6 +457,10 @@ export const PROVIDER_CATEGORY: Record<ProviderId, ProviderCategory> = {
   [ProviderId.AI_MISTRAL]: 'ai',
   [ProviderId.AI_DEEPSEEK]: 'ai',
   [ProviderId.AI_ZAI]: 'ai',
+  [ProviderId.AI_MOONSHOTAI]: 'ai',
+  [ProviderId.AI_ALIBABA]: 'ai',
+  [ProviderId.AI_MINIMAX]: 'ai',
+  [ProviderId.AI_META]: 'ai',
   [ProviderId.AI_ELEVENLABS]: 'ai',
   [ProviderId.AI_COHERE]: 'ai',
   [ProviderId.AI_VERCEL_GATEWAY]: 'ai',

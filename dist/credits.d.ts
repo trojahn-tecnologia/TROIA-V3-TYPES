@@ -16,6 +16,21 @@ export declare enum CreditCategory {
     AUTOMATION_CHECKLIST_COMPLETED = "automation.checklist.completed",
     INFRA_USER_ACTIVE = "infra.user.active",
     INFRA_CHANNEL_ACTIVE = "infra.channel.active",
+    /**
+     * Canal de e-mail (20/09/2026). Separado de `INFRA_CHANNEL_ACTIVE` porque
+     * custa a metade: canal de WhatsApp/IG/FB ocupa uma instância do gateway
+     * (R$ 15/mês), canal de e-mail não ocupa nenhuma (R$ 10/mês). Enquanto os
+     * dois dividiam a mesma linha, quem só usava e-mail pagava por instância
+     * que não existia. Ver `DOCS/modules/CREDITS_REPRICING.md`.
+     */
+    INFRA_CHANNEL_EMAIL = "infra.channel.email",
+    /**
+     * Armazenamento em disco (20/09/2026). A mídia de conversa é o maior custo
+     * de infraestrutura que o sistema nunca cobrou: 997 GB no S3 em agosto/2026,
+     * 1 MB por mensagem com anexo. A quantidade do débito são os GB ocupados
+     * pela empresa, medidos pela collection `storage-usage`.
+     */
+    INFRA_STORAGE_GB = "infra.storage.gb",
     INFRA_EMAIL_DOMAIN = "infra.email.domain",
     INFRA_DATABASE_SYNC = "infra.database.sync",
     WEBSITE_SITE_PUBLISHED = "website.site.published",
@@ -26,9 +41,39 @@ export declare enum CreditCategory {
     BILLING_CANCELLATION = "billing.cancellation",
     ADMIN_ADJUSTMENT = "admin.adjustment",
     AI_CONVERSATION_QA = "ai.conversation.qa",
-    MCP_TOOL_CALL = "mcp_tool_call"
+    MCP_TOOL_CALL = "mcp_tool_call",
+    /**
+     * Áudio (18/09/2026). Não cabem em `AI_TOKENS_*` porque o provedor não
+     * cobra por token: Whisper cobra por duração e TTS por caractere. Manter
+     * separado é o que deixa o extrato legível e o preço por modelo honesto.
+     */
+    AI_TRANSCRIPTION = "ai.transcription",
+    AI_SPEECH = "ai.speech"
 }
-export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day';
+/**
+ * Preço de um modelo de IA em CRÉDITOS, do jeito que o cliente paga.
+ *
+ * # Por que não dá para calcular no frontend
+ *
+ * O catálogo (`AI_MODELS`) traz o preço em dólar do fabricante — é o custo
+ * NOSSO, não o do cliente. O que o cliente paga sai da tabela de custos do
+ * app (`apps.costs[]`), que é por tenant, tem preço por modelo e pode ser
+ * editada no admin. Só o servidor conhece essa tabela.
+ *
+ * A unidade é por 1 MILHÃO de tokens porque é assim que todo fabricante
+ * publica preço, e porque em 1k os números ficam pequenos demais para
+ * comparar modelos de olho (10 contra 23 esconde que um é 2,3× o outro).
+ * Internamente a tabela é por 1k e o débito arredonda por 1k — esta conta é
+ * de VITRINE, não de cobrança.
+ */
+export interface AiModelCreditPrice {
+    modelId: string;
+    /** Créditos por 1M de tokens de entrada. `null` = categoria sem preço no app. */
+    inputPerMillion: number | null;
+    /** Créditos por 1M de tokens de saída. `null` = categoria sem preço no app. */
+    outputPerMillion: number | null;
+}
+export type CreditUnit = 'per_action' | 'per_1k_tokens' | 'per_month' | 'per_day' | 'per_minute' | 'per_1k_chars' | 'per_gb_month';
 export interface CreditCategoryConfig {
     label: string;
     unit: CreditUnit;
@@ -193,6 +238,17 @@ export interface CreditTransactionMetadata {
     modelId?: string;
     tokensInput?: number;
     tokensOutput?: number;
+    /**
+     * Parte da entrada que o provedor serviu do cache (20/09/2026). Só mede —
+     * o desconto do cache (75% na OpenAI) é automático e já vem embutido no
+     * preço que pagamos, mas sem este campo não há como saber QUANTO estamos
+     * aproveitando, e é ele que decide se o custo por atendimento é R$ 0,15 ou
+     * R$ 0,10. Ver `DOCS/modules/CREDITS_REPRICING.md` § "Medir o aproveitamento
+     * do cache".
+     */
+    tokensCached?: number;
+    /** Bytes ocupados no fechamento — só em `INFRA_STORAGE_GB`. */
+    storageBytes?: number;
     workflowId?: string;
     nodeId?: string;
     toolNames?: string[];
