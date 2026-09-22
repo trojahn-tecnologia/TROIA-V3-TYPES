@@ -73,6 +73,7 @@ export type ValidModuleId =
   | 'voices'
   | 'forms'
   | 'units'
+  | 'tags'
   | 'checklists'
   | 'sla-policies'
   | 'ticket-pipelines'

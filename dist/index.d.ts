@@ -97,3 +97,4 @@ export * from './sla';
 export * from './lead-capture';
 export * from './gamification';
 export * from './seller-dashboard';
+export * from './tags';

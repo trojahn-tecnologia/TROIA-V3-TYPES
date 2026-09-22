@@ -212,3 +212,7 @@ export * from './gamification';
 
 // Seller Dashboard — GET /api/leads/seller-dashboard (dentro do módulo CRM)
 export * from './seller-dashboard';
+
+// Tags — catálogo de tags do tenant (contatos, tickets, clientes, conversas).
+// O vínculo é pela PALAVRA, não por id: ver o cabeçalho de `tags.ts`.
+export * from './tags';

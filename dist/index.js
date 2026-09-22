@@ -175,3 +175,6 @@ __exportStar(require("./lead-capture"), exports);
 __exportStar(require("./gamification"), exports);
 // Seller Dashboard — GET /api/leads/seller-dashboard (dentro do módulo CRM)
 __exportStar(require("./seller-dashboard"), exports);
+// Tags — catálogo de tags do tenant (contatos, tickets, clientes, conversas).
+// O vínculo é pela PALAVRA, não por id: ver o cabeçalho de `tags.ts`.
+__exportStar(require("./tags"), exports);
