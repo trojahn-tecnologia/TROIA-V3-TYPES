@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_VALIDATION_CODES = exports.WORKFLOW_EXECUTION_STATS_BUCKETS = exports.WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WORKFLOW_NODE_INPUT_RETENTION_DAYS = exports.WORKFLOW_NODE_INPUT_MAX_BYTES = exports.WORKFLOW_EXECUTION_SUMMARY_RING_SIZE = exports.WORKFLOW_EXECUTION_RETENTION_DAYS = exports.WORKFLOW_EXECUTION_STATS_BUCKETS = exports.WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_WAIT_CANCELLED_HANDLE = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES = void 0;
 exports.nodeTypeAcceptsFilters = nodeTypeAcceptsFilters;
+exports.waitHasCancelledOutput = waitHasCancelledOutput;
 exports.readWaitCancelEvents = readWaitCancelEvents;
 // ============================================================
 // WORKFLOW TYPES
@@ -210,6 +211,27 @@ exports.WORKFLOW_CANCELLATION_EVENTS = {
 };
 exports.WORKFLOW_CANCELLATION_EVENT_TYPES = Object.keys(exports.WORKFLOW_CANCELLATION_EVENTS);
 /**
+ * Marca (`sourceHandle`) da saída vermelha "Cancelado" do nó Aguardar
+ * (spec 2026-09-20 §7.1, Fase 4b).
+ *
+ * NÃO pode ser `'event'`: essa era a marca da saída "Cancelado" ANTIGA, e a
+ * migração `2026-09-14-001` apaga toda ligação que sai dela — junto com a
+ * árvore de nós atrás dela. Também não pode ser `'timeout'`, que é a saída
+ * que segue depois da espera.
+ */
+exports.WORKFLOW_WAIT_CANCELLED_HANDLE = 'cancelled';
+/**
+ * O Aguardar tem a saída "Cancelado"? Fonte ÚNICA para tela, validação e
+ * compilador (spec 2026-09-20 §7.1): a saída existe quando o nó tem regra
+ * PRÓPRIA na aba Cancelamento — regra de outro nó (ou do gatilho) não desenha
+ * saída aqui, mesmo que também desvie a execução por esta (D13).
+ */
+function waitHasCancelledOutput(node) {
+    if (node.type !== 'control_wait_for')
+        return false;
+    return (node.data.cancellation?.rules ?? []).length > 0;
+}
+/**
  * @deprecated recorte do catálogo novo com os 4 eventos que o Aguardar antigo
  * aceitava. Some junto com `WaitCancelEvent`.
  */
@@ -240,6 +262,17 @@ exports.WAIT_UNTIL_MAX_DURATION_MS = 72 * 60 * 60 * 1000;
 exports.WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = 30;
 /** Baldes em que a listagem classifica uma execução (a régua da pausa automática). */
 exports.WORKFLOW_EXECUTION_STATS_BUCKETS = ['completed', 'failed', 'customerFailed', 'cancelled', 'running', 'interrupted'];
+/** Por quantos dias uma execução em status FINAL fica guardada antes de expirar. */
+exports.WORKFLOW_EXECUTION_RETENTION_DAYS = 30;
+/** Quantas execuções elegíveis o resumo do workflow guarda no anel (`executionSummary.recentOutcomes`). */
+exports.WORKFLOW_EXECUTION_SUMMARY_RING_SIZE = 20;
+// ============================================================
+// WORKFLOW NODE RUN INPUTS — o "Visualizar contexto" do nó (F2)
+// ============================================================
+/** Teto, em bytes, do que se guarda de entrada de UM nó numa execução. */
+exports.WORKFLOW_NODE_INPUT_MAX_BYTES = 32_768;
+/** Por quantos dias a entrada de um nó fica guardada. */
+exports.WORKFLOW_NODE_INPUT_RETENTION_DAYS = 30;
 /**
  * Validação estrutural de workflow (2026-08-27).
  *
@@ -296,4 +329,9 @@ exports.WORKFLOW_VALIDATION_CODES = [
      * tem `data.filters` preenchido.
      */
     'FILTRO_INVALIDO',
+    /**
+     * Ligação na saída "Cancelado" de um Aguardar que não tem regra própria na
+     * aba Cancelamento (spec 2026-09-20 §7.1, D12) — a saída só existe com regra.
+     */
+    'WAIT_FOR_CANCELADO_SEM_REGRA',
 ];

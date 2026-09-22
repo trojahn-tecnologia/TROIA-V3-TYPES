@@ -1000,6 +1000,23 @@ export interface WorkflowNodeCancellation {
     rules: WorkflowCancellationRule[];
 }
 /**
+ * Marca (`sourceHandle`) da saída vermelha "Cancelado" do nó Aguardar
+ * (spec 2026-09-20 §7.1, Fase 4b).
+ *
+ * NÃO pode ser `'event'`: essa era a marca da saída "Cancelado" ANTIGA, e a
+ * migração `2026-09-14-001` apaga toda ligação que sai dela — junto com a
+ * árvore de nós atrás dela. Também não pode ser `'timeout'`, que é a saída
+ * que segue depois da espera.
+ */
+export declare const WORKFLOW_WAIT_CANCELLED_HANDLE = "cancelled";
+/**
+ * O Aguardar tem a saída "Cancelado"? Fonte ÚNICA para tela, validação e
+ * compilador (spec 2026-09-20 §7.1): a saída existe quando o nó tem regra
+ * PRÓPRIA na aba Cancelamento — regra de outro nó (ou do gatilho) não desenha
+ * saída aqui, mesmo que também desvie a execução por esta (D13).
+ */
+export declare function waitHasCancelledOutput(node: Pick<WorkflowNode, 'type' | 'data'>): boolean;
+/**
  * @deprecated recorte do catálogo novo com os 4 eventos que o Aguardar antigo
  * aceitava. Some junto com `WaitCancelEvent`.
  */
@@ -1367,6 +1384,13 @@ export interface Workflow {
     /** Último aviso de falha frequente (2026-09-15) — trava de 1 aviso por
      * `WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS`. Interno: não vai na API. */
     frequentFailuresAlertedAt?: Date;
+    /**
+     * Resumo de execuções (2026-09-21), preenchido a partir do histórico e mantido
+     * incrementalmente a cada execução final. Alimenta as réguas de pausa automática
+     * e de aviso de falha frequente quando o histórico expira por validade.
+     * Interno: não vai na API, não é aceito de cliente.
+     */
+    executionSummary?: WorkflowExecutionSummary;
     definition: WorkflowDefinition;
     folderId?: ObjectId;
     /** Classificação de uso. Default: 'automation' */
@@ -1419,7 +1443,7 @@ export interface WorkflowExecutionStats {
 /**
  * Workflow Response (API Response)
  */
-export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'autoPause'> {
+export interface WorkflowResponse extends Omit<Workflow, '_id' | 'folderId' | 'appId' | 'companyId' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'autoPause' | 'executionSummary'> {
     id: string;
     folderId?: string;
     appId: string;
@@ -1478,6 +1502,35 @@ export interface WorkflowCancelReason {
     nodeId?: string;
     nodeLabel?: string;
     ruleIndex?: number;
+}
+/**
+ * Uma vez em que a execução, em vez de ser cancelada, seguiu pela saída
+ * "Cancelado" de um Aguardar (spec 2026-09-20 §7.1, Fase 4b).
+ *
+ * É LISTA em `WorkflowExecution.cancelDiversions`: o caminho vermelho pode
+ * conter outro Aguardar com saída vermelha, e o segundo desvio não apaga o
+ * primeiro.
+ *
+ * `at` é texto ISO 8601, como `WorkflowCancelReason.at` — o campo é lido pela
+ * tela e conferido por igualdade (o `$push` não duplica entrada com o mesmo
+ * `at`); nada aqui é comparado por faixa de data no Mongo.
+ */
+export interface WorkflowCancelDiversion {
+    /** Instante do desvio, ISO 8601. */
+    at: string;
+    /** Aguardar que desviou, e seu rótulo na hora do desvio. */
+    waitNodeId: string;
+    waitNodeLabel: string;
+    /** Evento que teria cancelado a execução, ex.: 'message.received'. */
+    eventType: string;
+    /** Entidade do evento: 'conversation' | 'lead' | 'contact' | 'ticket' | 'event'. */
+    entityKind: string;
+    entityId: string;
+    /** Nó cuja regra casou (pode ser o gatilho), e seu rótulo na hora do desvio. */
+    ruleNodeId: string;
+    ruleNodeLabel: string;
+    /** Texto em português que a tela mostra, montado na hora do desvio. */
+    description: string;
 }
 /**
  * Workflow Execution Entity (Database Document)
@@ -1541,6 +1594,12 @@ export interface WorkflowExecution {
     interrupted?: boolean;
     /** Motivo do cancelamento. Só existe quando `status === 'cancelled'` (spec 2026-09-14). */
     cancelledBy?: WorkflowCancelReason;
+    /**
+     * Os desvios pela saída "Cancelado" de um Aguardar (spec 2026-09-20 §7.1).
+     * Execução desviada NÃO é cancelada: ela segue pelo caminho vermelho e
+     * termina `completed`/`failed` conforme o que roda ali.
+     */
+    cancelDiversions?: WorkflowCancelDiversion[];
     /** Chave única vinda do gatilho de webhook com "uma execução por identifier"
      * ligado (2026-09-15). Índice único por workflow. */
     identifier?: string;
@@ -1553,6 +1612,42 @@ export interface WorkflowExecution {
      * Usado por findExecutionIdByRunId para resume de runs suspensos.
      */
     mastraRunId?: string;
+    /**
+     * Instante em que a execução chegou a um status FINAL; o prazo de validade
+     * conta daqui. Ausente = nunca expira.
+     */
+    retentionStartsAt?: Date;
+}
+/** Por quantos dias uma execução em status FINAL fica guardada antes de expirar. */
+export declare const WORKFLOW_EXECUTION_RETENTION_DAYS = 30;
+/** Quantas execuções elegíveis o resumo do workflow guarda no anel (`executionSummary.recentOutcomes`). */
+export declare const WORKFLOW_EXECUTION_SUMMARY_RING_SIZE = 20;
+/**
+ * Uma execução elegível para as réguas de pausa automática / aviso de falha
+ * frequente, como registrada no anel de `executionSummary.recentOutcomes`.
+ */
+export interface WorkflowExecutionOutcome {
+    executionId: string;
+    startedAt: Date;
+    status: 'completed' | 'failed';
+    partialFailure?: boolean;
+    error?: string;
+}
+/**
+ * Resumo de execuções de UM workflow (2026-09-21), mantido no próprio
+ * documento do workflow para que as réguas de pausa automática e de aviso de
+ * falha frequente continuem funcionando depois que o histórico de execuções
+ * expira por validade. Ver `Workflow.executionSummary`.
+ */
+export interface WorkflowExecutionSummary {
+    lastExecution?: {
+        executionId: string;
+        startedAt: Date;
+        status: WorkflowExecutionStatus;
+    };
+    recentOutcomes?: WorkflowExecutionOutcome[];
+    /** Instante em que o resumo foi preenchido a partir do histórico completo. */
+    backfilledAt?: Date;
 }
 /**
  * Workflow Execution Response (API Response)
@@ -1564,6 +1659,40 @@ export interface WorkflowExecutionResponse extends Omit<WorkflowExecution, '_id'
     companyId: string;
     startedAt: string;
     completedAt?: string;
+}
+/** Teto, em bytes, do que se guarda de entrada de UM nó numa execução. */
+export declare const WORKFLOW_NODE_INPUT_MAX_BYTES = 32768;
+/** Por quantos dias a entrada de um nó fica guardada. */
+export declare const WORKFLOW_NODE_INPUT_RETENTION_DAYS = 30;
+/** Uma execução em que o nó rodou e teve a entrada guardada. */
+export interface NodeRunListItem {
+    executionId: string;
+    /** Status da EXECUÇÃO (não do nó) — `WorkflowExecutionStatus`, nunca `NodeRunEntryStatus`. */
+    status: WorkflowExecutionStatus;
+    startedAt: string;
+    durationMs?: number;
+    /** Quantas vezes o nó recebeu entrada nesta execução (Repetição > 1). */
+    passes: number;
+    isTest: boolean;
+}
+export interface NodeRunListResponse {
+    items: NodeRunListItem[];
+    /** O workflow tem alguma execução (com ou sem contexto guardado)? Decide o texto do estado vazio. */
+    workflowHasExecutions: boolean;
+}
+/** O que chegou ao nó numa passagem. */
+export interface NodeRunInput {
+    createdAt: string;
+    /**
+     * A foto do que chegou. `unknown` de propósito: quando o que chegou não vira
+     * JSON, o valor guardado é um TEXTO de marcação, não um objeto.
+     */
+    input: unknown;
+    truncated: boolean;
+    originalBytes: number;
+}
+export interface NodeRunInputsResponse {
+    items: NodeRunInput[];
 }
 /**
  * Workflow Trigger Count (for inactivity triggers)
@@ -1808,7 +1937,7 @@ export interface WorkflowValidationResult {
  * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
  * essa informação (o errorHandler só serializa `fieldErrors`).
  */
-export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO"];
+export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO", "WAIT_FOR_CANCELADO_SEM_REGRA"];
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];
 export interface ValidationIssue {
     code: WorkflowValidationCode;
