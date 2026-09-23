@@ -9,7 +9,7 @@ import type { DatabaseType } from './databases';
  * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
  * directly and stay in sync automatically.
  */
-export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_transfer_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "action_find_unit", "action_find_user", "action_find_contact", "action_url_to_pdf", "action_nfe_pdf", "control_if", "control_switch", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_transfer_conversation", "action_satisfaction_survey", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "action_find_unit", "action_find_user", "action_find_contact", "action_url_to_pdf", "action_nfe_pdf", "control_if", "control_switch", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
@@ -806,6 +806,38 @@ export interface TransferConversationActionConfig {
     reason?: string;
 }
 /**
+ * Motivos de encerramento que o nó CSAT oferece: só os que NÃO bloqueiam a
+ * pesquisa (spam, duplicada, expirada e sem resposta nunca recebem CSAT —
+ * `SATISFACTION_SKIP_CLOSE_REASONS` no backend).
+ */
+export declare const SATISFACTION_SURVEY_CLOSE_REASONS: readonly ["resolved", "transferred", "other"];
+export type SatisfactionSurveyCloseReason = (typeof SATISFACTION_SURVEY_CLOSE_REASONS)[number];
+/**
+ * "CSAT — Satisfação do Cliente" (2026-09-23)
+ *
+ * Encerramento ESTIMULADO com pesquisa ESTIMULADA: o nó encerra a conversa pelo
+ * mesmo funil do chat e envia a pesquisa de satisfação do canal mesmo com ela
+ * desligada lá (e mesmo com agente de IA atendendo). Texto, opções e prazo de
+ * resposta são os do canal — sem configuração no canal, os de
+ * `DEFAULT_CHANNEL_SATISFACTION_CONFIG`. A captura da nota é a mesma do
+ * encerramento pelo canal (`satisfaction`/`satisfactionPending` na conversa).
+ *
+ * Conversa que já estava encerrada: o nó não envia (saída Falha).
+ */
+export interface SatisfactionSurveyActionConfig {
+    /**
+     * De onde vem a conversa — mesmo contrato do Transferir conversa.
+     * - 'context': a conversa do gatilho — ou, sem ela, a criada pelo nó logo antes
+     * - 'variable': `conversationId` traz um id ou uma `{{variável}}`
+     * @default 'context'
+     */
+    conversationSource?: 'context' | 'variable';
+    /** Conversa quando `conversationSource === 'variable'` (aceita {{variável}}). */
+    conversationId?: string;
+    /** Motivo do encerramento. @default 'resolved' */
+    closeReason?: SatisfactionSurveyCloseReason;
+}
+/**
  * IF Control Configuration
  */
 export interface IfControlConfig {
@@ -1256,7 +1288,7 @@ export interface SkillOutputConfig {
 /**
  * Node Configuration - Union of all config types
  */
-export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | FindUnitActionConfig | FindUserActionConfig | FindContactActionConfig | UrlToPdfActionConfig | NfePdfActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | TransferConversationActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
+export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | FindUnitActionConfig | FindUserActionConfig | FindContactActionConfig | UrlToPdfActionConfig | NfePdfActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | TransferConversationActionConfig | SatisfactionSurveyActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
 /**
  * Workflow Variable Value - Type-safe recursive value type for workflow variables
  */

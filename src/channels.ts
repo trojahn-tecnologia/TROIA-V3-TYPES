@@ -107,6 +107,25 @@ export interface ChannelSatisfactionConfig {
   timeoutMinutes: number;
 }
 
+/**
+ * Pesquisa padrão do sistema — FONTE ÚNICA (2026-09-23). A tela do canal
+ * pré-preenche com ela, e o nó "CSAT — Satisfação do Cliente" do workflow a
+ * usa quando o canal nunca configurou a própria pesquisa. `enabled: false`:
+ * o padrão não liga a pesquisa em canal nenhum (day-0 off continua valendo).
+ */
+export const DEFAULT_CHANNEL_SATISFACTION_CONFIG: ChannelSatisfactionConfig = {
+  enabled: false,
+  message: 'Como você avalia o atendimento que acabou de receber? Responda com o número da opção:',
+  options: [
+    { value: 1, emoji: '😍', label: 'Ótimo' },
+    { value: 2, emoji: '🙂', label: 'Bom' },
+    { value: 3, emoji: '😐', label: 'Regular' },
+    { value: 4, emoji: '🙁', label: 'Ruim' },
+    { value: 5, emoji: '😡', label: 'Péssimo' },
+  ],
+  timeoutMinutes: 60,
+};
+
 // ============================================================================
 // CHANNEL OUT-OF-HOURS CONFIG
 // ============================================================================

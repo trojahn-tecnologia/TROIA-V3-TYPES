@@ -98,3 +98,4 @@ export * from './lead-capture';
 export * from './gamification';
 export * from './seller-dashboard';
 export * from './tags';
+export * from './csat-report';

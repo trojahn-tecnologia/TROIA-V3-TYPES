@@ -81,6 +81,13 @@ export interface ChannelSatisfactionConfig {
     timeoutMinutes: number;
 }
 /**
+ * Pesquisa padrão do sistema — FONTE ÚNICA (2026-09-23). A tela do canal
+ * pré-preenche com ela, e o nó "CSAT — Satisfação do Cliente" do workflow a
+ * usa quando o canal nunca configurou a própria pesquisa. `enabled: false`:
+ * o padrão não liga a pesquisa em canal nenhum (day-0 off continua valendo).
+ */
+export declare const DEFAULT_CHANNEL_SATISFACTION_CONFIG: ChannelSatisfactionConfig;
+/**
  * Auto-resposta para mensagens recebidas fora do horário comercial da
  * empresa (company.businessCalendar). Ausente ou enabled !== true =
  * desligado. Máximo 3 respostas por conversa; só sem agente IA ativo.

@@ -41,6 +41,7 @@ export const WORKFLOW_NODE_TYPES = [
   'action_set_variable',
   'action_create_conversation',
   'action_transfer_conversation',
+  'action_satisfaction_survey',
   'action_create_ticket',
   'action_internal_notification',
   'action_find_leads',
@@ -99,7 +100,10 @@ export function nodeTypeAcceptsFilters(type: string): boolean {
 export const WORKFLOW_SUCCESS_HANDLE = 'success';
 export const WORKFLOW_FAILURE_HANDLE = 'failure';
 
-export const WORKFLOW_SUCCESS_FAILURE_NODE_TYPES: readonly WorkflowNodeType[] = ['action_transfer_conversation'];
+export const WORKFLOW_SUCCESS_FAILURE_NODE_TYPES: readonly WorkflowNodeType[] = [
+  'action_transfer_conversation',
+  'action_satisfaction_survey',
+];
 
 export function nodeTypeHasSuccessFailureOutputs(type: string): boolean {
   return (WORKFLOW_SUCCESS_FAILURE_NODE_TYPES as readonly string[]).includes(type);
@@ -971,6 +975,40 @@ export interface TransferConversationActionConfig {
 }
 
 /**
+ * Motivos de encerramento que o nó CSAT oferece: só os que NÃO bloqueiam a
+ * pesquisa (spam, duplicada, expirada e sem resposta nunca recebem CSAT —
+ * `SATISFACTION_SKIP_CLOSE_REASONS` no backend).
+ */
+export const SATISFACTION_SURVEY_CLOSE_REASONS = ['resolved', 'transferred', 'other'] as const;
+export type SatisfactionSurveyCloseReason = (typeof SATISFACTION_SURVEY_CLOSE_REASONS)[number];
+
+/**
+ * "CSAT — Satisfação do Cliente" (2026-09-23)
+ *
+ * Encerramento ESTIMULADO com pesquisa ESTIMULADA: o nó encerra a conversa pelo
+ * mesmo funil do chat e envia a pesquisa de satisfação do canal mesmo com ela
+ * desligada lá (e mesmo com agente de IA atendendo). Texto, opções e prazo de
+ * resposta são os do canal — sem configuração no canal, os de
+ * `DEFAULT_CHANNEL_SATISFACTION_CONFIG`. A captura da nota é a mesma do
+ * encerramento pelo canal (`satisfaction`/`satisfactionPending` na conversa).
+ *
+ * Conversa que já estava encerrada: o nó não envia (saída Falha).
+ */
+export interface SatisfactionSurveyActionConfig {
+  /**
+   * De onde vem a conversa — mesmo contrato do Transferir conversa.
+   * - 'context': a conversa do gatilho — ou, sem ela, a criada pelo nó logo antes
+   * - 'variable': `conversationId` traz um id ou uma `{{variável}}`
+   * @default 'context'
+   */
+  conversationSource?: 'context' | 'variable';
+  /** Conversa quando `conversationSource === 'variable'` (aceita {{variável}}). */
+  conversationId?: string;
+  /** Motivo do encerramento. @default 'resolved' */
+  closeReason?: SatisfactionSurveyCloseReason;
+}
+
+/**
  * IF Control Configuration
  */
 export interface IfControlConfig {
@@ -1395,6 +1433,7 @@ export type NodeConfig =
   | UpdateContactActionConfig
   | AssignActionConfig
   | TransferConversationActionConfig
+  | SatisfactionSurveyActionConfig
   | SetVariableActionConfig
   | IfControlConfig
   | SwitchControlConfig

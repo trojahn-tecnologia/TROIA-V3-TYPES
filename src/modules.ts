@@ -55,6 +55,7 @@ export type ValidModuleId =
   | 'calendar'
   | 'calls'
   | 'reports'
+  | 'reports-csat'
   | 'knowledge'
   | 'company'
   | 'teams'

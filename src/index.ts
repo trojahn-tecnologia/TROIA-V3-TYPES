@@ -216,3 +216,6 @@ export * from './seller-dashboard';
 // Tags — catálogo de tags do tenant (contatos, tickets, clientes, conversas).
 // O vínculo é pela PALAVRA, não por id: ver o cabeçalho de `tags.ts`.
 export * from './tags';
+
+// Relatório de CSAT — GET /api/reports/csat (permissão `reports-csat`)
+export * from './csat-report';
