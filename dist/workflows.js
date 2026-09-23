@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_VALIDATION_CODES = exports.WORKFLOW_NODE_INPUT_RETENTION_DAYS = exports.WORKFLOW_NODE_INPUT_MAX_BYTES = exports.WORKFLOW_EXECUTION_SUMMARY_RING_SIZE = exports.WORKFLOW_EXECUTION_RETENTION_DAYS = exports.WORKFLOW_EXECUTION_STATS_BUCKETS = exports.WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_WAIT_CANCELLED_HANDLE = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES = void 0;
+exports.WORKFLOW_VALIDATION_CODES = exports.WORKFLOW_NODE_INPUT_RETENTION_DAYS = exports.WORKFLOW_NODE_INPUT_MAX_BYTES = exports.WORKFLOW_EXECUTION_SUMMARY_RING_SIZE = exports.WORKFLOW_EXECUTION_RETENTION_DAYS = exports.WORKFLOW_EXECUTION_STATS_BUCKETS = exports.WORKFLOW_EXECUTION_STATS_WINDOW_DAYS = exports.WAIT_UNTIL_MAX_DURATION_MS = exports.WAIT_CANCEL_EVENT_ACTORS = exports.WORKFLOW_WAIT_CANCELLED_HANDLE = exports.WORKFLOW_CANCELLATION_EVENT_TYPES = exports.WORKFLOW_CANCELLATION_EVENTS = exports.WORKFLOW_EVENT_ACTORS = exports.BUSINESS_HOURS_NODE_TYPES = exports.WORKFLOW_EXECUTION_IDENTIFIER_MAX_LENGTH = exports.WORKFLOW_CONDITION_OPERATORS = exports.WORKFLOW_EXECUTION_OPEN_STATUSES = exports.WORKFLOW_EXECUTION_STATUSES = exports.WORKFLOW_AUTO_PAUSE_REASONS = exports.WORKFLOW_FREQUENT_FAILURES_ALERT_INTERVAL_HOURS = exports.WORKFLOW_FREQUENT_FAILURES_THRESHOLD = exports.WORKFLOW_FREQUENT_FAILURES_WINDOW = exports.WORKFLOW_AUTO_PAUSE_CONSECUTIVE_FAILURES = exports.WORKFLOW_STATUSES = exports.WORKFLOW_SUCCESS_FAILURE_NODE_TYPES = exports.WORKFLOW_FAILURE_HANDLE = exports.WORKFLOW_SUCCESS_HANDLE = exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES = void 0;
 exports.nodeTypeAcceptsFilters = nodeTypeAcceptsFilters;
+exports.nodeTypeHasSuccessFailureOutputs = nodeTypeHasSuccessFailureOutputs;
 exports.waitHasCancelledOutput = waitHasCancelledOutput;
 exports.readWaitCancelEvents = readWaitCancelEvents;
 // ============================================================
@@ -40,6 +41,7 @@ exports.WORKFLOW_NODE_TYPES = [
     'action_assign',
     'action_set_variable',
     'action_create_conversation',
+    'action_transfer_conversation',
     'action_create_ticket',
     'action_internal_notification',
     'action_find_leads',
@@ -76,6 +78,22 @@ exports.WORKFLOW_NODE_TYPES = [
 exports.WORKFLOW_FILTERABLE_NODE_TYPES = exports.WORKFLOW_NODE_TYPES.filter((t) => t.startsWith('action_') || t === 'ai_agent' || t === 'ai_agent_inline' || t === 'control_wait_for' || t === 'skill_input');
 function nodeTypeAcceptsFilters(type) {
     return exports.WORKFLOW_FILTERABLE_NODE_TYPES.includes(type);
+}
+/**
+ * Saídas "Sucesso" e "Falha" (2026-09-23, nó Transferir conversa): nó de ação
+ * que pode NÃO conseguir fazer o que promete ganha duas saídas, e o desenho
+ * decide o que acontece em cada caso. Fonte ÚNICA para a tela (alças do nó),
+ * o validador e o compilador.
+ *
+ * O nó devolve `{ success: boolean }`: `true` segue pela saída `success`,
+ * `false` pela `failure`. Sem ligação na saída Falha o nó LANÇA quando não
+ * consegue — a execução falha com o motivo, em vez de terminar calada.
+ */
+exports.WORKFLOW_SUCCESS_HANDLE = 'success';
+exports.WORKFLOW_FAILURE_HANDLE = 'failure';
+exports.WORKFLOW_SUCCESS_FAILURE_NODE_TYPES = ['action_transfer_conversation'];
+function nodeTypeHasSuccessFailureOutputs(type) {
+    return exports.WORKFLOW_SUCCESS_FAILURE_NODE_TYPES.includes(type);
 }
 /**
  * Workflow Statuses — runtime constant + derived type.
@@ -334,4 +352,9 @@ exports.WORKFLOW_VALIDATION_CODES = [
      * aba Cancelamento (spec 2026-09-20 §7.1, D12) — a saída só existe com regra.
      */
     'WAIT_FOR_CANCELADO_SEM_REGRA',
+    /**
+     * Ligação presa num ponto de saída que não é "Sucesso" nem "Falha", num nó
+     * que tem essas duas saídas (`nodeTypeHasSuccessFailureOutputs`, 2026-09-23).
+     */
+    'SUCESSO_FALHA_HANDLE_INVALIDO',
 ];

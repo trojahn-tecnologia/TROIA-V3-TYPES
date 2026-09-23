@@ -9,7 +9,7 @@ import type { DatabaseType } from './databases';
  * runtime validators (Zod enums) can import WORKFLOW_NODE_TYPES
  * directly and stay in sync automatically.
  */
-export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "action_find_unit", "action_find_user", "action_find_contact", "action_url_to_pdf", "action_nfe_pdf", "control_if", "control_switch", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
+export declare const WORKFLOW_NODE_TYPES: readonly ["trigger_webhook", "trigger_schedule", "trigger_event", "trigger_manual", "trigger_date_field", "trigger_inactivity", "trigger_instagram_comment", "trigger_instagram_mention", "action_send_message", "action_send_email", "action_send_template", "action_send_media", "action_http_request", "action_query_database", "action_create_lead", "action_update_lead", "action_update_contact", "action_add_tag", "action_remove_tag", "action_assign", "action_set_variable", "action_create_conversation", "action_transfer_conversation", "action_create_ticket", "action_internal_notification", "action_find_leads", "action_create_database_document", "action_mirror_media", "action_voice_clone", "action_voice_tts", "action_voice_clone_delete", "action_create_checklist", "action_find_unit", "action_find_user", "action_find_contact", "action_url_to_pdf", "action_nfe_pdf", "control_if", "control_switch", "control_wait_for", "control_loop", "control_split", "control_retry_scope", "ai_agent", "ai_agent_inline", "skill_input", "skill_output"];
 /** Derived from WORKFLOW_NODE_TYPES — do not edit manually. */
 export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
 /**
@@ -19,6 +19,20 @@ export type WorkflowNodeType = (typeof WORKFLOW_NODE_TYPES)[number];
  */
 export declare const WORKFLOW_FILTERABLE_NODE_TYPES: readonly WorkflowNodeType[];
 export declare function nodeTypeAcceptsFilters(type: string): boolean;
+/**
+ * Saídas "Sucesso" e "Falha" (2026-09-23, nó Transferir conversa): nó de ação
+ * que pode NÃO conseguir fazer o que promete ganha duas saídas, e o desenho
+ * decide o que acontece em cada caso. Fonte ÚNICA para a tela (alças do nó),
+ * o validador e o compilador.
+ *
+ * O nó devolve `{ success: boolean }`: `true` segue pela saída `success`,
+ * `false` pela `failure`. Sem ligação na saída Falha o nó LANÇA quando não
+ * consegue — a execução falha com o motivo, em vez de terminar calada.
+ */
+export declare const WORKFLOW_SUCCESS_HANDLE = "success";
+export declare const WORKFLOW_FAILURE_HANDLE = "failure";
+export declare const WORKFLOW_SUCCESS_FAILURE_NODE_TYPES: readonly WorkflowNodeType[];
+export declare function nodeTypeHasSuccessFailureOutputs(type: string): boolean;
 /**
  * Workflow Statuses — runtime constant + derived type.
  */
@@ -754,6 +768,44 @@ export interface CreateConversationActionConfig {
     channelId?: string;
 }
 /**
+ * Transfer Conversation Action Configuration (2026-09-23)
+ *
+ * Transfere a conversa para um usuário ou uma equipe pelo MESMO motor do botão
+ * "Transferir" do chat (`ConversationsService.transferConversation`): o usuário
+ * precisa atender o canal da conversa; a equipe roda o rodízio entre os membros
+ * que atendem o canal. Deu certo → pausa o agente de IA da conversa (se ativo)
+ * e segue pela saída Sucesso; não deu → saída Falha (ver
+ * `WORKFLOW_SUCCESS_FAILURE_NODE_TYPES`).
+ *
+ * Todo id aceita `{{variável}}` do fluxo.
+ */
+export interface TransferConversationActionConfig {
+    /**
+     * De onde vem a conversa.
+     * - 'context': a conversa do gatilho — ou, sem ela, a criada pelo nó logo antes
+     * - 'variable': `conversationId` traz um id ou uma `{{variável}}`
+     * @default 'context'
+     */
+    conversationSource?: 'context' | 'variable';
+    /** Conversa quando `conversationSource === 'variable'` (aceita {{variável}}). */
+    conversationId?: string;
+    /** Destino da transferência. */
+    transferTo: 'user' | 'team';
+    /**
+     * Como o destino foi escolhido na tela: da lista ('specific') ou por uma
+     * `{{variável}}` ('variable'). O motor trata os dois igual — muda só o
+     * controle que a tela mostra (mesmo padrão do `assignTo` do Criar lead).
+     * @default 'specific'
+     */
+    targetSource?: 'specific' | 'variable';
+    /** Usuário de destino quando `transferTo === 'user'` (aceita {{variável}}). */
+    userId?: string;
+    /** Equipe de destino quando `transferTo === 'team'` (aceita {{variável}}). */
+    teamId?: string;
+    /** Motivo gravado no histórico da conversa (aceita {{variável}}). */
+    reason?: string;
+}
+/**
  * IF Control Configuration
  */
 export interface IfControlConfig {
@@ -1204,7 +1256,7 @@ export interface SkillOutputConfig {
 /**
  * Node Configuration - Union of all config types
  */
-export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | FindUnitActionConfig | FindUserActionConfig | FindContactActionConfig | UrlToPdfActionConfig | NfePdfActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
+export type NodeConfig = WebhookTriggerConfig | ScheduleTriggerConfig | EventTriggerConfig | AnyDateFieldTriggerConfig | InactivityTriggerConfig | InstagramCommentTriggerConfig | InstagramMentionTriggerConfig | SendMessageActionConfig | SendEmailActionConfig | HttpRequestActionConfig | QueryDatabaseActionConfig | CreateLeadActionConfig | UpdateLeadActionConfig | FindUnitActionConfig | FindUserActionConfig | FindContactActionConfig | UrlToPdfActionConfig | NfePdfActionConfig | SendTemplateActionConfig | CreateTicketActionConfig | UpdateContactActionConfig | AssignActionConfig | TransferConversationActionConfig | SetVariableActionConfig | IfControlConfig | SwitchControlConfig | LoopControlConfig | WaitForControlConfig | SplitControlConfig | AIAgentNodeConfig | AIAgentInlineConfig | CreateDatabaseDocumentActionConfig | RetryScopeControlConfig | MirrorMediaActionConfig | VoiceCloneActionConfig | VoiceTtsActionConfig | VoiceCloneDeleteActionConfig | SkillInputConfig | SkillOutputConfig | Record<string, unknown>;
 /**
  * Workflow Variable Value - Type-safe recursive value type for workflow variables
  */
@@ -1937,7 +1989,7 @@ export interface WorkflowValidationResult {
  * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
  * essa informação (o errorHandler só serializa `fieldErrors`).
  */
-export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO", "WAIT_FOR_CANCELADO_SEM_REGRA"];
+export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO", "WAIT_FOR_CANCELADO_SEM_REGRA", "SUCESSO_FALHA_HANDLE_INVALIDO"];
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];
 export interface ValidationIssue {
     code: WorkflowValidationCode;
