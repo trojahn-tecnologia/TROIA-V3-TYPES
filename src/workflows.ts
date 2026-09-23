@@ -1904,6 +1904,13 @@ export interface WorkflowExecution {
   /** Chave única vinda do gatilho de webhook com "uma execução por identifier"
    * ligado (2026-09-15). Índice único por workflow. */
   identifier?: string;
+  /**
+   * Nó-gatilho que disparou a execução (23/09/2026 — o workflow pode ter
+   * vários gatilhos, e cada um roda o fluxo a partir dele). A retomada de um
+   * fluxo que dormiu recompila a partir do MESMO gatilho. Ausente em execução
+   * anterior a essa data: vale o primeiro gatilho do desenho.
+   */
+  triggerNodeId?: string;
   appId: ObjectId;
   companyId: ObjectId;
   /**
@@ -2371,6 +2378,12 @@ export const WORKFLOW_VALIDATION_CODES = [
   'FANOUT_HTTP_AGUARDA',
   /** Desenho sem nenhum gatilho (nem `skill_input`). */
   'SEM_GATILHO',
+  /**
+   * Gatilho que o motor não suporta repetido no mesmo workflow (23/09/2026):
+   * dois Agendamentos, ou duas Inatividades da mesma entidade — o relógio é um
+   * só por workflow e o segundo nunca dispararia.
+   */
+  'GATILHO_REPETIDO',
   /** Nó sem nenhuma ligação — nem entrando, nem saindo. */
   'NO_SOLTO',
   /** Campo obrigatório faltando ou fora do formato na configuração de um nó. */

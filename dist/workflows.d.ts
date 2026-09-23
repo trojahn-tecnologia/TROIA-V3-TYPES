@@ -1687,6 +1687,13 @@ export interface WorkflowExecution {
     /** Chave única vinda do gatilho de webhook com "uma execução por identifier"
      * ligado (2026-09-15). Índice único por workflow. */
     identifier?: string;
+    /**
+     * Nó-gatilho que disparou a execução (23/09/2026 — o workflow pode ter
+     * vários gatilhos, e cada um roda o fluxo a partir dele). A retomada de um
+     * fluxo que dormiu recompila a partir do MESMO gatilho. Ausente em execução
+     * anterior a essa data: vale o primeiro gatilho do desenho.
+     */
+    triggerNodeId?: string;
     appId: ObjectId;
     companyId: ObjectId;
     /**
@@ -2021,7 +2028,7 @@ export interface WorkflowValidationResult {
  * editor pintar de vermelho os nós culpados — o 422 do PATCH não carrega
  * essa informação (o errorHandler só serializa `fieldErrors`).
  */
-export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO", "WAIT_FOR_CANCELADO_SEM_REGRA", "SUCESSO_FALHA_HANDLE_INVALIDO"];
+export declare const WORKFLOW_VALIDATION_CODES: readonly ["NODE_TYPE_DESCONHECIDO", "ARESTA_ORFA", "SEM_ENTRADA", "MULTIPLAS_ENTRADAS", "CICLO", "IF_SEM_CAMINHO", "IF_HANDLE_INVALIDO", "SWITCH_SEM_HANDLE", "SPLIT_HANDLE_INVALIDO", "LOOP_SAIDAS", "WAIT_FOR_SAIDAS", "FANOUT_JUNCAO", "FANOUT_ESPERA", "FANOUT_HORARIO", "SWITCH_HANDLE_NAO_COMPILAVEL", "CONTROL_FLOW_EM_LOOP", "RETRY_SAIDAS", "CONTROL_FLOW_EM_RETRY", "FANOUT_HTTP_AGUARDA", "SEM_GATILHO", "GATILHO_REPETIDO", "NO_SOLTO", "CONFIG_INVALIDA", "LEGADO", "CANCELAMENTO_INVALIDO", "WAIT_FOR_SAIDA_ANTIGA", "FILTRO_INVALIDO", "WAIT_FOR_CANCELADO_SEM_REGRA", "SUCESSO_FALHA_HANDLE_INVALIDO"];
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];
 export interface ValidationIssue {
     code: WorkflowValidationCode;

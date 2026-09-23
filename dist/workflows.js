@@ -335,6 +335,12 @@ exports.WORKFLOW_VALIDATION_CODES = [
     'FANOUT_HTTP_AGUARDA',
     /** Desenho sem nenhum gatilho (nem `skill_input`). */
     'SEM_GATILHO',
+    /**
+     * Gatilho que o motor não suporta repetido no mesmo workflow (23/09/2026):
+     * dois Agendamentos, ou duas Inatividades da mesma entidade — o relógio é um
+     * só por workflow e o segundo nunca dispararia.
+     */
+    'GATILHO_REPETIDO',
     /** Nó sem nenhuma ligação — nem entrando, nem saindo. */
     'NO_SOLTO',
     /** Campo obrigatório faltando ou fora do formato na configuração de um nó. */
