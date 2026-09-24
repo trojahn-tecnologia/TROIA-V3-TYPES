@@ -63,6 +63,9 @@ export interface Contact extends CreatorStamp {
   // Personal information
   personalInfo?: PersonalInfo;
 
+  // Free-text notes about the contact (the "Notas" field in the contact form)
+  notes?: string;
+
   // Assignment system integration
   assigneeId?: string;
   teamId?: string;
@@ -102,6 +105,7 @@ export interface CreateContactRequest {
   tags?: string[];
   identifiers: Partial<ContactIdentifiers>;
   personalInfo?: PersonalInfo;
+  notes?: string;
   customerId?: string;
   assigneeId?: string;
   teamId?: string;
@@ -113,6 +117,7 @@ export interface UpdateContactRequest {
   tags?: string[];
   identifiers?: Partial<ContactIdentifiers>;
   personalInfo?: PersonalInfo;
+  notes?: string;
   customerId?: string;
   assigneeId?: string;
   teamId?: string;

@@ -35,6 +35,7 @@ export interface Contact extends CreatorStamp {
     identifiers: ContactIdentifiers;
     customerId?: string;
     personalInfo?: PersonalInfo;
+    notes?: string;
     assigneeId?: string;
     teamId?: string;
     lastInteractionAt?: string;
@@ -52,6 +53,7 @@ export interface CreateContactRequest {
     tags?: string[];
     identifiers: Partial<ContactIdentifiers>;
     personalInfo?: PersonalInfo;
+    notes?: string;
     customerId?: string;
     assigneeId?: string;
     teamId?: string;
@@ -62,6 +64,7 @@ export interface UpdateContactRequest {
     tags?: string[];
     identifiers?: Partial<ContactIdentifiers>;
     personalInfo?: PersonalInfo;
+    notes?: string;
     customerId?: string;
     assigneeId?: string;
     teamId?: string;

@@ -219,6 +219,8 @@ export interface Conversation extends CreatorStamp {
   satisfactionAt?: string;
   /** Auto-respostas fora do horário já enviadas nesta conversa (máx 3) */
   outOfHoursTryings?: number;
+  /** Quando saiu o último aviso fora do horário (ISO na API; Date no banco) — no máximo 1 por hora */
+  outOfHoursLastSentAt?: string;
 
   // Provider integration (via lookup)
   provider?: {                // ✅ Populated provider data (via lookup, not stored)
