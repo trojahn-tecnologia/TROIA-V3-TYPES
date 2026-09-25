@@ -74,6 +74,19 @@ export type AIProviderConfig =
 /**
  * Features suportadas por um modelo de IA
  * Diferente de AIAgentCapability (que são features do agente, não do modelo)
+ *
+ * `'reasoning'` = o modelo PENSA POR PADRÃO, e o pensamento sai do mesmo
+ * limite de saída da resposta. O backend dá a ele folga de saída (piso de
+ * 8.192) e não manda temperature/seed. Sem a marca, um limite baixo (300)
+ * some inteiro no pensamento e o agente fica MUDO — foi o GLM 5.3 em prod e
+ * o gpt-5/gpt-5-mini na bateria de 24/09/2026.
+ *
+ * Confira pela bateria (`scripts/bateria-agente-duas-instancias.ts
+ * --modelos gateway` no backend), NÃO pela etiqueta "reasoning" do gateway:
+ * ela marca quem CONSEGUE pensar, não quem pensa sempre — na bateria de
+ * 24/09 (61 modelos, limite de 300), só gpt-5, gpt-5-mini, gemini-3-flash,
+ * glm-5.3-flashx e minimax-m3 ficaram mudos; os GPT-5.4 em diante, os Claude
+ * e os Gemini 2.5 responderam normalmente.
  */
 export type AIModelFeature = 'pdf' | 'image' | 'tools' | 'reasoning';
 
@@ -191,7 +204,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     gatewaySlug: 'openai/gpt-5-mini',
     name: 'GPT-5 Mini',
     provider: 'openai',
-    features: ['pdf', 'image', 'tools'],
+    features: ['pdf', 'image', 'tools', 'reasoning'],
     highlight: 'GPT-5 econômico',
     pricing: { input: 0.25, output: 1.00 },
     contextWindow: 128_000,
@@ -224,7 +237,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     gatewaySlug: 'openai/gpt-5',
     name: 'GPT-5',
     provider: 'openai',
-    features: ['pdf', 'image', 'tools'],
+    features: ['pdf', 'image', 'tools', 'reasoning'],
     highlight: 'Máxima inteligência OpenAI',
     pricing: { input: 1.25, output: 10.00 },
     contextWindow: 256_000,
@@ -542,7 +555,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     gatewaySlug: 'google/gemini-3-flash',
     name: 'Gemini 3 Flash',
     provider: 'google',
-    features: ['pdf', 'image', 'tools'],
+    features: ['pdf', 'image', 'tools', 'reasoning'],
     highlight: 'Gemini 3 rápido, 1M de contexto',
     pricing: { input: 0.5, output: 3.0 },
     contextWindow: 1_000_000,
@@ -641,7 +654,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     gatewaySlug: 'zai/glm-5.3-flashx',
     name: 'GLM 5.3 FlashX',
     provider: 'zai',
-    features: ['image', 'tools'],
+    features: ['image', 'tools', 'reasoning'],
     highlight: 'Meio-termo entre Flash e completo',
     pricing: { input: 0.37, output: 1.25 },
     contextWindow: 1_000_000,
@@ -784,7 +797,7 @@ export const AI_MODELS: AIModelDefinition[] = [
     gatewaySlug: 'minimax/minimax-m3',
     name: 'MiniMax M3',
     provider: 'minimax',
-    features: ['pdf', 'image', 'tools'],
+    features: ['pdf', 'image', 'tools', 'reasoning'],
     highlight: 'MiniMax atual, 512k de contexto',
     pricing: { input: 0.3, output: 1.2 },
     contextWindow: 512_000,

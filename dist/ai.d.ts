@@ -40,6 +40,19 @@ export type AIProviderConfig = OpenAIConfig | AnthropicConfig | CohereConfig | H
 /**
  * Features suportadas por um modelo de IA
  * Diferente de AIAgentCapability (que são features do agente, não do modelo)
+ *
+ * `'reasoning'` = o modelo PENSA POR PADRÃO, e o pensamento sai do mesmo
+ * limite de saída da resposta. O backend dá a ele folga de saída (piso de
+ * 8.192) e não manda temperature/seed. Sem a marca, um limite baixo (300)
+ * some inteiro no pensamento e o agente fica MUDO — foi o GLM 5.3 em prod e
+ * o gpt-5/gpt-5-mini na bateria de 24/09/2026.
+ *
+ * Confira pela bateria (`scripts/bateria-agente-duas-instancias.ts
+ * --modelos gateway` no backend), NÃO pela etiqueta "reasoning" do gateway:
+ * ela marca quem CONSEGUE pensar, não quem pensa sempre — na bateria de
+ * 24/09 (61 modelos, limite de 300), só gpt-5, gpt-5-mini, gemini-3-flash,
+ * glm-5.3-flashx e minimax-m3 ficaram mudos; os GPT-5.4 em diante, os Claude
+ * e os Gemini 2.5 responderam normalmente.
  */
 export type AIModelFeature = 'pdf' | 'image' | 'tools' | 'reasoning';
 /**
