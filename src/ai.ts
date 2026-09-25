@@ -637,6 +637,11 @@ export const AI_MODELS: AIModelDefinition[] = [
     pricing: { input: 1.35, output: 5.4 },
     contextWindow: 128_000,
     maxOutputTokens: 8_192,
+    // Fora do seletor desde 24/09/2026 (decisão do dono): pelo gateway ele não
+    // chama ferramenta de verdade — escreve a chamada como texto — e o agente
+    // do TroiaChat só fala com o cliente por ferramenta. Não respondeu em
+    // nenhuma rodada da bateria de modelos.
+    deprecated: true,
   },
   {
     id: 'glm-5.3',
@@ -802,6 +807,11 @@ export const AI_MODELS: AIModelDefinition[] = [
     pricing: { input: 0.3, output: 1.2 },
     contextWindow: 512_000,
     maxOutputTokens: 512_000,
+    // Fora do seletor desde 24/09/2026 (decisão do dono): no fluxo do agente se
+    // perde nas instruções — negou a foto que elas mandavam enviar e chegou a
+    // inventar uma persona ("Mila da MV Refrigeração") que não existe em lugar
+    // nenhum. Numa conversa simples obedece; com o prompt do agente, não.
+    deprecated: true,
   },
   {
     id: 'llama-3.3-70b',
@@ -813,6 +823,10 @@ export const AI_MODELS: AIModelDefinition[] = [
     pricing: { input: 0.72, output: 0.72 },
     contextWindow: 128_000,
     maxOutputTokens: 8_192,
+    // Fora do seletor desde 24/09/2026 (decisão do dono): depois da primeira
+    // mensagem passa a escrever a chamada de ferramenta como JSON em texto,
+    // mesmo com o reestímulo — sem foto e sem transferência na bateria.
+    deprecated: true,
   },
   {
     id: 'llama-4-maverick',
