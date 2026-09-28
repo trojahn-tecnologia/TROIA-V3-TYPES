@@ -2,6 +2,8 @@ import { ObjectId } from 'mongodb';
 import type { ActorType } from './common';
 
 import type { DatabaseType } from './databases';
+import type { FormField } from './forms';
+import { FormFieldType } from './forms';
 
 // ============================================================
 // WORKFLOW TYPES
@@ -42,6 +44,10 @@ export const WORKFLOW_NODE_TYPES = [
   'action_create_conversation',
   'action_transfer_conversation',
   'action_satisfaction_survey',
+  'action_ask_question',
+  'action_ask_form',
+  'action_next_number',
+  'action_save_form_response',
   'action_create_ticket',
   'action_internal_notification',
   'action_find_leads',
@@ -103,6 +109,7 @@ export const WORKFLOW_FAILURE_HANDLE = 'failure';
 export const WORKFLOW_SUCCESS_FAILURE_NODE_TYPES: readonly WorkflowNodeType[] = [
   'action_transfer_conversation',
   'action_satisfaction_survey',
+  'action_save_form_response',
 ];
 
 export function nodeTypeHasSuccessFailureOutputs(type: string): boolean {
@@ -1009,6 +1016,419 @@ export interface SatisfactionSurveyActionConfig {
 }
 
 /**
+ * "Pergunta" (2026-09-28)
+ *
+ * Um nó só pergunta, espera a resposta e confere se ela serve. O laço de
+ * tentativas vive DENTRO do nó, porque o desenho não aceita ciclo (`CICLO`):
+ * resposta que não serve recebe a mensagem de "não entendi" e a pergunta
+ * continua valendo, até acabarem as tentativas. É o molde dos motores de chat
+ * de mercado (Twilio "Send & Wait For Reply", ManyChat "Data Collection",
+ * Botpress "Capture Information", Typebot, Blip).
+ *
+ * Saídas — fonte ÚNICA em `askQuestionOutputHandles`:
+ * - tipo `options`: uma por opção (`option-<id>`); `number` e `text`: `answered`;
+ * - `invalid`: as tentativas acabaram sem resposta que sirva (não existe no tipo `text`,
+ *   que aceita qualquer resposta);
+ * - `no_reply`: o prazo venceu sem resposta que sirva.
+ * Saída sem ligação encerra o caminho ali, sem erro.
+ */
+export const ASK_QUESTION_ANSWER_TYPES = ['options', 'number', 'text'] as const;
+export type AskQuestionAnswerType = (typeof ASK_QUESTION_ANSWER_TYPES)[number];
+
+export interface AskQuestionOption {
+  /**
+   * Id ESTÁVEL da opção. A marca da saída é `option-<id>`, nunca o índice:
+   * apagar a opção do meio não pode mandar as ligações das outras para o
+   * caminho errado (é o que acontece no Selecionar, que marca por `case-N`).
+   */
+  id: string;
+  /** Rótulo da saída — também vale como resposta. */
+  label: string;
+  /** Outras respostas aceitas para esta opção (ex.: "sim", "s", "👍"). */
+  keywords?: string[];
+}
+
+export interface AskQuestionActionConfig {
+  /**
+   * De onde vem a conversa — mesmo contrato do Transferir conversa.
+   * - 'context': a conversa do gatilho — ou, sem ela, a criada pelo nó logo antes
+   * - 'variable': `conversationId` traz um id ou uma `{{variável}}`
+   * @default 'context'
+   */
+  conversationSource?: 'context' | 'variable';
+  /** Conversa quando `conversationSource === 'variable'` (aceita {{variável}}). */
+  conversationId?: string;
+  /** Texto da pergunta (aceita {{variável}}). */
+  message: string;
+  answerType: AskQuestionAnswerType;
+  /** Opções do tipo `options` (2 a `ASK_QUESTION_MAX_OPTIONS`). */
+  options?: AskQuestionOption[];
+  /** Menor número aceito no tipo `number` (inteiro). */
+  numberMin?: number;
+  /** Maior número aceito no tipo `number` (inteiro). */
+  numberMax?: number;
+  /**
+   * Mensagem de "não entendi" (aceita {{variável}}). Vazia = texto padrão
+   * que lista as respostas aceitas (`defaultAskQuestionRetryMessage`).
+   */
+  retryMessage?: string;
+  /**
+   * Quantas vezes a mensagem de "não entendi" pode sair antes da saída
+   * `invalid`. 0 a `ASK_QUESTION_MAX_RETRIES_CAP`.
+   * @default ASK_QUESTION_DEFAULT_MAX_RETRIES
+   */
+  maxRetries?: number;
+  /**
+   * Prazo para responder, contado do envio da pergunta. Teto de 72 h
+   * (`WAIT_UNTIL_MAX_DURATION_MS`), o mesmo do Aguardar.
+   * @default ASK_QUESTION_DEFAULT_TIMEOUT
+   */
+  timeout?: { duration: number; unit: AskQuestionTimeoutUnit };
+  /** Variável que guarda o resultado — `{{variables.<saveAs>.answer}}`. */
+  saveAs?: string;
+}
+
+export type AskQuestionTimeoutUnit = Exclude<WaitDurationUnit, 'seconds'>;
+
+export const ASK_QUESTION_ANSWERED_HANDLE = 'answered';
+export const ASK_QUESTION_INVALID_HANDLE = 'invalid';
+export const ASK_QUESTION_NO_REPLY_HANDLE = 'no_reply';
+export const ASK_QUESTION_OPTION_HANDLE_PREFIX = 'option-';
+
+export const ASK_QUESTION_MAX_OPTIONS = 10;
+export const ASK_QUESTION_MAX_RETRIES_CAP = 5;
+export const ASK_QUESTION_DEFAULT_MAX_RETRIES = 2;
+export const ASK_QUESTION_DEFAULT_TIMEOUT: Readonly<{ duration: number; unit: AskQuestionTimeoutUnit }> = {
+  duration: 24,
+  unit: 'hours',
+};
+
+export function askQuestionOptionHandle(optionId: string): string {
+  return `${ASK_QUESTION_OPTION_HANDLE_PREFIX}${optionId}`;
+}
+
+/**
+ * Saídas do nó "Pergunta", na ordem da tela. Fonte ÚNICA para tela (alças),
+ * validador (ligação em saída que não existe) e compilador (um ramo por saída).
+ */
+export function askQuestionOutputHandles(config: Partial<AskQuestionActionConfig> | undefined): string[] {
+  const answerType = config?.answerType ?? 'options';
+  const handles: string[] = [];
+  if (answerType === 'options') {
+    for (const option of config?.options ?? []) {
+      if (typeof option?.id === 'string' && option.id.trim() !== '') {
+        handles.push(askQuestionOptionHandle(option.id));
+      }
+    }
+  } else {
+    handles.push(ASK_QUESTION_ANSWERED_HANDLE);
+  }
+  if (answerType !== 'text') handles.push(ASK_QUESTION_INVALID_HANDLE);
+  handles.push(ASK_QUESTION_NO_REPLY_HANDLE);
+  return handles;
+}
+
+/**
+ * Texto padrão da mensagem de "não entendi" quando o nó não traz um: diz ao
+ * cliente o que serve como resposta, que é o que tira alguém do laço.
+ */
+export function defaultAskQuestionRetryMessage(config: Partial<AskQuestionActionConfig> | undefined): string {
+  if (config?.answerType === 'number') {
+    const min = config.numberMin ?? 1;
+    const max = config.numberMax ?? 5;
+    return `Não entendi sua resposta. Responda só com um número de ${min} a ${max}, por favor.`;
+  }
+  const labels = (config?.options ?? [])
+    .map((option) => option.label.trim())
+    .filter((label) => label !== '');
+  const ultima = labels[labels.length - 1];
+  if (ultima === undefined) return 'Não entendi sua resposta. Pode responder de novo, por favor?';
+  const lista = labels.length === 1 ? ultima : `${labels.slice(0, -1).join(', ')} ou ${ultima}`;
+  return `Não entendi sua resposta. Responda com: ${lista}.`;
+}
+
+/**
+ * "Número sequencial" (2026-09-28)
+ *
+ * Entrega o próximo número de uma sequência com nome (ex.: o número da sorte de
+ * um sorteio): 0001, 0002… sem repetir, mesmo com vários clientes ao mesmo
+ * tempo. Quem recebeu cada número fica registrado — é a lista que o sorteio
+ * confere. A mesma execução pedindo de novo no mesmo nó recebe o MESMO número.
+ * A sequência é da empresa: dois fluxos com o mesmo nome dividem a numeração.
+ */
+export interface NextNumberActionConfig {
+  /** Nome da sequência. A chave ignora acento, maiúscula e espaço repetido. */
+  sequenceName: string;
+  /** Texto antes do número (ex.: "SORTE-"). */
+  prefix?: string;
+  /**
+   * Dígitos com zero à esquerda (0 = sem preencher).
+   * @default NEXT_NUMBER_DEFAULT_PAD_LENGTH
+   */
+  padLength?: number;
+  /** Primeiro número, quando a sequência ainda não existe. @default 1 */
+  startAt?: number;
+  /** Variável que guarda o resultado — `{{variables.<saveAs>.formatted}}`. */
+  saveAs?: string;
+}
+
+export const NEXT_NUMBER_DEFAULT_PAD_LENGTH = 4;
+export const NEXT_NUMBER_MAX_PAD_LENGTH = 12;
+
+/** Saída do nó "Número sequencial" — também vai para `variables[saveAs]`. */
+export interface NextNumberResult {
+  /** Nome da sequência, como no nó. */
+  sequence: string;
+  number: number;
+  /** Prefixo + número com zeros à esquerda (ex.: "0042"). */
+  formatted: string;
+}
+
+export function formatSequenceNumber(
+  number: number,
+  padLength: number = NEXT_NUMBER_DEFAULT_PAD_LENGTH,
+  prefix = '',
+): string {
+  return `${prefix}${String(number).padStart(Math.max(0, padLength), '0')}`;
+}
+
+/**
+ * "Salvar formulário" (2026-09-28)
+ *
+ * Junta valores do fluxo — em geral as respostas dos nós "Pergunta" — e grava
+ * como UMA resposta de formulário ligada ao lead: o mesmo lugar do formulário
+ * de captura (coleção `checklists`, `linkedEntity: lead`), que aparece na aba
+ * Formulários do lead. Nunca copia respostas para o documento do lead
+ * (NUNCA #80). Opção escrita pelo cliente vira a OPÇÃO do formulário (pelo
+ * rótulo ou pelo valor) e nota vira número.
+ *
+ * Saídas Sucesso/Falha (`WORKFLOW_SUCCESS_FAILURE_NODE_TYPES`). Falha =
+ * formulário apagado/desativado, lead não encontrado, campo obrigatório sem
+ * valor ou valor fora das opções — conferido ANTES de gravar, então a falha
+ * não deixa resposta pela metade no lead.
+ */
+export interface SaveFormResponseActionConfig {
+  /** Formulário (tipo `form`). */
+  formId: string;
+  /**
+   * Ligar a resposta a um lead (aparece na aba Formulários dele). Desligado, a
+   * resposta fica só no formulário. @default true
+   */
+  linkToLead?: boolean;
+  /**
+   * De onde vem o lead (quando `linkToLead`).
+   * - 'context': o lead do gatilho (ou o do contato do fluxo)
+   * - 'variable': `leadId` traz uma `{{variável}}` (ou um id)
+   * - 'specific': `leadId` é o lead escolhido na lista
+   * @default 'context'
+   */
+  leadSource?: 'context' | 'variable' | 'specific';
+  /** Lead quando `leadSource` é 'variable' ({{variável}}) ou 'specific' (id). */
+  leadId?: string;
+  /** Pergunta do formulário (id do campo) → valor: `{{variável}}` ou texto fixo. */
+  answers?: Record<string, string>;
+  /** Variável que guarda o resultado — `{{variables.<saveAs>.responseId}}`. */
+  saveAs?: string;
+}
+
+/** Saída do nó "Salvar formulário" — também vai para `variables[saveAs]`. */
+export interface SaveFormResponseResult {
+  success: boolean;
+  formId: string;
+  responseId?: string;
+  leadId?: string;
+  /** Quantas perguntas do formulário receberam valor. */
+  answered: number;
+  error?: string;
+}
+
+/**
+ * "Perguntar formulário" (2026-09-28)
+ *
+ * Faz TODAS as perguntas de um formulário pelo WhatsApp, uma por uma, com a
+ * mesma espera e conferência do nó "Pergunta" (prazo e "não entendi" por
+ * pergunta). O formulário é a fonte das perguntas: mudar o formulário muda a
+ * conversa, sem mexer no fluxo.
+ *
+ * Saídas: `answered` ("Respondeu" — todas as obrigatórias responderam) e
+ * `no_reply` ("Não respondeu" — o prazo de alguma pergunta venceu, ou uma
+ * obrigatória esgotou as tentativas). Pergunta OPCIONAL que esgota as
+ * tentativas é pulada.
+ *
+ * Para gravar as respostas no lead, ligue um "Salvar formulário" depois — os
+ * dois se completam (`{{variables.<saveAs>.answers.<id do campo>}}`).
+ */
+export interface AskFormActionConfig {
+  /** De onde vem a conversa — mesmo contrato do nó "Pergunta". @default 'context' */
+  conversationSource?: 'context' | 'variable';
+  conversationId?: string;
+  /** Formulário (tipo `form`) cujas perguntas serão feitas. */
+  formId: string;
+  /**
+   * Texto de cada pergunta no WhatsApp: id do campo → texto (aceita
+   * {{variável}}). Sem texto, vale `defaultAskFormQuestionText` (nome da
+   * pergunta, descrição e as opções numeradas).
+   */
+  messages?: Record<string, string>;
+  /**
+   * Perguntas do formulário que o nó NÃO faz (ids dos campos) — as que outro
+   * nó preenche, como o número da sorte do "Número sequencial".
+   */
+  skipFieldIds?: string[];
+  /** "Não entendi" por pergunta, 0 a `ASK_QUESTION_MAX_RETRIES_CAP`. @default ASK_QUESTION_DEFAULT_MAX_RETRIES */
+  maxRetries?: number;
+  /** Prazo de CADA pergunta. @default ASK_QUESTION_DEFAULT_TIMEOUT */
+  timeout?: { duration: number; unit: AskQuestionTimeoutUnit };
+  /** Variável com o resultado — `{{variables.<saveAs>.answers.<id do campo>.answer}}`. */
+  saveAs?: string;
+}
+
+/** Tipos de campo que o WhatsApp consegue perguntar e conferir. */
+export const ASK_FORM_ASKABLE_FIELD_TYPES: readonly FormFieldType[] = [
+  FormFieldType.SHORT_TEXT,
+  FormFieldType.LONG_TEXT,
+  FormFieldType.EMAIL,
+  FormFieldType.PHONE,
+  FormFieldType.URL,
+  FormFieldType.CPF,
+  FormFieldType.CNPJ,
+  FormFieldType.DATE,
+  FormFieldType.TIME,
+  FormFieldType.NUMBER,
+  FormFieldType.RATING,
+  FormFieldType.LINEAR_SCALE,
+  FormFieldType.SELECT,
+  FormFieldType.RADIO,
+  FormFieldType.CHECKBOX,
+  FormFieldType.MULTI_SELECT,
+];
+
+/** O campo é perguntado pelo nó? (título, parágrafo, foto e arquivo não são.) */
+export function isAskFormFieldAskable(field: Pick<FormField, 'type'>): boolean {
+  return (ASK_FORM_ASKABLE_FIELD_TYPES as readonly string[]).includes(field.type);
+}
+
+/** Faixa numérica que o campo aceita (nota: 1 a 5; escala: 0 a 10; número: livre). */
+export function askFormNumberRange(field: Pick<FormField, 'type' | 'validation'>): { min: number; max: number } {
+  const min = field.validation?.min;
+  const max = field.validation?.max;
+  if (field.type === FormFieldType.RATING) return { min: min ?? 1, max: max ?? 5 };
+  if (field.type === FormFieldType.LINEAR_SCALE) return { min: min ?? 0, max: max ?? 10 };
+  return { min: min ?? 0, max: max ?? Number.MAX_SAFE_INTEGER };
+}
+
+/**
+ * Texto padrão da pergunta no WhatsApp: nome em negrito, descrição, e — em
+ * campo de escolha — as opções numeradas (o número também vale como
+ * resposta). Fonte ÚNICA para a tela (prévia) e o motor.
+ */
+/**
+ * As opções do campo valem pelo NÚMERO da posição na lista? Não quando alguma
+ * opção já É um número ("1", "2", "3") — aí "2" seria ambíguo, e a lista sai
+ * com marcadores em vez de números.
+ */
+export function askFormOptionsByPosition(field: Pick<FormField, 'options'>): boolean {
+  const numero = /^\s*\d+\s*$/;
+  return !(field.options ?? []).some((o) => numero.test(o.label) || numero.test(o.value));
+}
+
+export function defaultAskFormQuestionText(
+  field: Pick<FormField, 'type' | 'label' | 'description' | 'options' | 'validation'>,
+): string {
+  const partes = [`*${field.label.trim()}*`];
+  const descricao = field.description?.trim();
+  if (descricao) partes.push(descricao);
+
+  const multipla = field.type === FormFieldType.CHECKBOX || field.type === FormFieldType.MULTI_SELECT;
+  if (field.type === FormFieldType.SELECT || field.type === FormFieldType.RADIO || multipla) {
+    const numerar = askFormOptionsByPosition(field);
+    const opcoes = (field.options ?? []).map((o, i) => (numerar ? `${i + 1}. ${o.label}` : `• ${o.label}`));
+    if (opcoes.length > 0) partes.push(opcoes.join('\n'));
+    if (multipla) partes.push('(pode escolher mais de uma, separadas por vírgula)');
+  } else if (!descricao && (field.type === FormFieldType.NUMBER || field.type === FormFieldType.RATING || field.type === FormFieldType.LINEAR_SCALE)) {
+    const { min, max } = askFormNumberRange(field);
+    if (max < Number.MAX_SAFE_INTEGER) partes.push(`(responda com um número de ${min} a ${max})`);
+  }
+  return partes.join('\n\n');
+}
+
+/** Saídas do nó "Perguntar formulário" — "Respondeu" e "Não respondeu". */
+export function askFormOutputHandles(): string[] {
+  return [ASK_QUESTION_ANSWERED_HANDLE, ASK_QUESTION_NO_REPLY_HANDLE];
+}
+
+/**
+ * Nós que perguntam ao cliente e DORMEM esperando a resposta ("Pergunta" e
+ * "Perguntar formulário"). Valem para os dois as mesmas regras de desenho:
+ * ramificam por saída, não entram em caminhos paralelos nem em repetição, e
+ * não convivem com a regra de cancelamento "Mensagem recebida".
+ */
+export const WORKFLOW_QUESTION_NODE_TYPES: readonly WorkflowNodeType[] = ['action_ask_question', 'action_ask_form'];
+
+export function isWorkflowQuestionNodeType(type: string): boolean {
+  return (WORKFLOW_QUESTION_NODE_TYPES as readonly string[]).includes(type);
+}
+
+/**
+ * Saídas de um nó de pergunta — fonte ÚNICA para tela, validador e
+ * compilador. `null` quando o tipo não é de pergunta.
+ */
+export function questionNodeOutputHandles(type: string, config: unknown): string[] | null {
+  if (type === 'action_ask_question') return askQuestionOutputHandles(config as Partial<AskQuestionActionConfig> | undefined);
+  if (type === 'action_ask_form') return askFormOutputHandles();
+  return null;
+}
+
+/** Uma pergunta do formulário depois do nó. */
+export interface AskFormAnswer {
+  /** Nome da pergunta no formulário. */
+  label: string;
+  /** Rótulo da opção (lista em múltipla escolha), número ou texto. `null` sem resposta. */
+  answer: string | number | string[] | null;
+  /** O que o cliente mandou, na ordem. */
+  text: string;
+  /** `skipped` = opcional que esgotou as tentativas. */
+  status: AskQuestionStatus | 'skipped';
+}
+
+/** Saída do nó "Perguntar formulário" — também vai para `variables[saveAs]`. */
+export interface AskFormResult {
+  path: string;
+  status: 'answered' | 'no_reply';
+  formId: string;
+  /** id do campo → resposta. Só as perguntas feitas. */
+  answers: Record<string, AskFormAnswer>;
+  /** Perguntas respondidas. */
+  answered: number;
+  /** Onde parou, quando `no_reply`. */
+  stoppedAt?: { fieldId: string; label: string; reason: 'invalid' | 'no_reply' };
+  conversationId?: string;
+}
+
+/** Como a pergunta terminou. */
+export type AskQuestionStatus = 'answered' | 'invalid' | 'no_reply';
+
+/**
+ * Saída do nó "Pergunta" — é também o que vai para `variables[saveAs]`.
+ */
+export interface AskQuestionResult {
+  /** Marca da saída seguida (`option-<id>`, `answered`, `invalid` ou `no_reply`). */
+  path: string;
+  status: AskQuestionStatus;
+  /** Rótulo da opção, número ou texto aceito. `null` sem resposta que sirva. */
+  answer: string | number | null;
+  /** Id da opção escolhida (tipo `options`). */
+  optionId?: string;
+  /** O que o cliente mandou, na ordem (mensagens juntas por quebra de linha). */
+  text: string;
+  /** Respostas que não serviram. */
+  attempts: number;
+  /** ISO 8601 — quando a resposta que serviu chegou. */
+  answeredAt?: string;
+  conversationId?: string;
+}
+
+/**
  * IF Control Configuration
  */
 export interface IfControlConfig {
@@ -1434,6 +1854,10 @@ export type NodeConfig =
   | AssignActionConfig
   | TransferConversationActionConfig
   | SatisfactionSurveyActionConfig
+  | AskQuestionActionConfig
+  | AskFormActionConfig
+  | NextNumberActionConfig
+  | SaveFormResponseActionConfig
   | SetVariableActionConfig
   | IfControlConfig
   | SwitchControlConfig
@@ -2416,6 +2840,18 @@ export const WORKFLOW_VALIDATION_CODES = [
    * que tem essas duas saídas (`nodeTypeHasSuccessFailureOutputs`, 2026-09-23).
    */
   'SUCESSO_FALHA_HANDLE_INVALIDO',
+  /**
+   * Ligação presa numa saída que o nó "Pergunta" não tem (2026-09-28) — em
+   * geral a opção foi apagada ou o tipo de resposta mudou
+   * (`askQuestionOutputHandles`).
+   */
+  'PERGUNTA_SAIDA_INVALIDA',
+  /**
+   * Regra "Mensagem recebida" da aba Cancelamento que continua valendo
+   * enquanto um nó "Pergunta" espera a resposta (2026-09-28): a própria
+   * resposta do cliente cancelaria o fluxo.
+   */
+  'PERGUNTA_CANCELADA_PELA_RESPOSTA',
 ] as const;
 
 export type WorkflowValidationCode = (typeof WORKFLOW_VALIDATION_CODES)[number];

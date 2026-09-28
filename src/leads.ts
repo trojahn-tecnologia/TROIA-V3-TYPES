@@ -457,10 +457,18 @@ export interface LeadQuery extends PaginationQuery {
     assigneeId?: string | string[];                                                                                                 // Multiple selection
     teamId?: string | string[];                                                                                                     // Multiple selection
     /**
-     * Filtro por respostas do formulário de captura do funil (D3 — duas fases
-     * via `checklists.answers`). Só campos de escolha. Exige `funnelId` único.
+     * Filtro por respostas de formulário (D3 — duas fases via
+     * `checklists.answers`). Só campos de escolha. As perguntas são do
+     * formulário `formAnswersFormId`; sem ele, do formulário de captura do
+     * funil (exige `funnelId` único).
      */
     formAnswers?: Array<{ fieldId: string; values: string[] }>;
+    /**
+     * Formulário do filtro por resposta (2026-09-28) — qualquer formulário, não
+     * só o de captura. Sozinho (sem `formAnswers`) filtra os leads que têm
+     * alguma resposta enviada dele.
+     */
+    formAnswersFormId?: string;
     customerId?: string;
     scoreMin?: number;
     scoreMax?: number;
