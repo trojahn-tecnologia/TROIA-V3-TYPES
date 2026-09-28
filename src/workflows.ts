@@ -2877,12 +2877,14 @@ export interface WorkflowValidationResponse {
  * `template` = template de MENSAGEM. `checklistTemplate` = modelo de checklist
  * (`Form` com `type: 'checklist'`) — são coleções diferentes, e tratar os dois
  * como `template` fazia o wizard de import oferecer templates de mensagem para
- * remapear o modelo do node "Criar Checklist".
+ * remapear o modelo do node "Criar Checklist". `form` = formulário
+ * (`Form` com `type: 'form'`) dos nós "Perguntar formulário" e "Salvar
+ * formulário" (2026-09-28).
  */
 export type WorkflowRefType =
   | 'channel' | 'funnel' | 'funnelStep' | 'pipeline' | 'pipelineStage'
   | 'agent' | 'template' | 'user' | 'team' | 'contact' | 'database'
-  | 'checklistTemplate' | 'unit';
+  | 'checklistTemplate' | 'unit' | 'form';
 
 export interface WorkflowExportRef {
   token: string;              // "$ref:1" — único no arquivo
