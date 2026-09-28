@@ -311,12 +311,23 @@ export interface FormSubmissionMetadata {
 /**
  * FormSubmission - Documento de resposta individual
  */
+/**
+ * De onde veio a resposta (2026-09-28). O relatório do formulário junta as
+ * respostas do link público (`form-submissions`) com as gravadas num lead
+ * (`checklists`): captura por QR, automação ("Salvar formulário") e a aba
+ * Formulários do lead. Ausente = link público (respostas antigas).
+ */
+export type FormSubmissionSource = 'public_link' | 'automation' | 'lead_capture' | 'lead';
+
 export interface FormSubmission extends TenantAwareDocument {
   formId: string;
   answers: FormAnswer[];
   metadata: FormSubmissionMetadata;
   submittedAt: Date;
   contactId?: string;
+  source?: FormSubmissionSource;
+  /** Lead da resposta, quando ela foi gravada num lead. */
+  leadId?: string;
 }
 
 /**

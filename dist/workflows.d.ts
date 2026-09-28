@@ -1082,6 +1082,27 @@ export declare function askFormNumberRange(field: Pick<FormField, 'type' | 'vali
  */
 export declare function askFormOptionsByPosition(field: Pick<FormField, 'options'>): boolean;
 export declare function defaultAskFormQuestionText(field: Pick<FormField, 'type' | 'label' | 'description' | 'options' | 'validation'>): string;
+/**
+ * Perguntas que um "Salvar formulário" DEPOIS do "Perguntar formulário"
+ * preenche com OUTRO valor (número sequencial, texto fixo, outra Pergunta) —
+ * o nó não as faz: a resposta do cliente seria jogada fora (2026-09-28,
+ * número da sorte perguntado ao cliente no teste). Fonte ÚNICA para o motor e
+ * a tela. Devolve id do campo → nome do "Salvar formulário" que o preenche.
+ *
+ * Vale só com `saveAs`: sem ele o "Salvar formulário" nem tem como usar as
+ * respostas do questionário, e tudo pareceria "preenchido por outro valor".
+ * `saves` = os "Salvar formulário" que vêm DEPOIS deste nó no desenho.
+ */
+export declare function askFormFieldsFilledElsewhere(ask: {
+    formId?: string;
+    saveAs?: string;
+}, saves: Array<{
+    label: string;
+    config: {
+        formId?: string;
+        answers?: Record<string, string>;
+    };
+}>): Record<string, string>;
 /** Saídas do nó "Perguntar formulário" — "Respondeu" e "Não respondeu". */
 export declare function askFormOutputHandles(): string[];
 /**

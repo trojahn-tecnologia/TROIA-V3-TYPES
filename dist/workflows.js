@@ -11,6 +11,7 @@ exports.isAskFormFieldAskable = isAskFormFieldAskable;
 exports.askFormNumberRange = askFormNumberRange;
 exports.askFormOptionsByPosition = askFormOptionsByPosition;
 exports.defaultAskFormQuestionText = defaultAskFormQuestionText;
+exports.askFormFieldsFilledElsewhere = askFormFieldsFilledElsewhere;
 exports.askFormOutputHandles = askFormOutputHandles;
 exports.isWorkflowQuestionNodeType = isWorkflowQuestionNodeType;
 exports.questionNodeOutputHandles = questionNodeOutputHandles;
@@ -353,6 +354,35 @@ function defaultAskFormQuestionText(field) {
             partes.push(`(responda com um número de ${min} a ${max})`);
     }
     return partes.join('\n\n');
+}
+/**
+ * Perguntas que um "Salvar formulário" DEPOIS do "Perguntar formulário"
+ * preenche com OUTRO valor (número sequencial, texto fixo, outra Pergunta) —
+ * o nó não as faz: a resposta do cliente seria jogada fora (2026-09-28,
+ * número da sorte perguntado ao cliente no teste). Fonte ÚNICA para o motor e
+ * a tela. Devolve id do campo → nome do "Salvar formulário" que o preenche.
+ *
+ * Vale só com `saveAs`: sem ele o "Salvar formulário" nem tem como usar as
+ * respostas do questionário, e tudo pareceria "preenchido por outro valor".
+ * `saves` = os "Salvar formulário" que vêm DEPOIS deste nó no desenho.
+ */
+function askFormFieldsFilledElsewhere(ask, saves) {
+    const saveAs = ask.saveAs?.trim();
+    if (!saveAs || !ask.formId)
+        return {};
+    const proprio = `variables.${saveAs}.`;
+    const preenchidas = {};
+    for (const save of saves) {
+        if (save.config.formId !== ask.formId)
+            continue;
+        for (const [fieldId, valor] of Object.entries(save.config.answers ?? {})) {
+            if (typeof valor !== 'string' || valor.trim() === '' || valor.includes(proprio))
+                continue;
+            if (!(fieldId in preenchidas))
+                preenchidas[fieldId] = save.label;
+        }
+    }
+    return preenchidas;
 }
 /** Saídas do nó "Perguntar formulário" — "Respondeu" e "Não respondeu". */
 function askFormOutputHandles() {
