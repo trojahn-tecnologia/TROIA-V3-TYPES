@@ -286,6 +286,14 @@ export interface Lead extends CreatorStamp {
 
   /** Captura por QR Code (spec §4.1). Ausente = lead não veio de QR. */
   capture?: LeadCaptureInfo;
+  /**
+   * Cupons do lead para sorteio (2026-09-29) — números gerados pelo sistema,
+   * nunca editados à mão: pela página de captura (funil com "Dar cupom a quem
+   * se cadastrar") e pelo nó "Número sequencial" no modo "Gerar cupom do
+   * lead". Um contador por empresa, sem repetir (último + 1); "Zerar cupons"
+   * limpa o campo de todos os leads e a numeração recomeça do 1.
+   */
+  coupons?: number[];
 
   createdAt: string;
   updatedAt: string;
@@ -634,4 +642,21 @@ export interface LeadKanbanQuery {
 export interface LeadKanbanColumnQuery extends LeadKanbanQuery {
   stepId: string;
   cursor?: string;
+}
+
+// ============================================================================
+// CUPONS DO LEAD (sorteio — 2026-09-29)
+// ============================================================================
+
+/** Dígitos com zero à esquerda na exibição do cupom (0012). */
+export const LEAD_COUPON_PAD_LENGTH = 4;
+
+/** Cupom como o cliente vê: `12` → `"0012"`. */
+export function formatLeadCoupon(coupon: number): string {
+  return String(coupon).padStart(LEAD_COUPON_PAD_LENGTH, '0');
+}
+
+/** `POST /api/leads/coupons/reset` — quantos leads perderam os cupons. */
+export interface LeadCouponsResetResponse {
+  clearedLeads: number;
 }

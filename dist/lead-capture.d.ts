@@ -15,6 +15,8 @@ export interface LeadCaptureSnapshot {
     channelName?: string;
     message?: string;
     consentText?: string;
+    /** Funil dá cupom a quem se cadastra (`FunnelCaptureConfig.issueCoupon`). */
+    issueCoupon?: boolean;
     emailRequired?: boolean;
 }
 export interface LeadCaptureSession {
@@ -54,6 +56,8 @@ export interface LeadCaptureSession {
         phone: string;
         email?: string;
     };
+    /** Cupom de sorteio dado no cadastro (funil com `issueCoupon`). */
+    coupon?: number;
     consent?: {
         acceptedAt: string;
         ip?: string;
@@ -134,6 +138,8 @@ export interface LeadCapturePublicSubmitResponse {
     code: string;
     /** `true` = sem Etapa 2, captura já confirmada ("Pronto!"). */
     done: boolean;
+    /** Cupom de sorteio dado neste cadastro, formatado (0012). */
+    coupon?: string;
 }
 /** TTL da sessão no Redis — 7 dias (D2). */
 export declare const LEAD_CAPTURE_SESSION_TTL_SECONDS: number;

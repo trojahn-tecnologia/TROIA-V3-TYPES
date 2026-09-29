@@ -17,6 +17,12 @@ export interface FunnelCaptureConfig {
     consentText?: string;
     /** Página pública: e-mail obrigatório (default: opcional). */
     emailRequired?: boolean;
+    /**
+     * Dar cupom de sorteio a quem se cadastrar pela página (2026-09-29). O
+     * número vai para os cupons do lead e para a variável `{{cupom}}` da
+     * mensagem. Cadastro de quem já tinha lead aberto no funil não ganha cupom.
+     */
+    issueCoupon?: boolean;
 }
 /**
  * Funnel - Sales funnel structure

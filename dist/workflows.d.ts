@@ -945,7 +945,19 @@ export declare function defaultAskQuestionRetryMessage(config: Partial<AskQuesti
  * A sequência é da empresa: dois fluxos com o mesmo nome dividem a numeração.
  */
 export interface NextNumberActionConfig {
-    /** Nome da sequência. A chave ignora acento, maiúscula e espaço repetido. */
+    /**
+     * O que o nó numera (2026-09-29):
+     * - 'sequence': sequência com nome, só do fluxo (como sempre foi);
+     * - 'lead_coupon': cupom de sorteio do LEAD — o contador da empresa, o mesmo
+     *   da página de captura; o número vai para os cupons do lead.
+     * @default 'sequence'
+     */
+    target?: 'sequence' | 'lead_coupon';
+    /** De onde vem o lead no modo 'lead_coupon'. @default 'context' */
+    leadSource?: 'context' | 'variable';
+    /** Lead quando `leadSource === 'variable'` (id ou {{variável}}). */
+    leadId?: string;
+    /** Nome da sequência (modo 'sequence'). A chave ignora acento, maiúscula e espaço repetido. */
     sequenceName: string;
     /** Texto antes do número (ex.: "SORTE-"). */
     prefix?: string;
@@ -963,12 +975,16 @@ export declare const NEXT_NUMBER_DEFAULT_PAD_LENGTH = 4;
 export declare const NEXT_NUMBER_MAX_PAD_LENGTH = 12;
 /** Saída do nó "Número sequencial" — também vai para `variables[saveAs]`. */
 export interface NextNumberResult {
-    /** Nome da sequência, como no nó. */
+    /** Nome da sequência, como no nó ("Cupons do lead" no modo 'lead_coupon'). */
     sequence: string;
     number: number;
     /** Prefixo + número com zeros à esquerda (ex.: "0042"). */
     formatted: string;
+    /** Lead que recebeu o cupom (modo 'lead_coupon'). */
+    leadId?: string;
 }
+/** Nome da "sequência" no modo 'lead_coupon' — é o que aparece em `sequence`. */
+export declare const NEXT_NUMBER_LEAD_COUPON_SEQUENCE = "Cupons do lead";
 export declare function formatSequenceNumber(number: number, padLength?: number, prefix?: string): string;
 /**
  * "Salvar formulário" (2026-09-28)

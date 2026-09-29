@@ -120,9 +120,33 @@ export interface FormField {
 // ============================================================
 
 /**
+ * Dados de contato no formulário público (2026-09-29). Ligado, a página pede
+ * nome, WhatsApp e e-mail (cada um obrigatório ou não) e a resposta fica com o
+ * contato (`FormSubmission.contactId`) — achado pelo telefone ou criado.
+ * Desligado, a resposta é anônima. Ligado exige WhatsApp OU e-mail
+ * obrigatório: sem nenhum dos dois não há como garantir o contato.
+ */
+export interface FormContactDataSettings {
+  enabled: boolean;
+  requireName: boolean;
+  requirePhone: boolean;
+  requireEmail: boolean;
+}
+
+/** Formulário novo nasce pedindo nome e WhatsApp; e-mail opcional. */
+export const DEFAULT_FORM_CONTACT_DATA: FormContactDataSettings = {
+  enabled: true,
+  requireName: true,
+  requirePhone: true,
+  requireEmail: false,
+};
+
+/**
  * FormSettings - Configuracoes de comportamento do formulario
  */
 export interface FormSettings {
+  /** Ausente = formulário anterior a 2026-09-29, anônimo. */
+  contactData?: FormContactDataSettings;
   allowMultipleResponses: boolean;
   showProgressBar: boolean;
   shuffleFields: boolean;
@@ -331,10 +355,23 @@ export interface FormSubmission extends TenantAwareDocument {
 }
 
 /**
+ * Quem respondeu (2026-09-29) — montado na LEITURA a partir do `contactId` da
+ * resposta. Sem contato (link público anônimo, resposta anterior a
+ * 29/09/2026) não há `respondent`.
+ */
+export interface FormRespondent {
+  name?: string;
+  /** Só dígitos, com DDI (ex.: 554791236370). Nunca o LID. */
+  phone?: string;
+  email?: string;
+}
+
+/**
  * FormSubmissionResponse - Response type sem _id
  */
 export interface FormSubmissionResponse extends Omit<FormSubmission, '_id'> {
   id: string;
+  respondent?: FormRespondent;
 }
 
 /**
@@ -352,6 +389,16 @@ export interface FormSubmissionListResponse extends ListResponse<FormSubmissionR
 export interface SubmitFormRequest {
   answers: { fieldId: string; value: string | string[] | number | boolean | null }[];
   metadata?: Partial<FormSubmissionMetadata>;
+  /** Dados de contato — só quando o formulário pede (`settings.contactData`). */
+  contact?: FormSubmissionContact;
+}
+
+/** O que a pessoa digitou no bloco de contato da página pública. */
+export interface FormSubmissionContact {
+  name?: string;
+  /** Com DDI (ex.: +5547991236370). */
+  phone?: string;
+  email?: string;
 }
 
 /**
@@ -427,6 +474,8 @@ export interface FormPublicData {
   settings: {
     showProgressBar: boolean;
     shuffleFields: boolean;
+    /** Presente só quando o formulário pede os dados de contato. */
+    contactData?: FormContactDataSettings;
   };
   styling: FormStyling;
   thankYouMessage?: string;
