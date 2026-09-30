@@ -768,6 +768,14 @@ export interface CreateConversationActionConfig {
      * Can be a context reference like {{event.channelId}}.
      */
     channelId?: string;
+    /**
+     * De onde vem o canal (2026-09-30):
+     * - 'fixed' (padrão): o `channelId` configurado no nó;
+     * - 'lead_origin': o canal de origem do lead do fluxo (`lead.channelId`) —
+     *   no lead capturado por QR, o canal de confirmação do funil. Lead sem
+     *   canal faz o nó falhar com o motivo.
+     */
+    channelSource?: 'fixed' | 'lead_origin';
 }
 /**
  * Transfer Conversation Action Configuration (2026-09-23)
