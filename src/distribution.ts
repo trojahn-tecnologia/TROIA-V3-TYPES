@@ -165,4 +165,38 @@ export type DistributionResultReason =
   /** `last_interaction` não achou histórico ou o user saiu da pool. */
   | 'no_previous_interaction'
   /** Estratégia ainda não implementada (availability/last_interaction Phase 5). */
-  | 'not_implemented';
+  | 'not_implemented'
+  /** Havia candidatos, mas todos estavam na lista de excluídos (transferência por inatividade). */
+  | 'pool_empty_after_exclusion';
+
+/**
+ * Opções de `DistributionService.pickReassignmentCandidate` — a escolha de
+ * quem recebe uma conversa na transferência por inatividade (spec
+ * 2026-09-29). Nunca gira o contador de rodízio do contexto (I1): a
+ * distribuição normal continua exatamente igual.
+ */
+export interface ReassignmentCandidateOptions {
+  /** Quem NÃO pode receber: o responsável atual + quem já deixou esta espera sem resposta (D6). */
+  excludeUserIds: readonly string[];
+  /** Responsável atual — o escolhido é o próximo depois dele, em ordem fixa de id. */
+  currentUserId: string;
+  /** Com equipe: candidatos = membros da equipe ∩ atendentes do contexto (D13). */
+  teamId?: string;
+  /** Prefere quem está online; se ninguém estiver, usa todos (D17). */
+  preferOnline: boolean;
+}
+
+/**
+ * Resultado de `DistributionService.pickReassignmentCandidate`.
+ */
+export interface ReassignmentCandidateResult {
+  /** Usuário escolhido ou `null` quando não sobrou ninguém. */
+  userId: string | null;
+  /** Estratégia efetiva (`fixed_team` com equipe; `sequential` na queda do `last_interaction`). */
+  strategyUsed: DistributionStrategy;
+  /** Tamanho da pool depois da exclusão e dos filtros. */
+  poolSize: number;
+  reason: DistributionResultReason;
+  /** Equipe que originou a pool, quando houver. */
+  teamId?: string;
+}

@@ -52,7 +52,9 @@ export type AssignmentStrategy =
   /** Regra Lead → Conversa (syncConversationAssigneeIfEligible). */
   | 'lead_sync'
   /** Lead criado pela página pública do QR Code, já atribuído ao vendedor que gerou o QR (spec §4.1). */
-  | 'qr_capture';
+  | 'qr_capture'
+  /** Transferência automática porque o responsável não respondeu ao cliente a tempo (spec 2026-09-29). */
+  | 'inactivity_transfer';
 
 /**
  * Contexto canônico passado pros services de domínio (`LeadsService`,
@@ -107,4 +109,17 @@ export interface AssignmentContext {
   distributionTeamId?: string;
   /** Tamanho da pool elegível no momento da escolha. */
   distributionPoolSize?: number;
+
+  // ── Transferência por inatividade (strategy === 'inactivity_transfer') ──
+
+  /** Prazo configurado no canal, em minutos, que o responsável anterior deixou passar. */
+  inactivityMinutes?: number;
+  /** Número desta transferência dentro da mesma espera do cliente (1, 2, 3…). */
+  inactivityAttempt?: number;
+  /** Se o prazo contou só o horário comercial — o texto diz "de expediente". */
+  businessHoursOnly?: boolean;
+
+  // --- Transferência da IA para o dono do lead (spec 2026-09-30-ia-transfere-para-dono-do-lead) ---
+  /** Id do lead cujo dono decidiu o destino de uma transferência da IA — o texto diz "responsável pelo lead". */
+  leadOwnerLeadId?: string;
 }

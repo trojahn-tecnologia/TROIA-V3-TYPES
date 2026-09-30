@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_CHANNEL_SATISFACTION_CONFIG = void 0;
+exports.DEFAULT_CHANNEL_INACTIVITY_TRANSFER_CONFIG = exports.DEFAULT_CHANNEL_SATISFACTION_CONFIG = void 0;
 /**
  * Pesquisa padrão do sistema — FONTE ÚNICA (2026-09-23). A tela do canal
  * pré-preenche com ela, e o nó "CSAT — Satisfação do Cliente" do workflow a
@@ -18,4 +18,12 @@ exports.DEFAULT_CHANNEL_SATISFACTION_CONFIG = {
         { value: 5, emoji: '😡', label: 'Péssimo' },
     ],
     timeoutMinutes: 60,
+};
+exports.DEFAULT_CHANNEL_INACTIVITY_TRANSFER_CONFIG = {
+    enabled: false,
+    timeoutMinutes: 10,
+    target: 'distribution',
+    businessHoursOnly: true,
+    maxTransfers: 3,
+    transferLinkedLead: false,
 };

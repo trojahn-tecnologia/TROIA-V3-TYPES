@@ -141,6 +141,47 @@ export interface ChannelOutOfHoursConfig {
 }
 
 // ============================================================================
+// CHANNEL INACTIVITY TRANSFER CONFIG
+// ============================================================================
+
+/**
+ * Para quem a conversa vai quando o responsável não responde:
+ * - `distribution`: o método da Configuração de Distribuição do canal (ou o
+ *   rodízio dentro da equipe da conversa, quando ela tem equipe — D13);
+ * - `fixed_operator`: uma pessoa fixa (ex.: gerente). A corrente termina nela.
+ */
+export type InactivityTransferTarget = 'distribution' | 'fixed_operator';
+
+/**
+ * Transferência automática por inatividade do operador (spec
+ * 2026-09-29-transferencia-por-inatividade). Ausente ou `enabled !== true` =
+ * desligado — nada muda no dia do deploy para quem não ligar.
+ */
+export interface ChannelInactivityTransferConfig {
+  enabled: boolean;
+  /** Minutos sem resposta humana até transferir (de expediente, se `businessHoursOnly`). 1–1440. */
+  timeoutMinutes: number;
+  target: InactivityTransferTarget;
+  /** Obrigatório com `target: 'fixed_operator'`. Usuário ativo da empresa — não precisa ser atendente do canal (D12). */
+  fixedOperatorUserId?: string;
+  /** D10 — o tempo só conta dentro do horário comercial da empresa. Sem calendário = relógio corrido. */
+  businessHoursOnly: boolean;
+  /** D4 — máximo de transferências por espera do cliente. Ao atingir, a conversa fica com o último. 1–10. */
+  maxTransfers: number;
+  /** D2 — o lead aberto do contato, se era de quem deixou o cliente sem resposta, acompanha a conversa. */
+  transferLinkedLead: boolean;
+}
+
+export const DEFAULT_CHANNEL_INACTIVITY_TRANSFER_CONFIG: ChannelInactivityTransferConfig = {
+  enabled: false,
+  timeoutMinutes: 10,
+  target: 'distribution',
+  businessHoursOnly: true,
+  maxTransfers: 3,
+  transferLinkedLead: false,
+};
+
+// ============================================================================
 // CHANNEL USER (operators vinculados a um canal)
 // ============================================================================
 
@@ -241,6 +282,8 @@ export interface Channel {
   satisfactionConfig?: ChannelSatisfactionConfig;
   /** Auto-resposta fora do horário comercial — ausente = desligado */
   outOfHoursConfig?: ChannelOutOfHoursConfig;
+  /** Transferência automática por inatividade do operador — ausente = desligado */
+  inactivityTransferConfig?: ChannelInactivityTransferConfig;
   /**
    * Distribuição automática de conversas — config unificada (D8, D9).
    * Mesmo shape que `Funnel.assignmentConfig` e `TicketPipeline.assignmentConfig`.
@@ -353,6 +396,8 @@ export interface UpdateChannelRequest {
   satisfactionConfig?: ChannelSatisfactionConfig;
   /** Auto-resposta fora do horário comercial — ausente = desligado */
   outOfHoursConfig?: ChannelOutOfHoursConfig;
+  /** Transferência automática por inatividade do operador — ausente = desligado */
+  inactivityTransferConfig?: ChannelInactivityTransferConfig;
   status?: ExtendedStatus;
 }
 

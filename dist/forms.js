@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormStatus = exports.DEFAULT_FORM_CONTACT_DATA = exports.CONFORMITY_VALUES = exports.FormFieldType = void 0;
+exports.FormStatus = exports.FORM_CONFIRMATION_EMAIL_VARIABLES = exports.DEFAULT_FORM_CONTACT_DATA = exports.CONFORMITY_VALUES = exports.FormFieldType = void 0;
 // ============================================================
 // FORM FIELD TYPES
 // ============================================================
@@ -42,6 +42,8 @@ exports.DEFAULT_FORM_CONTACT_DATA = {
     requirePhone: true,
     requireEmail: false,
 };
+/** Variáveis do e-mail de confirmação — `{{nome}}` etc.; `respostas` vira a lista pergunta/resposta. */
+exports.FORM_CONFIRMATION_EMAIL_VARIABLES = ['nome', 'email', 'telefone', 'formulario', 'respostas'];
 // ============================================================
 // FORM STATUS
 // ============================================================
