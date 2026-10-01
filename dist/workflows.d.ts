@@ -2176,7 +2176,15 @@ export interface WorkflowTriggerCountResponse extends Omit<WorkflowTriggerCount,
  * never fire. Kept in the union to avoid breaking existing consumers/configs;
  * adding a publisher promotes the member to its category group above.
  */
-export type WorkflowEventType = 'message.received' | 'message.sent' | 'conversation.created' | 'conversation.updated' | 'conversation.closed' | 'conversation.assigned' | 'contact.created' | 'contact.updated' | 'contact.tag_added' | 'contact.tag_removed' | 'lead.created' | 'lead.updated' | 'lead.stage_changed' | 'lead.won' | 'lead.lost' | 'ticket.created' | 'ticket.updated' | 'ticket.status_changed' | 'ticket.assigned' | 'ticket.resolved' | 'ticket.closed' | 'calendar_event.created' | 'calendar_event.updated' | 'calendar_event.cancelled' | 'database.document.created' | 'database.document.updated' | 'form.submitted' | 'custom.event' | 'message.delivered' | 'message.read' | 'conversation.reopened' | 'conversation.inactive' | 'contact.deleted' | 'contact.birthday' | 'contact.inactive' | 'lead.inactive' | 'webhook.received' | 'instagram.comment.received' | 'instagram.mention.received' | 'facebook.comment.received';
+export type WorkflowEventType = 'message.received' | 'message.sent' | 'conversation.created' | 'conversation.updated' | 'conversation.closed' | 'conversation.assigned' | 'contact.created' | 'contact.updated' | 'contact.tag_added' | 'contact.tag_removed' | 'lead.created' | 'lead.updated' | 'lead.stage_changed' | 'lead.won' | 'lead.lost'
+/**
+ * Captura por QR confirmada (2026-10-01): a pessoa preencheu a página de
+ * captura e mandou a mensagem de confirmação no WhatsApp. Publicado uma vez,
+ * na primeira confirmação do lead que a captura criou; o payload leva a
+ * conversa da confirmação (`conversationId`). Funil sem confirmação no
+ * WhatsApp não publica.
+ */
+ | 'lead.confirmed' | 'ticket.created' | 'ticket.updated' | 'ticket.status_changed' | 'ticket.assigned' | 'ticket.resolved' | 'ticket.closed' | 'calendar_event.created' | 'calendar_event.updated' | 'calendar_event.cancelled' | 'database.document.created' | 'database.document.updated' | 'form.submitted' | 'custom.event' | 'message.delivered' | 'message.read' | 'conversation.reopened' | 'conversation.inactive' | 'contact.deleted' | 'contact.birthday' | 'contact.inactive' | 'lead.inactive' | 'webhook.received' | 'instagram.comment.received' | 'instagram.mention.received' | 'facebook.comment.received';
 /**
  * Workflow Event
  */

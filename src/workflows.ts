@@ -2564,6 +2564,14 @@ export type WorkflowEventType =
   | 'lead.stage_changed'
   | 'lead.won'
   | 'lead.lost'
+  /**
+   * Captura por QR confirmada (2026-10-01): a pessoa preencheu a página de
+   * captura e mandou a mensagem de confirmação no WhatsApp. Publicado uma vez,
+   * na primeira confirmação do lead que a captura criou; o payload leva a
+   * conversa da confirmação (`conversationId`). Funil sem confirmação no
+   * WhatsApp não publica.
+   */
+  | 'lead.confirmed'
   // Tickets
   | 'ticket.created'
   | 'ticket.updated'
