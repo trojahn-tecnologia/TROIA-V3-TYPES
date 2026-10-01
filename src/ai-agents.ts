@@ -149,13 +149,8 @@ export interface AIAgentEscalationConfig {
   teamId?: string;
   /** Obrigatório quando defaultTarget = 'user' */
   userId?: string;
-  /**
-   * Com true, toda transferência do agente vai primeiro para o dono do lead
-   * aberto do cliente, quando ele pode receber (usuário ativo e vinculado ao
-   * canal; para equipe, membro dela). Sem dono que possa receber, vale o
-   * destino acima. Ausente = desligada (spec 2026-09-30-ia-transfere-para-dono-do-lead).
-   */
-  preferLeadOwner?: boolean;
+  // "Priorizar o responsável pelo lead" saiu daqui em 2026-10-01: virou opção
+  // da distribuição do CANAL (`DistributionConfig.preferLeadOwner`).
 }
 
 /**

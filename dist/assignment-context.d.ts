@@ -38,7 +38,17 @@ export type AssignmentStrategy = 'manual' | 'sequential' | 'fixed_operator' | 'f
 /** Lead criado pela página pública do QR Code, já atribuído ao vendedor que gerou o QR (spec §4.1). */
  | 'qr_capture'
 /** Transferência automática porque o responsável não respondeu ao cliente a tempo (spec 2026-09-29). */
- | 'inactivity_transfer';
+ | 'inactivity_transfer'
+/** Conversa nova entregue ao responsável pelo lead aberto do contato, antes da distribuição do canal (2026-10-01). */
+ | 'lead_owner';
+/** Por que o responsável pelo lead NÃO recebeu a conversa (2026-10-01). */
+export type LeadOwnerSkipReason = 
+/** Não está vinculado ao canal da conversa. */
+'not_in_channel'
+/** Usuário desativado ou excluído. */
+ | 'inactive'
+/** A transferência era para uma equipe da qual ele não faz parte. */
+ | 'not_in_team';
 /**
  * Contexto canônico passado pros services de domínio (`LeadsService`,
  * `ConversationsService`, `TicketsService`) ao executar uma atribuição.
@@ -81,6 +91,10 @@ export interface AssignmentContext {
     inactivityAttempt?: number;
     /** Se o prazo contou só o horário comercial — o texto diz "de expediente". */
     businessHoursOnly?: boolean;
-    /** Id do lead cujo dono decidiu o destino de uma transferência da IA — o texto diz "responsável pelo lead". */
+    /** Id do lead cujo dono decidiu o destino (transferência da IA ou conversa nova) — o texto diz "responsável pelo lead". */
     leadOwnerLeadId?: string;
+    /** Quem é o responsável pelo lead que ficou de fora — o texto registra o nome e o motivo abaixo. */
+    skippedLeadOwnerId?: string;
+    /** Por que ele ficou de fora. Só faz sentido junto de `skippedLeadOwnerId`. */
+    skippedLeadOwnerReason?: LeadOwnerSkipReason;
 }

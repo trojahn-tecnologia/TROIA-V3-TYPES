@@ -6,8 +6,8 @@
  * (`conversationsService`, `leadsService`, `ticketsService`) e pelo
  * frontend (componente `DistributionConfigSection`).
  *
- * Este arquivo expõe apenas tipos — a implementação do motor vive em
- * `TROIA-V3-BACKEND/src/modules/distribution/`.
+ * Este arquivo expõe tipos e um leitor de config (`isLeadOwnerPreferred`) —
+ * a implementação do motor vive em `TROIA-V3-BACKEND/src/modules/distribution/`.
  *
  * Durante a migração (Fase 0 → Fase 10), este arquivo coexiste com o
  * legado `assignment.ts`. O legado será removido na Fase 10.
@@ -63,7 +63,23 @@ export interface DistributionConfig {
     fixedOperatorConfig?: DistributionFixedOperatorConfig;
     /** Usado apenas quando `type === 'fixed_team'`. */
     fixedTeamConfig?: DistributionFixedTeamConfig;
+    /**
+     * Só em CANAIS (2026-10-01): antes da estratégia acima, a conversa vai para
+     * o responsável pelo lead aberto do contato, quando ele pode receber (usuário
+     * ativo e vinculado ao canal). Vale na chegada de uma conversa nova e nas
+     * transferências do agente de IA. Quando ele não pode receber, segue a
+     * distribuição normal e o motivo fica no registro de atribuição do chat.
+     *
+     * **Ausente = ligada** (decisão do dono: nasce ligada em todos os canais).
+     * Leia sempre por {@link isLeadOwnerPreferred}, nunca o campo cru.
+     */
+    preferLeadOwner?: boolean;
 }
+/**
+ * A regra "priorizar o responsável pelo lead" vale neste canal? Faz parte da
+ * distribuição automática: com ela desligada no canal, a regra não age.
+ */
+export declare function isLeadOwnerPreferred(config: Pick<DistributionConfig, 'enabled' | 'preferLeadOwner'> | null | undefined): boolean;
 export interface DistributionFixedOperatorConfig {
     /** ID do usuário fixo. Quando contexto não é público, precisa estar em
      *  context-users com role attendant. */

@@ -29,6 +29,12 @@ export interface VisitsAnalyticsQuery {
     startDate?: string;
     endDate?: string;
     unitId?: string;
+    /**
+     * UF do endereço da unidade (`SC`, `PR`…) — recorta a tela para TODAS as
+     * unidades daquele estado. `unitId` é mais específico e vence quando os dois
+     * chegam juntos.
+     */
+    unitState?: string;
     channel?: LeadChannel;
     origin?: string;
     source?: LeadSource;
